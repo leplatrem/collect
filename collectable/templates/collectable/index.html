@@ -1,0 +1,29 @@
+<h1>Explore</h1>
+
+<h2>Most wanted</h2>
+{% for collectable in most_wanted %}
+  <li><a href="{% url "details" collectable.id %}">#{{ forloop.counter }}</a> ({{ collectable.nwanted }})</li>
+{% empty %}
+No collectable wanted.
+{% endfor %}
+
+<h2>Most liked</h2>
+{% for collectable in most_liked %}
+  <li><a href="{% url "details" collectable.id %}">#{{ forloop.counter }}</a> ({{ collectable.nliked }})</li>
+{% empty %}
+No collectable liked.
+{% endfor %}
+
+<h2>Most owned</h2>
+{% for collectable in most_owned %}
+  <li><a href="{% url "details" collectable.id %}">#{{ forloop.counter }}</a> ({{ collectable.nowned }})</li>
+{% empty %}
+No collectable owned.
+{% endfor %}
+
+<h2>By tag</h2>
+<ul>
+  {% for tag in tag_list %}
+    <li><a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})</li>
+  {% endfor %}
+</ul>

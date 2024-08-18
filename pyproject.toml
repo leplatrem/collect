@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "collect"
+version = "0.1.0"
+description = ""
+authors = ["Mathieu Leplatre <mathieu@leplat.re>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django-taggit = "^6.0.0"
+django = "^5.1"
+django-simple-history = "^3.7.0"
+pytest = "^8.3.2"
+mypy = "^1.11.1"
+pytest-cov = "^5.0.0"
+ruff = "^0.6.1"
+pillow = "^10.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    "__pycache__",
+    ".venv/",
+]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E", "W",
+    # flake8
+    "F",
+    # isort
+    "I",
+]
+ignore = [
+    # `format` will wrap lines.
+    "E501",
+]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2

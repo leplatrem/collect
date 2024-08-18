@@ -1,0 +1,29 @@
+{% for tag in tag_list %}
+  <a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }}) /
+{% endfor %}
+
+<h2>Sub-tags</h2>
+<ul>
+  {% for tag in subtag_list %}
+    <li><a href="{% url "by_tags" slugs|join:","|add:","|add:tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})</li>
+  {% endfor %}
+</ul>
+
+<h2>{{ collectable_list.size }} Results</h2>
+{% for collectable in collectable_list %}
+<div>
+  <img src="{{ collectable.photo.url }}"/>
+  <p>
+    {% for tag in collectable.tags.all %}
+      <a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a>
+    {% endfor %}
+  </p>
+  <p>
+    {{ collectable.nowned }} owners
+    {{ collectable.nliked }} likes
+    {{ collectable.nwanted }} wants
+  </p>
+</div>
+{% empty %}
+No collectable with tags {{ slugs|join:", " }}
+{% endfor %}

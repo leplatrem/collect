@@ -1,0 +1,23 @@
+<img src="{{ collectable.photo.url }}"/>
+<p>
+  {% for tag in collectable.tags.all %}
+    <a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a>
+  {% endfor %}
+</p>
+<p>
+  {{ collectable.nowned }} owners
+  {{ collectable.nliked }} likes
+  {{ collectable.nwanted }} wants
+</p>
+<p>
+  Created at {{ collectable.created_at }}
+</p>
+<p>
+  Last modified at {{ collectable.modified_at }}
+</p>
+<h2>History</h2>
+<p>
+  {% for history in collectable.history.all %}
+  <li>{{ history.history_date }}: {{ history.history_user }} {{ history.history_type }}</li>
+  {% endfor %}
+</p>
