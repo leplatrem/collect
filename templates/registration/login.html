@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+    {% translate "Login" %}
+{% endblock %}
+{% block content %}
+    <h2>{% translate "Login" %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">{% translate "Log In" %}</button>
+    </form>
+    <p>
+        <a href="{% url 'password_reset' %}">{% translate "Forgot your password?" %}</a>
+    </p>
+    <h2>{% translate "New here?" %}</h2>
+    <p>
+        <a href="{% url 'signup' %}">{% translate "Sign up" %}</a>
+    </p>
+{% endblock %}

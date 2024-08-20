@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="collectable thumbnail">
+    <a href="{% url "details" collectable.id %}">
+        <img alt="{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}"
+             height="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
+             width="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
+             src="{{ collectable.thumbnail.url }}" />
+    </a>
+    <div class="taglist">
+        {% for tag in collectable.tags.all %}
+            <a href="{% url "by_tags" tag.slug %}">#{{ tag.name }}</a>
+        {% endfor %}
+    </div>
+    <div class="actions">
+        {% blocktranslate with n=collectable.nlikes %}{{ n }} likes{% endblocktranslate %}
+        {% blocktranslate with n=collectable.nwants %}{{ n }} wants{% endblocktranslate %}
+        {% blocktranslate with n=collectable.nowns %}{{ n }} owners{% endblocktranslate %}
+    </div>
+</div>

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+    {% translate "Sign Up" %}
+{% endblock %}
+{% block content %}
+    <h2>{% translate "Sign up" %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">{% translate "Sign up" %}</button>
+    </form>
+{% endblock %}

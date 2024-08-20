@@ -1,23 +1,44 @@
-<img src="{{ collectable.photo.url }}"/>
-<p>
-  {% for tag in collectable.tags.all %}
-    <a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a>
-  {% endfor %}
-</p>
-<p>
-  {{ collectable.nowned }} owners
-  {{ collectable.nliked }} likes
-  {{ collectable.nwanted }} wants
-</p>
-<p>
-  Created at {{ collectable.created_at }}
-</p>
-<p>
-  Last modified at {{ collectable.modified_at }}
-</p>
-<h2>History</h2>
-<p>
-  {% for history in collectable.history.all %}
-  <li>{{ history.history_date }}: {{ history.history_user }} {{ history.history_type }}</li>
-  {% endfor %}
-</p>
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Details{% endblock %}
+{% block content %}
+    <h1>{% translate "Details" %}</h1>
+    <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
+         height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+         width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+         src="{{ collectable.photo.url }}" />
+    <p>
+        {% for tag in collectable.tags.all %}
+            <a href="{% url "by_tags" tag.slug %}">#{{ tag.name }}</a>
+        {% endfor %}
+    </p>
+    {% include "collectable/possession_form.html" with collectable=collectable possession=possession form=possession_form %}
+    <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
+    <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
+    <h2>{% translate "History" %}</h2>
+    <p>
+        {% for history in collectable.history.all %}
+            <li>
+                {{ history.history_date }}: {{ history.history_user }} {{ history.get_history_type_display }}
+                {% if record.history_delta_changes %}
+                    <ul>
+                        {% for change in record.history_delta_changes %}
+                            <li>
+                                <strong>{{ change.field }}:</strong>
+                                {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </p>
+    <h2>{% translate "Similar collectables" %}</h2>
+    <p>
+        {% for collectable in related_collectables %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No other collectables with the same tags" %}
+        {% endfor %}
+    </p>
+{% endblock %}

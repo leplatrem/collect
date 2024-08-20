@@ -24,10 +24,12 @@ lint: $(INSTALL_STAMP)  ## Analyze code base
 	$(POETRY) run ruff check $(FOLDERS)
 	$(POETRY) run ruff format --check $(FOLDERS)
 	$(POETRY) run mypy $(FOLDERS) --ignore-missing-imports
+	$(POETRY) run djlint $(FOLDERS) --lint
 
 format: $(INSTALL_STAMP)  ## Format code base
 	$(POETRY) run ruff check --fix $(FOLDERS)
 	$(POETRY) run ruff format $(FOLDERS)
+	$(POETRY) run djlint $(FOLDERS) --reformat
 
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP) $(VERSION_FILE)

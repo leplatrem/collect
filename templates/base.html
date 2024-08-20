@@ -1,4 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
 <html>
-{% block "body" %}
-{% endblock %}
+    <head>
+        <meta charset="utf-8">
+        <title>Collect -
+            {% block title %}{% endblock %}
+        </title>
+        <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}'>
+        <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    </head>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <header>
+            <a href="{% url 'home' %}">Home</a>
+            {% if user.is_authenticated %}
+                Logged as {{ user }}
+                <a href="{% url 'password_change' %}">Password Change</a>
+                <a href="{% url 'profile' %}">Profile</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Log Out</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Log In</a>
+            {% endif %}
+        </header>
+        <nav>
+            {% block nav %}{% endblock %}
+        </nav>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            {% block footer %}{% endblock %}
+        </footer>
+    </body>
 </html>

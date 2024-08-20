@@ -1,0 +1,15 @@
+{% load i18n %}
+<div id="possession-form">
+    {% if user.is_authenticated %}
+        <form hx-post="{% url 'possession' collectable.id %}"
+              hx-target="#possession-form"
+              hx-trigger="change">
+            {{ form.as_p }}
+        </form>
+    {% endif %}
+    <p>
+        {% blocktranslate with n=collectable.nlikes %}{{ n }} likes{% endblocktranslate %}
+        {% blocktranslate with n=collectable.nwants %}{{ n }} wants{% endblocktranslate %}
+        {% blocktranslate with n=collectable.nowns %}{{ n }} owners{% endblocktranslate %}
+    </p>
+</div>
