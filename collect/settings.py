@@ -27,7 +27,9 @@ SECRET_KEY = config("SECRET_KEY", default="not-secret")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS: list[str] = config(
-    "ALLOWED_HOSTS", default="", cast=lambda v: [s.strip() for s in v.split(",")]
+    "ALLOWED_HOSTS",
+    default="localhost",
+    cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
 SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
