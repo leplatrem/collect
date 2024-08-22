@@ -43,9 +43,8 @@ If all collectables belong to the same owner, specify their username with `--own
 poetry run python ./manage.py loadfolder user ~/stickaz/ --owner=user --tags=tag1 --tags=tag2
 ```
 
-> Warning: the `loadfolder` command has some limitations when running it multiple times on the same folder.
-> Since the path relative to the specified folder will be used as the collectable identifier, if a
-> file is moved from a folder to another between two executions, it will be duplicated instead of updated.
+> Note: the `loadfolder` command relies on EXIF tags (`Date` of shot and camera `Model`) to uniquely
+> identify pictures, so that pictures can be moved into folders and not be duplicated.
 
 
 ## License

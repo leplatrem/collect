@@ -1,4 +1,5 @@
 import hashlib
+import os
 import uuid
 from pathlib import Path
 
@@ -6,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext_lazy as _
-from PIL import Image
+from PIL import ExifTags, Image
 
 from collectable.models import Collectable, Possession
 
@@ -40,14 +41,13 @@ class Command(BaseCommand):
         if options["owner"]:
             owner = User.objects.get(username=options["owner"])
 
-        taglist = options["tags"] or []
-
         images = folder_path.glob("**/*.jpg")
         for image_path in images:
             # Consider subfolders as tags.
             parent_folder = image_path.parent
             relative_folder = parent_folder.relative_to(folder_path)
             folder_tags = list(relative_folder.parts)
+            taglist = (options["tags"] or []) + folder_tags
 
             im = Image.open(image_path)
             width, height = im.size
@@ -59,46 +59,76 @@ class Command(BaseCommand):
                 )
                 continue
 
-            # Consider subfolders and filenames as identifiers of collectables
-            seed = image_path.relative_to(folder_path)
+            exif = im.getexif()
+            try:
+                # Use shot date time and camera model as identifier of collectable.
+                # This way pictures can be renamed and still be identified.
+                seed = (
+                    exif[ExifTags.Base.DateTime.value]
+                    + "-"
+                    + exif[ExifTags.Base.Model.value]
+                )
+            except KeyError:
+                self.stdout.write(
+                    self.style.ERROR(
+                        _('"%s" has no EXIF metadata, skipping.') % image_path
+                    )
+                )
+                continue
             m = hashlib.md5()
             m.update(str(seed).encode("utf-8"))
             uuid_id = uuid.UUID(m.hexdigest())
 
+            updated = False
+            created = False
             try:
                 collectable = Collectable.objects.get(id=uuid_id)
-                self.stdout.write(
-                    self.style.NOTICE(
-                        _('Collectable "%s" already exists') % collectable
-                    )
-                )
-                created = False
+
+                if set(taglist) != set(collectable.tags.slugs()):
+                    collectable.tags.add(*taglist)
+                    updated = True
+
+                if collectable.photo.size != os.path.getsize(image_path):
+                    with image_path.open(mode="rb") as f:
+                        collectable._history_user = creator
+                        collectable.photo = File(file=f, name=image_path.name)
+                        collectable.save()
+                    collectable.thumbnail.generate()
+                    updated = True
+
             except Collectable.DoesNotExist:
                 with image_path.open(mode="rb") as f:
                     photo = File(file=f, name=image_path.name)
                     collectable = Collectable(id=uuid_id, photo=photo)
                     collectable._history_user = creator
                     collectable.save()
-                    collectable.thumbnail.generate()
+                collectable.tags.add(*taglist)
+                collectable.thumbnail.generate()
                 created = True
 
-            if tags := (taglist + folder_tags):
-                collectable.tags.add(*tags)
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(_("Successfully created %s") % collectable)
+                )
+            if updated:
+                self.stdout.write(
+                    self.style.SUCCESS(_("Successfully updated %s") % collectable)
+                )
 
             if owner:
-                possession, _created = Possession.objects.get_or_create(
+                possession, changed = Possession.objects.get_or_create(
                     collectable=collectable, user=owner
                 )
                 if not possession.owns:
                     possession.owns = True
                     possession.save()
-
-            if created:
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        _('Successfully created collectable "%s"') % collectable
+                    changed = True
+                if changed:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            _("Successfully assigned owner of %s") % collectable
+                        )
                     )
-                )
 
         self.stdout.write(
             self.style.SUCCESS(
