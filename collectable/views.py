@@ -14,9 +14,10 @@ def index(request):
     )
     qs = Collectable.objects.with_counts()
     context = {
-        "most_wanted": qs.order_by("-nwants").filter(nwants__gt=0)[:3],
-        "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[:3],
-        "most_owned": qs.order_by("-nowns").filter(nowns__gt=0)[:3],
+        "latest": qs.order_by("-created_at")[:6],
+        "most_wanted": qs.order_by("-nwants").filter(nwants__gt=0)[:6],
+        "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[:6],
+        "most_owned": qs.order_by("-nowns").filter(nowns__gt=0)[:6],
         "tag_list": tag_list,
     }
     return render(request, "collectable/index.html", context)

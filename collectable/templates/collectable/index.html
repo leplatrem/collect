@@ -3,6 +3,12 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     <h1>{% translate "Explore" %}</h1>
+    <h2>{% translate "Latest" %}</h2>
+    {% for collectable in latest %}
+        {% include "collectable/collectable_thumbnail.html" %}
+    {% empty %}
+        {% translate "No collectable in database." %}
+    {% endfor %}
     <h2>{% translate "Most wanted" %}</h2>
     {% for collectable in most_wanted %}
         {% include "collectable/collectable_thumbnail.html" %}
