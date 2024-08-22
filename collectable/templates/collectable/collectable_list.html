@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h1>{{ title }}</h1>
     {% for collectable in object_list %}
         {% include "collectable/collectable_thumbnail.html" %}
     {% empty %}

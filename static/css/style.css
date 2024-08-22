@@ -19,3 +19,42 @@ header button {
     border-radius: 4px;
     border: solid 1px;
 }
+
+#possession-form label {
+    display: none;
+}
+
+#possession-form p {
+    display: inline-block;
+    margin: 0px;
+}
+
+#possession-form input[type=checkbox] {
+    display: block;
+    width: 30px;
+    height: 30px;
+    -webkit-appearance: none;
+    outline: 0;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+
+#possession-form #id_likes {
+    background-image: url(../icons/unliked.svg);
+}
+#possession-form #id_likes:checked {
+    background-image: url(../icons/liked.svg);
+}
+#possession-form #id_wants {
+    background-image: url(../icons/unwanted.svg);
+}
+#possession-form #id_wants:checked {
+    background-image: url(../icons/wanted.svg);
+}
+#possession-form #id_owns {
+    background-image: url(../icons/unowned.svg);
+}
+#possession-form #id_owns:checked {
+    background-image: url(../icons/owned.svg);
+}
