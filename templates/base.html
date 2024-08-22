@@ -13,9 +13,8 @@
         <header>
             <a href="{% url 'home' %}">Home</a>
             {% if user.is_authenticated %}
-                Logged as {{ user }}
+                <a href="{% url 'profile' %}">{{ user }}</a>
                 <a href="{% url 'password_change' %}">Password Change</a>
-                <a href="{% url 'profile' %}">Profile</a>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
                     <button type="submit">Log Out</button>

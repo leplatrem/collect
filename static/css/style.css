@@ -1,3 +1,18 @@
+header form {
+    display: inline-block;
+}
+
+header button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    font-family: unset;
+    font-size: unset;
+    color: #0000EE;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .collectable.thumbnail {
     display: inline-block;
 
