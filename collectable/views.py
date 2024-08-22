@@ -1,7 +1,12 @@
+from typing import Any
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView
 from taggit.models import Tag
 
 from collectable.forms import PossessionForm
@@ -14,13 +19,44 @@ def index(request):
     )
     qs = Collectable.objects.with_counts()
     context = {
-        "latest": qs.order_by("-created_at")[:6],
-        "most_wanted": qs.order_by("-nwants").filter(nwants__gt=0)[:6],
-        "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[:6],
-        "most_owned": qs.order_by("-nowns").filter(nowns__gt=0)[:6],
+        "latest": qs.order_by("-created_at")[:3],
+        "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[:3],
+        "most_wanted": qs.order_by("-nwants").filter(nwants__gt=0)[:3],
+        "most_owned": qs.order_by("-nowns").filter(nowns__gt=0)[:3],
         "tag_list": tag_list,
     }
     return render(request, "collectable/index.html", context)
+
+
+class CollectableListView(ListView):
+    model = Collectable
+    sort_by = "-created_at"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = self.model.objects.with_counts().order_by(self.sort_by)
+        if self.sort_by == "-nlikes":
+            qs = qs.filter(nlikes__gt=0)
+        elif self.sort_by == "-nwants":
+            qs = qs.filter(nwants__gt=0)
+        elif self.sort_by == "-nowns":
+            qs = qs.filter(nowns__gt=0)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = {
+            "-created_at": _("Latest collectables"),
+            "-nlikes": _("Most liked collectables"),
+            "-nwants": _("Most wanted collectables"),
+            "-nowns": _("Most owned collectables"),
+        }[self.sort_by]
+        context["empty_msg"] = {
+            "-created_at": _("No collectable in databae."),
+            "-nlikes": _("No liked collectable"),
+            "-nwants": _("No wanted collectable"),
+            "-nowns": _("No owned collectable"),
+        }[self.sort_by]
+        return context
 
 
 def details(request, id):
