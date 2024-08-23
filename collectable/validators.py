@@ -1,3 +1,4 @@
+import pylibmagic  # noqa: F401, I001
 import magic
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible

@@ -1,5 +1,6 @@
 FOLDERS := collect collectable
 INSTALL_STAMP := .install.stamp
+ENV_FILE := .env
 POETRY := $(shell command -v poetry 2> /dev/null)
 
 .PHONY: help clean lint format tests
@@ -35,6 +36,9 @@ test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP) $(VERSION_FILE)
 	$(POETRY) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
 
-start: $(INSTALL_STAMP) ## Start the app
-	$(POETRY) run python manage.py runserver
+$(ENV_FILE):
+	cp -n env.local .env
 
+start: $(INSTALL_STAMP) $(ENV_FILE) ## Start the app
+	$(POETRY) run python manage.py migrate
+	$(POETRY) run python manage.py runserver
