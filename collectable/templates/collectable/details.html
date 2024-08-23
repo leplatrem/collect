@@ -13,6 +13,7 @@
               hx-post="{% url 'collectable:details' collectable.id %}"
               hx-select="#attributes"
               hx-target="#attributes"
+              hx-trigger="submit, keyup[keyCode==13] from:input"
               hx-swap="outerHTML">
             {{ form_edit }}
             <button type="submit">{% translate "Save" %}</button>
@@ -21,6 +22,18 @@
     {% user_possession_form collectable %}
     <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
     <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
+    <section>
+        <a href="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
+           hx-trigger="click, keyup[keyCode==219] from:window"
+           hx-get="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
+           hx-target="main"
+           hx-select="main">{% translate "Previous" %}</a>
+        <a href="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
+           hx-trigger="click, keyup[keyCode==221] from:window"
+           hx-get="{{ collectable.get_next_by_created_at.get_absolute_url }}"
+           hx-target="main"
+           hx-select="main">{% translate "Next" %}</a>
+    </section>
     <section>
         <h2>{% translate "History" %}</h2>
         <ul>
