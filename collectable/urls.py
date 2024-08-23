@@ -29,6 +29,8 @@ urlpatterns = [
     path("<uuid:id>/", views.details, name="details"),
     path("<uuid:id>/possession/", views.possession, name="possession"),
     re_path(
-        r"^tags/(?P<slugs>[a-zA-Z]+(,[a-zA-Z]+)*)/$", views.by_tags, name="by_tags"
+        r"^collection/(?P<slugs>[a-zA-Z]+(,[a-zA-Z]+)*)/$",
+        views.collection,
+        name="collection",
     ),
 ]

@@ -39,11 +39,11 @@
     {% if most_owned %}
         <a href="{% url "most-owned" %}">{% translate "More..." %}</a>
     {% endif %}
-    <h2>{% translate "By tag" %}</h2>
+    <h2>{% translate "Collections" %}</h2>
     <ul>
         {% for tag in tag_list %}
             <li>
-                <a href="{% url "by_tags" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
+                <a href="{% url "collection" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
             </li>
         {% endfor %}
     </ul>

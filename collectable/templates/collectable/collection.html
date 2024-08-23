@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+    {% translate "Collection" %}
+{% endblock %}
+{% block content %}
+    <h1>
+        {% translate "Collection" %}
+        {% for tag in tag_list %}
+            <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }})
+            {% if not forloop.last %}/{% endif %}
+        {% endfor %}
+    </h1>
+    <h2>
+        {% blocktranslate count counter=collectable_list|length %}
+        {{ counter }} Result
+        {% plural %}
+        {{ counter }} Results
+        {% endblocktranslate %}
+    </h2>
+    {% if reltag_list %}
+        <h3>{% translate "Related collections" %}</h3>
+        <ul>
+            {% for tag in reltag_list %}
+                <li>
+                    <a href="{% url "collection" slugs|join:","|add:","|add:tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
+                </li>
+            {% empty %}
+                {% translate "None" %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% for collectable in collectable_list %}
+        {% include "collectable/collectable_thumbnail.html" %}
+    {% empty %}
+        {% blocktranslate with slugs=slugs|join:", " %}No collectable with tags {{ slugs }}{% endblocktranslate %}
+    {% endfor %}
+{% endblock %}

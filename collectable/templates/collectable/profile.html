@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Profile" %}{% endblock %}
+{% block title %}
+    {% translate "Profile" %}
+{% endblock %}
 {% block content %}
     <h1>{% translate "Profile" %} {{ user }}</h1>
     <h2>{% translate "Owned" %}</h2>
     {% if collectable_owned %}
-        <p>{% blocktranslate count counter=collectable_owned.count %}{{counter}} item.{% plural %}{{counter}} items.{% endblocktranslate %}</p>
+        <p>
+            {% blocktranslate count counter=collectable_owned.count %}{{counter}} item.{% plural %}{{counter}} items.{% endblocktranslate %}
+        </p>
     {% endif %}
     {% for collectable in collectable_owned %}
         {% include "collectable/collectable_thumbnail.html" %}
@@ -14,7 +18,9 @@
     {% endfor %}
     <h2>{% translate "Liked" %}</h2>
     {% if collectable_liked %}
-        <p>{% blocktranslate count counter=collectable_liked.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}</p>
+        <p>
+            {% blocktranslate count counter=collectable_liked.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
+        </p>
     {% endif %}
     {% for collectable in collectable_liked %}
         {% include "collectable/collectable_thumbnail.html" %}
@@ -23,7 +29,9 @@
     {% endfor %}
     <h2>{% translate "Wanted" %}</h2>
     {% if collectable_wanted %}
-        <p>{% blocktranslate count counter=collectable_wanted.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}</p>
+        <p>
+            {% blocktranslate count counter=collectable_wanted.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
+        </p>
     {% endif %}
     {% for collectable in collectable_wanted %}
         <p>{% include "collectable/collectable_thumbnail.html" %}</p>

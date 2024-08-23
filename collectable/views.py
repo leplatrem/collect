@@ -107,7 +107,7 @@ def possession(request, id):
     )
 
 
-def by_tags(request, slugs):
+def collection(request, slugs):
     slugs = slugs.split(",")
     tag_list = list(
         Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
@@ -138,7 +138,7 @@ def by_tags(request, slugs):
         "tag_list": tag_list,
         "reltag_list": reltag_list,
     }
-    return render(request, "collectable/by_tags.html", context)
+    return render(request, "collectable/collection.html", context)
 
 
 @login_required

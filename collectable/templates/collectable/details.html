@@ -9,7 +9,7 @@
          src="{{ collectable.photo.url }}" />
     <p>
         {% for tag in collectable.tags.all %}
-            <a href="{% url "by_tags" tag.slug %}">#{{ tag.name }}</a>
+            <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a>
         {% endfor %}
     </p>
     {% include "collectable/possession_form.html" with collectable=collectable possession=possession form=possession_form %}
