@@ -10,12 +10,15 @@ from django.views.generic.base import RedirectView
 urlpatterns = i18n_patterns(
     path(
         "",
-        RedirectView.as_view(url=reverse_lazy("index"), permanent=False),
+        RedirectView.as_view(url=reverse_lazy("collectable:index"), permanent=False),
         name="home",
     ),
-    path("collectable/", include("collectable.urls")),
-    path("accounts/", include("accounts.urls")),
-    path("accounts/", include("django.contrib.auth.urls")),
+    path(
+        "collectable/",
+        include(("collectable.urls", "collectable"), namespace="collectable"),
+    ),
+    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("accounts/", include(("django.contrib.auth.urls", "auth"), namespace="auth")),
 )
 
 if settings.ADMIN_ENABLED:

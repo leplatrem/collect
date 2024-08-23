@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load collectable_extras %}
 <div class="collectable thumbnail">
-    <a href="{% url "details" collectable.id %}">
+    <a href="{% url "collectable:details" collectable.id %}">
         <img alt="{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}"
              height="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
              width="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
@@ -9,7 +9,7 @@
     </a>
     <div class="taglist">
         {% for tag in collectable.tags.all %}
-            <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a>
+            <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a>
         {% endfor %}
     </div>
     {% user_possession_form collectable %}

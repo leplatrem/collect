@@ -2,7 +2,7 @@
 <div class="possession-form"
      id="possession-form-{{ form.instance.collectable.id }}">
     {% if user.is_authenticated %}
-        <form hx-post="{% url 'possession' form.instance.collectable.id %}"
+        <form hx-post="{% url 'collectable:possession' form.instance.collectable.id %}"
               hx-target="#possession-form-{{ form.instance.collectable.id }}"
               hx-trigger="change">
             {{ form.as_p }}

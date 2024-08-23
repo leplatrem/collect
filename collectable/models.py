@@ -105,7 +105,7 @@ class Collectable(models.Model):
     objects = CollectableManager()
 
     def get_absolute_url(self):
-        return reverse_lazy("details", kwargs={"id": self.id})
+        return reverse_lazy("collectable:details", kwargs={"id": self.id})
 
     def possession_of(self, user):
         possession = None

@@ -10,7 +10,7 @@
              width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
              src="{{ collectable.photo.url }}" />
         <form hx-encoding='multipart/form-data'
-              hx-post="{% url 'details' collectable.id %}"
+              hx-post="{% url 'collectable:details' collectable.id %}"
               hx-select="#attributes"
               hx-target="#attributes"
               hx-swap="outerHTML">

@@ -7,7 +7,7 @@
     <h1>
         {% translate "Collection" %}
         {% for tag in tag_list %}
-            <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }})
+            <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }})
             {% if not forloop.last %}/{% endif %}
         {% endfor %}
     </h1>
@@ -30,7 +30,7 @@
         <ul>
             {% for tag in reltag_list %}
                 <li>
-                    <a href="{% url "collection" slugs|join:","|add:","|add:tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
+                    <a href="{% url "collectable:collection" slugs|join:","|add:","|add:tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
                 </li>
             {% empty %}
                 {% translate "None" %}
