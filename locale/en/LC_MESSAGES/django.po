@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-23 09:57+0200\n"
+"POT-Creation-Date: 2024-08-23 11:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,91 +73,73 @@ msgstr ""
 msgid "%s collectables in database."
 msgstr ""
 
-#: collectable/models.py:19
+#: collectable/models.py:20
 msgid "Tag"
 msgstr ""
 
-#: collectable/models.py:20 collectable/models.py:67
+#: collectable/models.py:21 collectable/models.py:77
 msgid "Tags"
 msgstr ""
 
-#: collectable/models.py:60
+#: collectable/models.py:70
 msgid "Identifier"
 msgstr ""
 
-#: collectable/models.py:63
+#: collectable/models.py:73
 msgid "Created at"
 msgstr ""
 
-#: collectable/models.py:65
+#: collectable/models.py:75
 msgid "Modified at"
 msgstr ""
 
-#: collectable/models.py:66
+#: collectable/models.py:76
 msgid "Photo"
 msgstr ""
 
-#: collectable/models.py:69 collectable/templates/collectable/details.html:18
+#: collectable/models.py:79 collectable/templates/collectable/details.html:19
 msgid "History"
 msgstr ""
 
-#: collectable/models.py:88
+#: collectable/models.py:109
 msgid "Collectable"
 msgstr ""
 
-#: collectable/models.py:89
+#: collectable/models.py:110
 msgid "Collectables"
 msgstr ""
 
-#: collectable/models.py:95
+#: collectable/models.py:116
 msgid "Likes"
 msgstr ""
 
-#: collectable/models.py:96
+#: collectable/models.py:117
 msgid "Wants"
 msgstr ""
 
-#: collectable/models.py:97
+#: collectable/models.py:118
 msgid "Owns"
 msgstr ""
 
-#: collectable/models.py:100
+#: collectable/models.py:121
 msgid "Possession"
 msgstr ""
 
-#: collectable/models.py:101
+#: collectable/models.py:122
 msgid "Possessions"
 msgstr ""
 
-#: collectable/templates/collectable/collectable_thumbnail.html:4
+#: collectable/templates/collectable/collectable_thumbnail.html:5
 #, python-format
 msgid "Thumbnail of %(obj)s"
 msgstr ""
 
-#: collectable/templates/collectable/collectable_thumbnail.html:15
-#: collectable/templates/collectable/possession_form.html:11
-#, python-format
-msgid "%(n)s likes"
-msgstr ""
-
-#: collectable/templates/collectable/collectable_thumbnail.html:16
-#: collectable/templates/collectable/possession_form.html:12
-#, python-format
-msgid "%(n)s wants"
-msgstr ""
-
-#: collectable/templates/collectable/collectable_thumbnail.html:17
-#: collectable/templates/collectable/possession_form.html:13
-#, python-format
-msgid "%(n)s owners"
-msgstr ""
-
 #: collectable/templates/collectable/collection.html:4
-#: collectable/templates/collectable/collection.html:7
+#: collectable/templates/collectable/collection.html:8
 msgid "Collection"
 msgstr ""
 
-#: collectable/templates/collectable/collection.html:14
+#: collectable/templates/collectable/collection.html:15
 #, python-format
 msgid ""
 "\n"
@@ -170,43 +152,51 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: collectable/templates/collectable/collection.html:20
+#: collectable/templates/collectable/collection.html:22
 msgid "Related collections"
 msgstr ""
 
-#: collectable/templates/collectable/collection.html:27
+#: collectable/templates/collectable/collection.html:29
 msgid "None"
 msgstr ""
 
-#: collectable/templates/collectable/collection.html:33
+#: collectable/templates/collectable/collection.html:36
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:5
+#: collectable/templates/collectable/details.html:6
 msgid "Details"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:6
+#: collectable/templates/collectable/details.html:7
 #, python-format
 msgid "Photo of %(obj)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:16
+#: collectable/templates/collectable/details.html:17
 #, python-format
 msgid "Created at %(date)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:17
+#: collectable/templates/collectable/details.html:18
 #, python-format
 msgid "Last modified at %(date)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:36
+#: collectable/templates/collectable/details.html:24
+#, python-format
+msgid ""
+"\n"
+"                %(action)s by %(user)s\n"
+"                "
+msgstr ""
+
+#: collectable/templates/collectable/details.html:40
 msgid "Similar collectables"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:41
+#: collectable/templates/collectable/details.html:45
 msgid "No other collectables with the same tags"
 msgstr ""
 
@@ -218,7 +208,7 @@ msgstr ""
 msgid "Latest"
 msgstr ""
 
-#: collectable/templates/collectable/index.html:10
+#: collectable/templates/collectable/index.html:10 collectable/views.py:60
 msgid "No collectable in database."
 msgstr ""
 
@@ -234,7 +224,7 @@ msgid "Most wanted"
 msgstr ""
 
 #: collectable/templates/collectable/index.html:19
-#: collectable/templates/collectable/profile.html:31
+#: collectable/templates/collectable/profile.html:39
 msgid "No collectable wanted."
 msgstr ""
 
@@ -243,7 +233,7 @@ msgid "Most liked"
 msgstr ""
 
 #: collectable/templates/collectable/index.html:28
-#: collectable/templates/collectable/profile.html:22
+#: collectable/templates/collectable/profile.html:28
 msgid "No collectable liked."
 msgstr ""
 
@@ -252,7 +242,7 @@ msgid "Most owned"
 msgstr ""
 
 #: collectable/templates/collectable/index.html:37
-#: collectable/templates/collectable/profile.html:13
+#: collectable/templates/collectable/profile.html:17
 msgid "No collectable owned."
 msgstr ""
 
@@ -260,61 +250,78 @@ msgstr ""
 msgid "Collections"
 msgstr ""
 
-#: collectable/templates/collectable/profile.html:3
-#: collectable/templates/collectable/profile.html:5
+#: collectable/templates/collectable/possession_form.html:12
+#, python-format
+msgid "%(counter)s like"
+msgid_plural "%(counter)s likes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: collectable/templates/collectable/possession_form.html:13
+#, python-format
+msgid "%(counter)s want"
+msgid_plural "%(counter)s wants"
+msgstr[0] ""
+msgstr[1] ""
+
+#: collectable/templates/collectable/possession_form.html:14
+#, python-format
+msgid "%(counter)s owner"
+msgid_plural "%(counter)s owners"
+msgstr[0] ""
+msgstr[1] ""
+
+#: collectable/templates/collectable/profile.html:4
+#: collectable/templates/collectable/profile.html:7
 msgid "Profile"
 msgstr ""
 
-#: collectable/templates/collectable/profile.html:6
+#: collectable/templates/collectable/profile.html:8
 msgid "Owned"
 msgstr ""
 
-#: collectable/templates/collectable/profile.html:8
-#: collectable/templates/collectable/profile.html:17
-#: collectable/templates/collectable/profile.html:26
+#: collectable/templates/collectable/profile.html:11
+#: collectable/templates/collectable/profile.html:22
+#: collectable/templates/collectable/profile.html:33
 #, python-format
 msgid "%(counter)s item."
 msgid_plural "%(counter)s items."
 msgstr[0] ""
 msgstr[1] ""
 
-#: collectable/templates/collectable/profile.html:15
+#: collectable/templates/collectable/profile.html:19
 msgid "Liked"
 msgstr ""
 
-#: collectable/templates/collectable/profile.html:24
+#: collectable/templates/collectable/profile.html:30
 msgid "Wanted"
 msgstr ""
 
-#: collectable/views.py:48
+#: collectable/views.py:54
 msgid "Latest collectables"
 msgstr ""
 
-#: collectable/views.py:49
+#: collectable/views.py:55
 msgid "Most liked collectables"
 msgstr ""
 
-#: collectable/views.py:50
+#: collectable/views.py:56
 msgid "Most wanted collectables"
 msgstr ""
 
-#: collectable/views.py:51
+#: collectable/views.py:57
 msgid "Most owned collectables"
 msgstr ""
 
-#: collectable/views.py:54
-msgid "No collectable in databae."
-msgstr ""
-
-#: collectable/views.py:55
+#: collectable/views.py:61
 msgid "No liked collectable"
 msgstr ""
 
-#: collectable/views.py:56
+#: collectable/views.py:62
 msgid "No wanted collectable"
 msgstr ""
 
-#: collectable/views.py:57
+#: collectable/views.py:63
 msgid "No owned collectable"
 msgstr ""
 

@@ -1,15 +1,16 @@
 {% load i18n %}
-<div id="possession-form">
+<div class="possession-form"
+     id="possession-form-{{ form.instance.collectable.id }}">
     {% if user.is_authenticated %}
-        <form hx-post="{% url 'possession' collectable.id %}"
-              hx-target="#possession-form"
+        <form hx-post="{% url 'possession' form.instance.collectable.id %}"
+              hx-target="#possession-form-{{ form.instance.collectable.id }}"
               hx-trigger="change">
             {{ form.as_p }}
         </form>
     {% endif %}
     <p>
-        {% blocktranslate with n=collectable.nlikes %}{{ n }} likes{% endblocktranslate %}
-        {% blocktranslate with n=collectable.nwants %}{{ n }} wants{% endblocktranslate %}
-        {% blocktranslate with n=collectable.nowns %}{{ n }} owners{% endblocktranslate %}
+        {% blocktranslate count counter=form.instance.collectable.nlikes %}{{ counter }} like{% plural %}{{ counter }} likes{% endblocktranslate %}
+        {% blocktranslate count counter=form.instance.collectable.nwants %}{{ counter }} want{% plural %}{{ counter }} wants{% endblocktranslate %}
+        {% blocktranslate count counter=form.instance.collectable.nowns %}{{ counter }} owner{% plural %}{{ counter }} owners{% endblocktranslate %}
     </p>
 </div>

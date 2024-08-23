@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load collectable_extras %}
 <div class="collectable thumbnail">
     <a href="{% url "details" collectable.id %}">
         <img alt="{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}"
@@ -11,9 +12,5 @@
             <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a>
         {% endfor %}
     </div>
-    <div class="actions">
-        {% blocktranslate with n=collectable.nlikes %}{{ n }} likes{% endblocktranslate %}
-        {% blocktranslate with n=collectable.nwants %}{{ n }} wants{% endblocktranslate %}
-        {% blocktranslate with n=collectable.nowns %}{{ n }} owners{% endblocktranslate %}
-    </div>
+    {% user_possession_form collectable %}
 </div>

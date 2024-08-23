@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load collectable_extras %}
 {% block title %}Details{% endblock %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
@@ -12,14 +13,17 @@
             <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a>
         {% endfor %}
     </p>
-    {% include "collectable/possession_form.html" with collectable=collectable possession=possession form=possession_form %}
+    {% user_possession_form collectable %}
     <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
     <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
     <h2>{% translate "History" %}</h2>
     <p>
         {% for history in collectable.history.all %}
             <li>
-                {{ history.history_date }}: {{ history.history_user }} {{ history.get_history_type_display }}
+                {{ history.history_date }}:
+                {% blocktranslate with action=history.get_history_type_display user=history.history_user %}
+                {{ action }} by {{ user }}
+                {% endblocktranslate %}
                 {% if record.history_delta_changes %}
                     <ul>
                         {% for change in record.history_delta_changes %}

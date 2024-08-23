@@ -4,6 +4,7 @@ import simple_history
 import taggit.models
 from django.conf import settings
 from django.db import models
+from django.db.models import Prefetch
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
@@ -21,9 +22,20 @@ class UUIDTaggedItem(
 
 
 class CollectableManager(models.Manager):
-    def with_counts(self):
+    def with_counts_and_possessions(self, user):
+        # Since all views show tags, prefetch them.
+        qs = self.prefetch_related("tags")
+        # If user is logged in, prefetch their possessions.
+        if user.is_authenticated:
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "possession_set", queryset=Possession.objects.filter(user=user)
+                )
+            )
+        # Add counter aggregations for possessions
         return (
-            self.annotate(
+            qs
+            .annotate(
                 nlikes=Coalesce(
                     models.Count(
                         "possessions", filter=models.Q(possession__likes=True)
@@ -45,8 +57,6 @@ class CollectableManager(models.Manager):
                     0,
                 )
             )
-            # Since all views show tags, prefetch them.
-            .prefetch_related("tags")
         )
 
 
@@ -84,6 +94,17 @@ class Collectable(models.Model):
 
     objects = CollectableManager()
 
+    def possession_of(self, user):
+        possession = None
+        if user.is_authenticated:
+            possessions = self.possession_set.all()
+            possession = possessions[0] if possessions else None
+        if possession is None:
+            possession = Possession(
+                collectable=self, likes=False, wants=False, owns=False
+            )  # Don't save.
+        return possession
+
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
@@ -99,3 +120,4 @@ class Possession(models.Model):
     class Meta:
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
+        unique_together = ("user", "collectable")

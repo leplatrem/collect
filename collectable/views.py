@@ -14,10 +14,13 @@ from collectable.models import Collectable, Possession
 
 
 def index(request):
-    tag_list = Tag.objects.annotate(ncollectable=Count("collectable")).order_by(
-        "-ncollectable"
+    tag_list = (
+        Tag.objects.annotate(ncollectable=Count("collectable"))
+        .order_by("-ncollectable")
+        .filter(ncollectable__gt=0)
     )
-    qs = Collectable.objects.with_counts()
+    qs = Collectable.objects.with_counts_and_possessions(request.user)
+
     context = {
         "latest": qs.order_by("-created_at")[:3],
         "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[:3],
@@ -33,7 +36,10 @@ class CollectableListView(ListView):
     sort_by = "-created_at"
 
     def get_queryset(self) -> QuerySet[Any]:
-        qs = self.model.objects.with_counts().order_by(self.sort_by)
+        qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
+            self.sort_by
+        )
+
         if self.sort_by == "-nlikes":
             qs = qs.filter(nlikes__gt=0)
         elif self.sort_by == "-nwants":
@@ -51,7 +57,7 @@ class CollectableListView(ListView):
             "-nowns": _("Most owned collectables"),
         }[self.sort_by]
         context["empty_msg"] = {
-            "-created_at": _("No collectable in databae."),
+            "-created_at": _("No collectable in database."),
             "-nlikes": _("No liked collectable"),
             "-nwants": _("No wanted collectable"),
             "-nowns": _("No owned collectable"),
@@ -60,27 +66,16 @@ class CollectableListView(ListView):
 
 
 def details(request, id):
-    collectable = get_object_or_404(Collectable.objects.with_counts(), id=id)
+    collectable = get_object_or_404(
+        Collectable.objects.with_counts_and_possessions(request.user), id=id
+    )
 
-    possession = None
-    if request.user.is_authenticated:
-        possession = Possession.objects.filter(
-            user=request.user, collectable=collectable
-        ).first()
-    if possession is None:
-        possession = Possession(
-            collectable=collectable, likes=False, wants=False, owns=False
-        )
-    possession_form = PossessionForm(instance=possession)
-
-    related_collectables = Collectable.objects.with_counts()
+    related_collectables = Collectable.objects.with_counts_and_possessions(request.user)
     for tag in collectable.tags.all():
         related_collectables = related_collectables.filter(tags=tag)
 
     context = {
         "collectable": collectable,
-        "possession": possession,
-        "possession_form": possession_form,
         "related_collectables": related_collectables,
     }
 
@@ -96,14 +91,14 @@ def possession(request, id):
     )
     possession_form = PossessionForm(request.POST, instance=possession)
     possession = possession_form.save()
+    # Refresh counters
+    possession.collectable = Collectable.objects.with_counts_and_possessions(
+        request.user
+    ).get(id=id)
     return render(
         request,
         "collectable/possession_form.html",
-        {
-            "form": possession_form,
-            "possession": possession,
-            "collectable": Collectable.objects.with_counts().get(id=id),
-        },
+        {"form": possession_form},
     )
 
 
@@ -113,7 +108,7 @@ def collection(request, slugs):
         Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
     )
 
-    collectable_list = Collectable.objects.with_counts()
+    collectable_list = Collectable.objects.with_counts_and_possessions(request.user)
 
     for slug in slugs:
         collectable_list = collectable_list.filter(tags__slug=slug)
@@ -143,7 +138,7 @@ def collection(request, slugs):
 
 @login_required
 def profile(request):
-    qs = Collectable.objects.with_counts()
+    qs = Collectable.objects.with_counts_and_possessions(request.user)
     liked = qs.filter(possession__user=request.user, possession__likes=True)
     wanted = qs.filter(possession__user=request.user, possession__wants=True)
     owned = qs.filter(possession__user=request.user, possession__owns=True)
