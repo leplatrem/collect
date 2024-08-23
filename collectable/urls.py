@@ -26,6 +26,7 @@ urlpatterns = [
         views.CollectableListView.as_view(sort_by="-nowns"),
         name="most-owned",
     ),
+    path("create/", views.create, name="create"),
     path("<uuid:id>/", views.details, name="details"),
     path("<uuid:id>/possession/", views.possession, name="possession"),
     re_path(

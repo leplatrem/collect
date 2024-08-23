@@ -6,11 +6,14 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch
 from django.db.models.functions import Coalesce
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
 from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
+
+from collectable.validators import MimetypeValidator, SquareImageValidator
 
 
 class UUIDTaggedItem(
@@ -34,8 +37,7 @@ class CollectableManager(models.Manager):
             )
         # Add counter aggregations for possessions
         return (
-            qs
-            .annotate(
+            qs.annotate(
                 nlikes=Coalesce(
                     models.Count(
                         "possessions", filter=models.Q(possession__likes=True)
@@ -73,7 +75,15 @@ class Collectable(models.Model):
         _("Created at"), auto_now_add=True, editable=False
     )
     modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
-    photo = models.ImageField(_("Photo"), upload_to="collectables/%Y/")
+    photo = models.ImageField(
+        _("Photo"),
+        upload_to="collectables/%Y/",
+        help_text=_("Please provide a square JPEG image (.jpg, .jpeg)"),
+        validators=[
+            MimetypeValidator(["image/jpg", "image/jpeg"]),
+            SquareImageValidator(),
+        ],
+    )
     tags = TaggableManager(_("Tags"), through=UUIDTaggedItem)
     history = HistoricalRecords(
         _("History"), excluded_fields=["modified_at"]
@@ -93,6 +103,9 @@ class Collectable(models.Model):
     )
 
     objects = CollectableManager()
+
+    def get_absolute_url(self):
+        return reverse_lazy("details", kwargs={"id": self.id})
 
     def possession_of(self, user):
         possession = None

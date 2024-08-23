@@ -4,45 +4,52 @@
 {% block title %}Details{% endblock %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
-    <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
-         height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-         width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-         src="{{ collectable.photo.url }}" />
-    <p>
-        {% for tag in collectable.tags.all %}
-            <a href="{% url "collection" tag.slug %}">#{{ tag.name }}</a>
-        {% endfor %}
-    </p>
+    <section id="attributes">
+        <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
+             height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+             width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+             src="{{ collectable.photo.url }}" />
+        <form hx-encoding='multipart/form-data'
+              hx-post="{% url 'details' collectable.id %}"
+              hx-select="#attributes"
+              hx-target="#attributes"
+              hx-swap="outerHTML">
+            {{ form_edit }}
+            <button type="submit">{% translate "Save" %}</button>
+        </form>
+    </section>
     {% user_possession_form collectable %}
     <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
     <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
-    <h2>{% translate "History" %}</h2>
-    <p>
-        {% for history in collectable.history.all %}
-            <li>
-                {{ history.history_date }}:
-                {% blocktranslate with action=history.get_history_type_display user=history.history_user %}
+    <section>
+        <h2>{% translate "History" %}</h2>
+        <ul>
+            {% for history in collectable.history.all %}
+                <li>
+                    {{ history.history_date }}:
+                    {% blocktranslate with action=history.get_history_type_display user=history.history_user %}
                 {{ action }} by {{ user }}
                 {% endblocktranslate %}
-                {% if record.history_delta_changes %}
-                    <ul>
-                        {% for change in record.history_delta_changes %}
-                            <li>
-                                <strong>{{ change.field }}:</strong>
-                                {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </p>
-    <h2>{% translate "Similar collectables" %}</h2>
-    <p>
+                    {% if record.history_delta_changes %}
+                        <ul>
+                            {% for change in record.history_delta_changes %}
+                                <li>
+                                    <strong>{{ change.field }}:</strong>
+                                    {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section>
+        <h2>{% translate "Similar collectables" %}</h2>
         {% for collectable in related_collectables %}
             {% include "collectable/collectable_thumbnail.html" %}
         {% empty %}
             {% translate "No other collectables with the same tags" %}
         {% endfor %}
-    </p>
+    </section>
 {% endblock %}

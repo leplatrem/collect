@@ -3,13 +3,14 @@ from typing import Any
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 from taggit.models import Tag
 
-from collectable.forms import PossessionForm
+from collectable.forms import CollectableForm, PossessionForm
 from collectable.models import Collectable, Possession
 
 
@@ -65,17 +66,50 @@ class CollectableListView(ListView):
         return context
 
 
+@require_http_methods(["GET", "POST"])
+@login_required
+def create(request):
+    if request.method == "POST":
+        form = CollectableForm(request.POST, request.FILES)
+        if form.is_valid():
+            collectable = form.save()
+            return redirect(collectable)
+    else:
+        form = CollectableForm()
+    context = {
+        "form": form,
+    }
+    return render(request, "collectable/create.html", context)
+
+
+@require_http_methods(["GET", "POST"])
 def details(request, id):
     collectable = get_object_or_404(
         Collectable.objects.with_counts_and_possessions(request.user), id=id
     )
 
-    related_collectables = Collectable.objects.with_counts_and_possessions(request.user)
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return HttpResponse(_("Unauthorized"), status=401)
+        form = CollectableForm(request.POST, request.FILES, instance=collectable)
+        backup_photo = collectable.photo
+        if form.is_valid():
+            collectable = form.save()
+        else:
+            # Why `is_valid()` is altering `collectable.photo`??
+            collectable.photo = backup_photo
+    else:
+        form = CollectableForm(instance=collectable)
+
+    related_collectables = Collectable.objects.with_counts_and_possessions(
+        request.user
+    ).exclude(id=collectable.id)
     for tag in collectable.tags.all():
         related_collectables = related_collectables.filter(tags=tag)
 
     context = {
         "collectable": collectable,
+        "form_edit": form,
         "related_collectables": related_collectables,
     }
 
@@ -90,7 +124,9 @@ def possession(request, id):
         user=request.user, collectable=collectable
     )
     possession_form = PossessionForm(request.POST, instance=possession)
-    possession = possession_form.save()
+    if possession_form.is_valid():
+        possession = possession_form.save()
+
     # Refresh counters
     possession.collectable = Collectable.objects.with_counts_and_possessions(
         request.user

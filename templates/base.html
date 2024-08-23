@@ -15,10 +15,11 @@
             <a href="{% url 'home' %}">{% translate "Home" %}</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'profile' %}">{{ user }}</a>
+                <a href="{% url 'create' %}">{% translate "Create collectable" %}</a>
                 <a href="{% url 'password_change' %}">{% translate "Password Change" %}</a>
-                <form action="{% url 'logout' %}" method="post">
+                <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
-                    <button type="submit">{% translate "Log Out" %}</button>
+                    <button type="submit" class="link">{% translate "Log Out" %}</button>
                 </form>
             {% else %}
                 <a href="{% url 'login' %}">{% translate "Log In" %}</a>

@@ -1,8 +1,12 @@
-header form {
+header a {
+    margin-right: 15px;
+}
+
+form.inline {
     display: inline-block;
 }
 
-header button {
+button.link {
     background: none!important;
     border: none;
     padding: 0!important;
@@ -13,11 +17,19 @@ header button {
     cursor: pointer;
 }
 
+.errorlist {
+    color: red;
+}
+
 .collectable.thumbnail {
     display: inline-block;
 
     border-radius: 4px;
     border: solid 1px;
+}
+
+input[name="tags"] {
+    min-width: 50%;
 }
 
 .possession-form label {

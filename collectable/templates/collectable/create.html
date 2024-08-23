@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load collectable_extras %}
+{% block title %}Create{% endblock %}
+{% block content %}
+    <h1>{% translate "Create" %}</h1>
+    <form post="{% url 'create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">{% translate "Create" %}</button>
+    </form>
+{% endblock %}
