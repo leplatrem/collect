@@ -56,12 +56,18 @@ simple_history.register(UUIDTaggedItem)
 
 
 class Collectable(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
-    photo = models.ImageField(upload_to="collectables/%Y/")
-    tags = TaggableManager(through=UUIDTaggedItem)
-    history = HistoricalRecords(excluded_fields=["modified_at"])  # m2m_fields=[tags]
+    id = models.UUIDField(
+        _("Identifier"), primary_key=True, default=uuid.uuid4, editable=False
+    )
+    created_at = models.DateTimeField(
+        _("Created at"), auto_now_add=True, editable=False
+    )
+    modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
+    photo = models.ImageField(_("Photo"), upload_to="collectables/%Y/")
+    tags = TaggableManager(_("Tags"), through=UUIDTaggedItem)
+    history = HistoricalRecords(
+        _("History"), excluded_fields=["modified_at"]
+    )  # m2m_fields=[tags]
     possessions = models.ManyToManyField(settings.AUTH_USER_MODEL, through="Possession")
 
     thumbnail = ImageSpecField(
@@ -78,10 +84,18 @@ class Collectable(models.Model):
 
     objects = CollectableManager()
 
+    class Meta:
+        verbose_name = _("Collectable")
+        verbose_name_plural = _("Collectables")
+
 
 class Possession(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     collectable = models.ForeignKey(Collectable, on_delete=models.CASCADE)
-    likes = models.BooleanField(default=False)
-    wants = models.BooleanField(default=False)
-    owns = models.BooleanField(default=True)
+    likes = models.BooleanField(_("Likes"), default=False)
+    wants = models.BooleanField(_("Wants"), default=False)
+    owns = models.BooleanField(_("Owns"), default=True)
+
+    class Meta:
+        verbose_name = _("Possession")
+        verbose_name_plural = _("Possessions")

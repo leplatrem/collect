@@ -14,6 +14,7 @@ from pathlib import Path
 
 from decouple import config
 from dj_database_url import parse as db_url
+from django.utils.translation import gettext_lazy as _
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -61,6 +62,7 @@ if DEBUG:
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -137,6 +139,14 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = (
+    ("en", _("English")),
+    ("fr", _("French")),
+)
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale/",
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -153,6 +163,8 @@ TAGGIT_CASE_INSENSITIVE = True
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "uploads")
+
+ADMIN_ENABLED = config("ADMIN_ENABLED", default=DEBUG, cast=bool)
 
 COLLECTABLE_THUMBNAIL_SIZE = config("COLLECTABLE_THUMBNAIL_SIZE", default=320, cast=int)
 COLLECTABLE_THUMBNAIL_QUALITY = config(
