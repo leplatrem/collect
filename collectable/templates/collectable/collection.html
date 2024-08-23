@@ -18,6 +18,13 @@
         {{ counter }} Results
         {% endblocktranslate %}
     </h2>
+    {% if user.is_authenticated %}
+        <section>
+            <p>
+                {% blocktranslate with n=total_owned p=percent_owned|floatformat:"0" %}You own {{n}} items in this collection ({{p}}%){% endblocktranslate %}
+            </p>
+        </section>
+    {% endif %}
     {% if reltag_list %}
         <h3>{% translate "Related collections" %}</h3>
         <ul>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-23 16:37+0200\n"
+"POT-Creation-Date: 2024-08-23 17:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,22 +162,26 @@ msgstr[1] ""
 "  %(counter)s Résultats\n"
 "  "
 
-#: collectable/templates/collectable/collection.html:22
+#: collectable/templates/collectable/collection.html:24
+#, python-format
+msgid "You own %(n)s items in this collection (%(p)s%%)"
+msgstr "Vous possedez %(n)s objets dans cette collection (%(p)s%%)"
+
+#: collectable/templates/collectable/collection.html:29
 msgid "Related collections"
 msgstr "Collections associées"
 
-#: collectable/templates/collectable/collection.html:29
+#: collectable/templates/collectable/collection.html:36
 msgid "None"
 msgstr "Aucune"
 
-#: collectable/templates/collectable/collection.html:36
+#: collectable/templates/collectable/collection.html:43
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr "Aucun objet avec les étiquettes %(slugs)s"
 
 #: collectable/templates/collectable/create.html:6
 #: collectable/templates/collectable/create.html:10
-#| msgid "Created at"
 msgid "Create"
 msgstr "Ajouter"
 
@@ -271,7 +275,7 @@ msgstr "Aucun objet possédé."
 
 #: collectable/templates/collectable/index.html:42
 msgid "Collections"
-msgstr "Objets"
+msgstr "Collections"
 
 #: collectable/templates/collectable/possession_form.html:12
 #, python-format
@@ -327,7 +331,6 @@ msgstr "%s n'a pas le bon format de fichier."
 
 #: collectable/validators.py:32
 #, python-format
-#| msgid "\"%s\" is not a square image, skipping."
 msgid "%s is not a square image"
 msgstr "\"%s\" n'est pas une image carrée"
 
@@ -368,7 +371,6 @@ msgid "Home"
 msgstr "Accueil"
 
 #: templates/base.html:18
-#| msgid "Latest collectables"
 msgid "Create collectable"
 msgstr "Ajouter un objet"
 

@@ -149,6 +149,14 @@ def collection(request, slugs):
     for slug in slugs:
         collectable_list = collectable_list.filter(tags__slug=slug)
 
+    # Count how many are owned by the current user, taking advantage of prefetched
+    # data from above.
+    total_owned = sum(
+        1
+        for c in collectable_list
+        if c.possession_set.all() and c.possession_set.all()[0].owns
+    )
+
     known_tag_slugs = [t.slug for t in tag_list]
     for slug in slugs:
         if slug not in known_tag_slugs:
@@ -168,6 +176,8 @@ def collection(request, slugs):
         "collectable_list": collectable_list,
         "tag_list": tag_list,
         "reltag_list": reltag_list,
+        "total_owned": total_owned,
+        "percent_owned": 100 * total_owned / len(collectable_list),
     }
     return render(request, "collectable/collection.html", context)
 

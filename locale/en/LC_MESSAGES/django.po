@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-23 16:36+0200\n"
+"POT-Creation-Date: 2024-08-23 17:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,15 +156,20 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: collectable/templates/collectable/collection.html:22
-msgid "Related collections"
+#: collectable/templates/collectable/collection.html:24
+#, python-format
+msgid "You own %(n)s items in this collection (%(p)s%%)"
 msgstr ""
 
 #: collectable/templates/collectable/collection.html:29
-msgid "None"
+msgid "Related collections"
 msgstr ""
 
 #: collectable/templates/collectable/collection.html:36
+msgid "None"
+msgstr ""
+
+#: collectable/templates/collectable/collection.html:43
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr ""
