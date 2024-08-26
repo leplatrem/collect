@@ -63,8 +63,8 @@ class CollectableManager(models.Manager):
 
 
 # Track changes of tags
-simple_history.register(taggit.models.Tag)
-simple_history.register(UUIDTaggedItem)
+# simple_history.register(taggit.models.Tag)
+# simple_history.register(UUIDTaggedItem)
 
 
 class Collectable(models.Model):

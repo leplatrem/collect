@@ -9,8 +9,14 @@
         </form>
     {% endif %}
     <div class="counters">
-        <p>{% blocktranslate count counter=form.instance.collectable.nlikes %}{{ counter }} like{% plural %}{{ counter }} likes{% endblocktranslate %}</p>
-        <p>{% blocktranslate count counter=form.instance.collectable.nwants %}{{ counter }} want{% plural %}{{ counter }} wants{% endblocktranslate %}</p>
-        <p>{% blocktranslate count counter=form.instance.collectable.nowns %}{{ counter }} owner{% plural %}{{ counter }} owners{% endblocktranslate %}</p>
+        <p>
+            {% blocktranslate count counter=form.instance.collectable.nlikes %}{{ counter }} like{% plural %}{{ counter }} likes{% endblocktranslate %}
+        </p>
+        <p>
+            {% blocktranslate count counter=form.instance.collectable.nwants %}{{ counter }} want{% plural %}{{ counter }} wants{% endblocktranslate %}
+        </p>
+        <p>
+            {% blocktranslate count counter=form.instance.collectable.nowns %}{{ counter }} owner{% plural %}{{ counter }} owners{% endblocktranslate %}
+        </p>
     </div>
 </div>
