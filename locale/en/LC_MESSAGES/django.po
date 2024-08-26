@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-23 17:23+0200\n"
+"POT-Creation-Date: 2024-08-26 23:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,11 +27,11 @@ msgstr ""
 msgid "Invalid secret: %(value)s"
 msgstr ""
 
-#: collect/settings.py:143
+#: collect/settings.py:161
 msgid "English"
 msgstr ""
 
-#: collect/settings.py:144
+#: collect/settings.py:162
 msgid "French"
 msgstr ""
 
@@ -101,7 +101,7 @@ msgstr ""
 msgid "Please provide a square JPEG image (.jpg, .jpeg)"
 msgstr ""
 
-#: collectable/models.py:89 collectable/templates/collectable/details.html:25
+#: collectable/models.py:89 collectable/templates/collectable/details.html:38
 msgid "History"
 msgstr ""
 
@@ -188,21 +188,29 @@ msgstr ""
 msgid "Photo of %(obj)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:18
+#: collectable/templates/collectable/details.html:19
 msgid "Save"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:22
+#: collectable/templates/collectable/details.html:23
 #, python-format
 msgid "Created at %(date)s"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:23
+#: collectable/templates/collectable/details.html:24
 #, python-format
 msgid "Last modified at %(date)s"
 msgstr ""
 
 #: collectable/templates/collectable/details.html:30
+msgid "Previous"
+msgstr ""
+
+#: collectable/templates/collectable/details.html:35
+msgid "Next"
+msgstr ""
+
+#: collectable/templates/collectable/details.html:43
 #, python-format
 msgid ""
 "\n"
@@ -210,11 +218,11 @@ msgid ""
 "                "
 msgstr ""
 
-#: collectable/templates/collectable/details.html:48
+#: collectable/templates/collectable/details.html:61
 msgid "Similar collectables"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:52
+#: collectable/templates/collectable/details.html:65
 msgid "No other collectables with the same tags"
 msgstr ""
 
@@ -268,21 +276,25 @@ msgstr ""
 msgid "Collections"
 msgstr ""
 
-#: collectable/templates/collectable/possession_form.html:12
+#: collectable/templates/collectable/index.html:49
+msgid "No collection found."
+msgstr ""
+
+#: collectable/templates/collectable/possession_form.html:13
 #, python-format
 msgid "%(counter)s like"
 msgid_plural "%(counter)s likes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: collectable/templates/collectable/possession_form.html:13
+#: collectable/templates/collectable/possession_form.html:16
 #, python-format
 msgid "%(counter)s want"
 msgid_plural "%(counter)s wants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: collectable/templates/collectable/possession_form.html:14
+#: collectable/templates/collectable/possession_form.html:19
 #, python-format
 msgid "%(counter)s owner"
 msgid_plural "%(counter)s owners"
@@ -315,12 +327,12 @@ msgstr ""
 msgid "Wanted"
 msgstr ""
 
-#: collectable/validators.py:18
+#: collectable/validators.py:19
 #, python-format
 msgid "%s is not an acceptable file type."
 msgstr ""
 
-#: collectable/validators.py:32
+#: collectable/validators.py:33
 #, python-format
 msgid "%s is not a square image"
 msgstr ""

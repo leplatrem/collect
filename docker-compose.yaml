@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  web:
+    build: .
+    ports:
+      - 10001:8000
+    # Let the init system handle signals for us.
+    # among other things this helps shutdown be fast
+    init: true
+    volumes:
+      - ./.env:/app/.env
+      - db-folder:/mnt/db:rw
+      - media-folder:/mnt/media:rw
+
+volumes:
+  db-folder:
+  media-folder:

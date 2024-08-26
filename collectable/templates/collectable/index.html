@@ -45,6 +45,8 @@
             <li>
                 <a href="{% url "collectable:collection" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
             </li>
+        {% empty %}
+            {% translate "No collection found." %}
         {% endfor %}
     </ul>
 {% endblock %}

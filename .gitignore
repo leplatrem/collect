@@ -1,5 +1,6 @@
 db.sqlite3
 uploads/
+db/
 .install.stamp
 # Byte-compiled / optimized / DLL files
 __pycache__/
