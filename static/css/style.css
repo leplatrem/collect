@@ -45,7 +45,7 @@ section#attributes, section#possession {
     width: 50%;
 }
 
-input[name="tags"] {
+section#attributes input[type="text"] {
     width: 95%;
 }
 

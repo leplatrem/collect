@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 
 from collectable.models import Collectable, Possession
 
@@ -6,7 +6,10 @@ from collectable.models import Collectable, Possession
 class CollectableForm(ModelForm):
     class Meta:
         model = Collectable
-        fields = ["photo", "tags"]
+        fields = ["photo", "description", "tags"]
+        widgets = {
+            "description": TextInput(),
+        }
 
 
 class PossessionForm(ModelForm):
