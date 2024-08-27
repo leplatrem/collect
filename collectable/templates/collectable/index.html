@@ -40,7 +40,7 @@
         <a href="{% url "collectable:most-owned" %}">{% translate "More..." %}</a>
     {% endif %}
     <h2>{% translate "Collections" %}</h2>
-    <ul>
+    <ul class="as-columns">
         {% for tag in tag_list %}
             <li>
                 <a href="{% url "collectable:collection" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})

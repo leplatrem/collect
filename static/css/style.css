@@ -21,6 +21,10 @@ button.link {
     color: red;
 }
 
+.as-columns {
+    column-count: 4;
+}
+
 .collectable.thumbnail {
     display: inline-block;
     max-width: 324px;
