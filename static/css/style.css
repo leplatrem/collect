@@ -57,6 +57,7 @@ input[name="tags"] {
     width: 30px;
     height: 30px;
     margin-left: 33%;
+    cursor: pointer;
     -webkit-appearance: none;
     outline: 0;
     background-repeat: no-repeat;
