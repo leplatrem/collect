@@ -19,7 +19,9 @@
             <button type="submit">{% translate "Save" %}</button>
         </form>
     </section>
-    {% user_possession_form collectable %}
+    <section id="possession">
+        {% user_possession_form collectable %}
+    </section>
     <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
     <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
     <section>

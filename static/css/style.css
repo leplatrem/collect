@@ -41,8 +41,12 @@ button.link {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+section#attributes, section#possession {
+    width: 50%;
+}
+
 input[name="tags"] {
-    min-width: 50%;
+    width: 95%;
 }
 
 .possession-form label {
