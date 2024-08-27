@@ -9,16 +9,25 @@
              height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
              width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
              src="{{ collectable.photo.url }}" />
-        <form hx-encoding='multipart/form-data'
-              hx-post="{% url 'collectable:details' collectable.id %}"
-              hx-select="#attributes"
-              hx-target="#attributes"
-              hx-trigger="submit, keyup[keyCode==13] from:input"
-              hx-swap="outerHTML">
-            {{ form_edit }}
-            <button type="submit">{% translate "Save" %}</button>
-        </form>
-        {% if form_saved %}<p>{% translate "Saved ✅" %}</p>{% endif %}
+        {% if user.is_authenticated %}
+            <form hx-encoding='multipart/form-data'
+                hx-post="{% url 'collectable:details' collectable.id %}"
+                hx-select="#attributes"
+                hx-target="#attributes"
+                hx-trigger="submit, keyup[keyCode==13] from:input"
+                hx-swap="outerHTML">
+                {{ form_edit }}
+                <button type="submit">{% translate "Save" %}</button>
+            </form>
+            {% if form_saved %}<p>{% translate "Saved ✅" %}</p>{% endif %}
+        {% else %}
+            <p>{% translate "Description" %}: {{ collectable.description }}</p>
+            <p>{% translate "Tags" %}:
+                {% for tag in collectable.tags.all %}
+                    <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a>
+                {% endfor %}
+            </p>
+        {% endif %}
     </section>
     <section id="possession">
         {% user_possession_form collectable %}
