@@ -12,6 +12,7 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
 from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
+from simple_history.template_utils import HistoricalRecordContextHelper
 
 from collectable.validators import MimetypeValidator, SquareImageValidator
 
@@ -118,6 +119,27 @@ class Collectable(models.Model):
                 collectable=self, likes=False, wants=False, owns=False
             )  # Don't save.
         return possession
+
+    def history_with_deltas(self):
+        """
+        Return the history entries with delta information.
+        """
+        previous = None
+        history_records = self.history.all()
+        for current in history_records:
+            if previous is None:
+                previous = current
+                continue
+            delta = previous.diff_against(current)
+            if len(delta.changes) == 0 and len(delta.changed_fields) == 0:
+                # See tags https://github.com/jazzband/django-taggit/issues/918
+                # are not tracked
+                pass
+
+            helper = HistoricalRecordContextHelper(Collectable, previous)
+            previous.history_delta_changes = helper.context_for_delta_changes(delta)
+            previous = current
+        return history_records
 
     class Meta:
         verbose_name = _("Collectable")
