@@ -76,7 +76,7 @@ class Collectable(models.Model):
         _("Created at"), auto_now_add=True, editable=False
     )
     modified_at = models.DateTimeField(_("Modified at"), auto_now=True, editable=False)
-    description = models.TextField(_("Description"), default="")
+    description = models.TextField(_("Description"), blank=True)
     photo = models.ImageField(
         _("Photo"),
         upload_to="collectables/%Y/",
