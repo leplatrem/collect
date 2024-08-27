@@ -88,12 +88,14 @@ def details(request, id):
         Collectable.objects.with_counts_and_possessions(request.user), id=id
     )
 
+    form_saved = False
     if request.method == "POST":
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
         form = CollectableForm(request.POST, request.FILES, instance=collectable)
         backup_photo = collectable.photo
         if form.is_valid():
+            form_saved = True
             collectable = form.save()
         else:
             # Why `is_valid()` is altering `collectable.photo`??
@@ -110,6 +112,7 @@ def details(request, id):
     context = {
         "collectable": collectable,
         "form_edit": form,
+        "form_saved": form_saved,
         "related_collectables": related_collectables,
     }
 
