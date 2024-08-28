@@ -38,7 +38,7 @@ class CollectableListView(ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
-            self.sort_by
+            self.sort_by, "-created_at"
         )
 
         if self.sort_by == "-nlikes":
