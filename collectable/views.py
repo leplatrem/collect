@@ -183,7 +183,7 @@ def collection(request, slugs):
         "tag_list": tag_list,
         "reltag_list": reltag_list,
         "total_owned": total_owned,
-        "percent_owned": 100 * total_owned / len(collectable_list),
+        "percent_owned": 100 * total_owned / max(len(collectable_list), 1),
     }
     return render(request, "collectable/collection.html", context)
 
