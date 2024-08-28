@@ -37,18 +37,20 @@
     </section>
     <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
     <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
-    <section>
-        <a href="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
-           hx-trigger="click, keyup[keyCode==219] from:window"
-           hx-get="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
-           hx-target="main"
-           hx-select="main">{% translate "Previous" %}</a>
-        <a href="{{ collectable.get_previous_by_created_at.get_absolute_url }}"
-           hx-trigger="click, keyup[keyCode==221] from:window"
-           hx-get="{{ collectable.get_next_by_created_at.get_absolute_url }}"
-           hx-target="main"
-           hx-select="main">{% translate "Next" %}</a>
-    </section>
+    {% with previous=collectable.get_previous_by_created_at.get_absolute_url next=collectable.get_next_by_created_at.get_absolute_url %}
+        <section>
+            <a href="{{ previous }}"
+               hx-trigger="click, keyup[keyCode==219] from:window"
+               hx-get="{{ previous }}"
+               hx-target="main"
+               hx-select="main">{% translate "Previous" %}</a>
+            <a href="{{ next }}"
+               hx-trigger="click, keyup[keyCode==221] from:window"
+               hx-get="{{ next }}"
+               hx-target="main"
+               hx-select="main">{% translate "Next" %}</a>
+        </section>
+    {% endwith %}
     <section>
         <h2>{% translate "History" %}</h2>
         <ul>
@@ -74,10 +76,18 @@
     </section>
     <section>
         <h2>{% translate "Similar collectables" %}</h2>
-        {% for collectable in related_collectables %}
-            {% include "collectable/collectable_thumbnail.html" %}
-        {% empty %}
-            {% translate "No other collectables with the same tags" %}
-        {% endfor %}
+        {% with count=RELATED_COLLECTABLES_LIST_COUNT|stringformat:"s" %}
+            {% with related_count=related_collectables.count lslice=":"|add:count %}
+                {% for collectable in related_collectables|slice:lslice %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% endfor %}
+                {% if related_count == 0 %}
+                    {% translate "No other collectables with the same tags" %}
+                {% endif %}
+                {% if related_count > RELATED_COLLECTABLES_LIST_COUNT %}
+                    <a href="{% url "collectable:collection" collectable.tags.slugs|join:"," %}">{% translate "More..." %}</a>
+                {% endif %}
+            {% endwith %}
+        {% endwith %}
     </section>
 {% endblock %}

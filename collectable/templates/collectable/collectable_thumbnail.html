@@ -9,7 +9,7 @@
              src="{{ collectable.thumbnail.url }}" />
     </a>
     <div class="taglist">
-        {% for tag in collectable.tags.all %}
+        {% for tag in collectable.tags_list %}
             <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a>
         {% endfor %}
     </div>

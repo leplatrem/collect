@@ -27,12 +27,14 @@ class UUIDTaggedItem(
 class CollectableManager(models.Manager):
     def with_counts_and_possessions(self, user):
         # Since all views show tags, prefetch them.
-        qs = self.prefetch_related("tags")
+        qs = self.prefetch_related(Prefetch("tags", to_attr="tags_list"))
         # If user is logged in, prefetch their possessions.
         if user.is_authenticated:
             qs = qs.prefetch_related(
                 Prefetch(
-                    "possession_set", queryset=Possession.objects.filter(user=user)
+                    "possession_set",
+                    queryset=Possession.objects.filter(user=user),
+                    to_attr="possession_set_list",
                 )
             )
         # Add counter aggregations for possessions
@@ -111,8 +113,8 @@ class Collectable(models.Model):
     def possession_of(self, user):
         possession = None
         if user.is_authenticated:
-            possessions = self.possession_set.all()
-            possession = possessions[0] if possessions else None
+            if possessions := getattr(self, "possession_set_list", []):
+                possession = possessions[0]
         if possession is None:
             possession = Possession(
                 collectable=self, likes=False, wants=False, owns=False
@@ -124,7 +126,7 @@ class Collectable(models.Model):
         Return the history entries with delta information.
         """
         previous = None
-        history_records = self.history.all()
+        history_records = self.history.select_related("history_user").all()
         for current in history_records:
             if previous is None:
                 previous = current

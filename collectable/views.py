@@ -160,7 +160,7 @@ def collection(request, slugs):
     total_owned = sum(
         1
         for c in collectable_list
-        if c.possession_set.all() and c.possession_set.all()[0].owns
+        if getattr(c, "possession_set_list", []) and c.possession_set_list[0].owns
     )
 
     known_tag_slugs = [t.slug for t in tag_list]
