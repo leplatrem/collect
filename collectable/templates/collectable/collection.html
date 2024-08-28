@@ -27,7 +27,7 @@
     {% endif %}
     {% if reltag_list %}
         <h3>{% translate "Related collections" %}</h3>
-        <ul>
+        <ul class="as-columns">
             {% for tag in reltag_list %}
                 <li>
                     <a href="{% url "collectable:collection" slugs|join:","|add:","|add:tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
