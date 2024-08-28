@@ -73,6 +73,9 @@ def create(request):
         form = CollectableForm(request.POST, request.FILES)
         if form.is_valid():
             collectable = form.save()
+            Possession.objects.create(
+                user=request.user, collectable=collectable, owns=True
+            )
             return redirect(collectable)
     else:
         form = CollectableForm()
