@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('collectable', '0002_uuidtaggeditem_collectable_tags'),
+        ("collectable", "0002_uuidtaggeditem_collectable_tags"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='collectable',
-            name='description',
-            field=models.TextField(default='', verbose_name='Description'),
+            model_name="collectable",
+            name="description",
+            field=models.TextField(default="", verbose_name="Description"),
         ),
         migrations.AddField(
-            model_name='historicalcollectable',
-            name='description',
-            field=models.TextField(default='', verbose_name='Description'),
+            model_name="historicalcollectable",
+            name="description",
+            field=models.TextField(default="", verbose_name="Description"),
         ),
     ]

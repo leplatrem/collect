@@ -225,9 +225,7 @@ SECURE_SSL_REDIRECT: bool = config(
 SESSION_COOKIE_SECURE: bool = config(
     "DJANGO_SESSION_COOKIE_SECURE", default=False, cast=bool
 )
-CSRF_COOKIE_SECURE: bool = config(
-    "DJANGO_CSRF_COOKIE_SECURE", default=False, cast=bool
-)
+CSRF_COOKIE_SECURE: bool = config("DJANGO_CSRF_COOKIE_SECURE", default=False, cast=bool)
 CSRF_TRUSTED_ORIGINS: list[str] = config(
     "DJANGO_CSRF_TRUSTED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(",")]
 )

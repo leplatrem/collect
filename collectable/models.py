@@ -1,6 +1,5 @@
 import uuid
 
-import simple_history
 import taggit.models
 from django.conf import settings
 from django.db import models
@@ -11,8 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
 from simple_history.models import HistoricalRecords
-from taggit.managers import TaggableManager
 from simple_history.template_utils import HistoricalRecordContextHelper
+from taggit.managers import TaggableManager
 
 from collectable.validators import MimetypeValidator, SquareImageValidator
 

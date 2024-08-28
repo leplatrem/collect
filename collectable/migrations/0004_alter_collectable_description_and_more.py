@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('collectable', '0003_collectable_description_and_more'),
+        ("collectable", "0003_collectable_description_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='collectable',
-            name='description',
-            field=models.TextField(blank=True, verbose_name='Description'),
+            model_name="collectable",
+            name="description",
+            field=models.TextField(blank=True, verbose_name="Description"),
         ),
         migrations.AlterField(
-            model_name='historicalcollectable',
-            name='description',
-            field=models.TextField(blank=True, verbose_name='Description'),
+            model_name="historicalcollectable",
+            name="description",
+            field=models.TextField(blank=True, verbose_name="Description"),
         ),
     ]
