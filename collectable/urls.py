@@ -30,7 +30,7 @@ urlpatterns = [
     path("<uuid:id>/", views.details, name="details"),
     path("<uuid:id>/possession/", views.possession, name="possession"),
     re_path(
-        r"^collection/(?P<slugs>[0-9a-zA-Z\-]+(,[0-9a-zA-Z\-]+)*)/$",
+        r"^collection/(?P<slugs>[0-9a-zA-Z_\-]+(,[0-9a-zA-Z_\-]+)*)/$",
         views.collection,
         name="collection",
     ),
