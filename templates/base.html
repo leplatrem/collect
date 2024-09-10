@@ -1,14 +1,15 @@
 {% load static %}
 {% load i18n %}
 <!DOCTYPE html>
-<html>
+<html lang="{{ get_current_language }}">
     <head>
         <meta charset="utf-8">
         <title>Collect -
             {% block title %}{% endblock %}
         </title>
-        <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}'>
-        <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/style.css' %}">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="{% static '/js/htmx-2.0.2.min.js' %}"></script>
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <header>
