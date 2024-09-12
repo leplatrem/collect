@@ -1,0 +1,14 @@
+{% load i18n %}
+<div {% if page_obj.has_next %} hx-get="?page={{ page_obj.next_page_number }}" hx-trigger="revealed" hx-swap="outerHTML" hx-select="{{ hxselect }},nav" {% endif %}>
+    <noscript>
+        {% if page_obj.has_previous %}
+            <a class="first" href="?page=1">{% translate "First page" %}</a>
+            <a class="previous" href="?page={{ page_obj.previous_page_number }}">{% translate "Previous" %}</a>
+        {% endif %}
+        {% blocktranslate with number=page_obj.number total=page_obj.paginator.num_pages%}Page {{number}} of {{total}}{% endblocktranslate %}
+        {% if page_obj.has_next %}
+            <a class="next" href="?page={{ page_obj.next_page_number }}">{% translate "Next" %}</a>
+            <a class="last" href="?page={{ page_obj.paginator.num_pages }}">{% translate "Last page" %}</a>
+        {% endif %}
+    </noscript>
+</div>

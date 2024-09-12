@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models.query import QuerySet
@@ -40,13 +41,14 @@ def index(request):
 
 
 class CollectableListView(ListView):
-    template_name = "collectable/collectable_list.html"
+    model = Collectable
     sort_by = "-created_at"
+    paginate_by = settings.DEFAULT_PAGE_SIZE
 
     def get_queryset(self) -> QuerySet[Any]:
-        qs = Collectable.objects.with_counts_and_possessions(
-            self.request.user
-        ).order_by(self.sort_by, "-created_at")
+        qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
+            self.sort_by, "-created_at"
+        )
 
         if self.sort_by == "-nlikes":
             qs = qs.filter(nlikes__gt=0)
@@ -54,8 +56,6 @@ class CollectableListView(ListView):
             qs = qs.filter(nwants__gt=0)
         elif self.sort_by == "-nowns":
             qs = qs.filter(nowns__gt=0)
-
-        qs = paginate(self.request, qs)
 
         return qs
 
@@ -190,6 +190,7 @@ def collection(request, slugs):
     context = {
         "slugs": slugs,
         "collectable_list": collectable_list,
+        "page_obj": paginate(request, qs=collectable_list),
         "tag_list": tag_list,
         "reltag_list": reltag_list,
         "total_owned": total_owned,
