@@ -37,9 +37,14 @@
             {% endfor %}
         </ul>
     {% endif %}
-    {% for collectable in collectable_list %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% blocktranslate with slugs=slugs|join:", " %}No collectable with tags {{ slugs }}{% endblocktranslate %}
-    {% endfor %}
+    <section id="collectable-list">
+        {% for collectable in page_obj %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% blocktranslate with slugs=slugs|join:", " %}No collectable with tags {{ slugs }}{% endblocktranslate %}
+        {% endfor %}
+    </section>
+{% endblock %}
+{% block nav %}
+    {% include "paginator.html" with page_obj=page_obj hxselect="#collectable-list" %}
 {% endblock %}
