@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 from taggit.models import Tag
 
+from collect.utils import paginate
 from collectable.forms import CollectableForm, PossessionForm
 from collectable.models import Collectable, Possession
 
@@ -33,13 +34,13 @@ def index(request):
 
 
 class CollectableListView(ListView):
-    model = Collectable
+    template_name = "collectable/collectable_list.html"
     sort_by = "-created_at"
 
     def get_queryset(self) -> QuerySet[Any]:
-        qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
-            self.sort_by, "-created_at"
-        )
+        qs = Collectable.objects.with_counts_and_possessions(
+            self.request.user
+        ).order_by(self.sort_by, "-created_at")
 
         if self.sort_by == "-nlikes":
             qs = qs.filter(nlikes__gt=0)
@@ -47,6 +48,9 @@ class CollectableListView(ListView):
             qs = qs.filter(nwants__gt=0)
         elif self.sort_by == "-nowns":
             qs = qs.filter(nowns__gt=0)
+
+        qs = paginate(self.request, qs)
+
         return qs
 
     def get_context_data(self, **kwargs):
