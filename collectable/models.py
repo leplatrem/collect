@@ -3,7 +3,7 @@ import uuid
 import taggit.models
 from django.conf import settings
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
 from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +12,7 @@ from imagekit.processors import Thumbnail
 from simple_history.models import HistoricalRecords
 from simple_history.template_utils import HistoricalRecordContextHelper
 from taggit.managers import TaggableManager
+from taggit.models import Tag
 
 from collectable.validators import MimetypeValidator, SquareImageValidator
 
@@ -106,6 +107,13 @@ class Collectable(models.Model):
     )
 
     objects = CollectableManager()
+
+    def tags_with_count(self):
+        return (
+            Tag.objects.filter(slug__in=self.tags.slugs())
+            .annotate(ncollectable=Count("collectable"))
+            .order_by("-ncollectable")
+        )
 
     def get_absolute_url(self):
         return reverse_lazy("collectable:details", kwargs={"id": self.id})

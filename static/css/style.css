@@ -49,6 +49,15 @@ section#attributes input[type="text"] {
     width: 95%;
 }
 
+section#history ul {
+    max-height: 10em;
+    overflow-y: auto;
+}
+
+section#related {
+    margin-bottom: 1em;
+}
+
 .possession-form label {
     display: none;
 }

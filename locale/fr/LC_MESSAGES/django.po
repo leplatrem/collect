@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-13 00:02+0200\n"
+"POT-Creation-Date: 2024-09-13 00:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,11 +27,11 @@ msgstr "Secret d'invitation"
 msgid "Invalid secret: %(value)s"
 msgstr "Secret invalide : %(value)s"
 
-#: collect/settings.py:170
+#: collect/settings.py:161
 msgid "English"
 msgstr "Anglais"
 
-#: collect/settings.py:171
+#: collect/settings.py:162
 msgid "French"
 msgstr "Français"
 
@@ -73,68 +73,68 @@ msgstr "Propriétaire de %s assigné avec succès"
 msgid "%s collectables in database."
 msgstr "%s objets dans la base de données."
 
-#: collectable/models.py:23
+#: collectable/models.py:24
 msgid "Tag"
 msgstr "Étiquette"
 
-#: collectable/models.py:24 collectable/models.py:90
+#: collectable/models.py:25 collectable/models.py:91
 #: collectable/templates/collectable/details.html:28
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: collectable/models.py:74
+#: collectable/models.py:75
 msgid "Identifier"
 msgstr "Identifiant"
 
-#: collectable/models.py:77
+#: collectable/models.py:78
 msgid "Created at"
 msgstr "Créé le"
 
-#: collectable/models.py:79
+#: collectable/models.py:80
 msgid "Modified at"
 msgstr "Modifié le"
 
-#: collectable/models.py:80 collectable/templates/collectable/details.html:26
+#: collectable/models.py:81 collectable/templates/collectable/details.html:26
 msgid "Description"
 msgstr "Description"
 
-#: collectable/models.py:82
+#: collectable/models.py:83
 msgid "Photo"
 msgstr "Photo"
 
-#: collectable/models.py:84
+#: collectable/models.py:85
 msgid "Please provide a square JPEG image (.jpg, .jpeg)"
 msgstr "Veuillez fournir une image JPEG carrée (.jpg, .jpeg)"
 
-#: collectable/models.py:92 collectable/templates/collectable/details.html:55
+#: collectable/models.py:93 collectable/templates/collectable/details.html:55
 msgid "History"
 msgstr "Historique"
 
-#: collectable/models.py:146
+#: collectable/models.py:156
 msgid "Collectable"
 msgstr "Objet"
 
-#: collectable/models.py:147
+#: collectable/models.py:157
 msgid "Collectables"
 msgstr "Objets"
 
-#: collectable/models.py:153
+#: collectable/models.py:163
 msgid "Likes"
 msgstr "Aime"
 
-#: collectable/models.py:154
+#: collectable/models.py:164
 msgid "Wants"
 msgstr "Recherche"
 
-#: collectable/models.py:155
+#: collectable/models.py:165
 msgid "Owns"
 msgstr "Possède"
 
-#: collectable/models.py:158
+#: collectable/models.py:168
 msgid "Possession"
 msgstr "Possession"
 
-#: collectable/models.py:159
+#: collectable/models.py:169
 msgid "Possessions"
 msgstr "Possessions"
 
@@ -180,7 +180,7 @@ msgstr "Collections associées"
 msgid "None"
 msgstr "Aucune"
 
-#: collectable/templates/collectable/collection.html:45
+#: collectable/templates/collectable/collection.html:44
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr "Aucun objet avec les étiquettes %(slugs)s"
@@ -189,6 +189,11 @@ msgstr "Aucun objet avec les étiquettes %(slugs)s"
 #: collectable/templates/collectable/create.html:10
 msgid "Create"
 msgstr "Ajouter"
+
+#: collectable/templates/collectable/details.html:4
+#, python-format
+msgid "Details of %(id)s"
+msgstr "Détails de %(id)s"
 
 #: collectable/templates/collectable/details.html:6
 msgid "Details"
@@ -241,11 +246,15 @@ msgstr ""
 msgid "Similar collectables"
 msgstr "Objets similaires"
 
-#: collectable/templates/collectable/details.html:85
-msgid "No other collectables with the same tags"
-msgstr "Aucun autre objet avec les mêmes étiquettes"
+#: collectable/templates/collectable/details.html:79
+msgid "With the same tags"
+msgstr "Avec les mêmes étiquettes"
 
 #: collectable/templates/collectable/details.html:88
+msgid "No other collectables found."
+msgstr "Aucun autre objet trouvé."
+
+#: collectable/templates/collectable/details.html:91
 #: collectable/templates/collectable/index.html:13
 #: collectable/templates/collectable/index.html:22
 #: collectable/templates/collectable/index.html:31
@@ -261,7 +270,7 @@ msgstr "Explorer"
 msgid "Latest"
 msgstr "Derniers"
 
-#: collectable/templates/collectable/index.html:10 collectable/views.py:65
+#: collectable/templates/collectable/index.html:10 collectable/views.py:71
 msgid "No collectable in database."
 msgstr "Aucun objet dans la base de données."
 
@@ -357,35 +366,35 @@ msgstr "%s n'a pas le bon format de fichier."
 msgid "%s is not a square image"
 msgstr "\"%s\" n'est pas une image carrée"
 
-#: collectable/views.py:59
+#: collectable/views.py:65
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
-#: collectable/views.py:60
+#: collectable/views.py:66
 msgid "Most liked collectables"
 msgstr "Objets les plus aimés"
 
-#: collectable/views.py:61
+#: collectable/views.py:67
 msgid "Most wanted collectables"
 msgstr "Objets les plus recherchés"
 
-#: collectable/views.py:62
+#: collectable/views.py:68
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-#: collectable/views.py:66
+#: collectable/views.py:72
 msgid "No liked collectable"
 msgstr "Aucun objet aimé"
 
-#: collectable/views.py:67
+#: collectable/views.py:73
 msgid "No wanted collectable"
 msgstr "Aucun objet recherché"
 
-#: collectable/views.py:68
+#: collectable/views.py:74
 msgid "No owned collectable"
 msgstr "Aucun objet possédé"
 
-#: collectable/views.py:101
+#: collectable/views.py:107
 msgid "Unauthorized"
 msgstr "Interdit"
 
@@ -442,3 +451,6 @@ msgstr "S'inscrire"
 #: templates/registration/signup.html:4
 msgid "Sign Up"
 msgstr "S'inscrire"
+
+#~ msgid "No other collectables with the same tags"
+#~ msgstr "Aucun autre objet avec les mêmes étiquettes"

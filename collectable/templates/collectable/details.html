@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load collectable_extras %}
-{% block title %}Details{% endblock %}
+{% block title %}
+    {% blocktranslate with id=collectable.id %}Details of {{ id }}{% endblocktranslate %}
+{% endblock %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
     <section id="attributes">
@@ -13,6 +15,7 @@
             <form hx-encoding='multipart/form-data'
                   hx-post="{% url 'collectable:details' collectable.id %}"
                   hx-select="#attributes"
+                  hx-select-oob="#history,#related"
                   hx-target="#attributes"
                   hx-trigger="submit, keyup[keyCode==13] from:input"
                   hx-swap="outerHTML">
@@ -35,24 +38,10 @@
     <section id="possession">
         {% user_possession_form collectable %}
     </section>
-    <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
-    <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
-    {% with previous=collectable.get_previous_by_created_at.get_absolute_url next=collectable.get_next_by_created_at.get_absolute_url %}
-        <section>
-            <a href="{{ previous }}"
-               hx-trigger="click, keyup[keyCode==219] from:window"
-               hx-get="{{ previous }}"
-               hx-target="main"
-               hx-select="main">{% translate "Previous" %}</a>
-            <a href="{{ next }}"
-               hx-trigger="click, keyup[keyCode==221] from:window"
-               hx-get="{{ next }}"
-               hx-target="main"
-               hx-select="main">{% translate "Next" %}</a>
-        </section>
-    {% endwith %}
-    <section>
+    <section id="history">
         <h2>{% translate "History" %}</h2>
+        <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
+        <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
         <ul>
             {% for history in collectable.history_with_deltas %}
                 <li>
@@ -74,15 +63,22 @@
             {% endfor %}
         </ul>
     </section>
-    <section>
+    <section id="related">
         <h2>{% translate "Similar collectables" %}</h2>
+        <p>
+            {% translate "With the same tags" %}
+            {% for tag in collectable.tags_with_count.all %}
+                <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }})
+            {% endfor %}
+            :
+        </p>
         {% with count=RELATED_COLLECTABLES_LIST_COUNT|stringformat:"s" %}
             {% with related_count=related_collectables.count lslice=":"|add:count %}
                 {% for collectable in related_collectables|slice:lslice %}
                     {% include "collectable/collectable_thumbnail.html" %}
                 {% endfor %}
                 {% if related_count == 0 %}
-                    {% translate "No other collectables with the same tags" %}
+                    {% translate "No other collectables found." %}
                 {% endif %}
                 {% if related_count > RELATED_COLLECTABLES_LIST_COUNT %}
                     <a href="{% url "collectable:collection" collectable.tags.slugs|join:"," %}">{% translate "More..." %}</a>
@@ -90,4 +86,20 @@
             {% endwith %}
         {% endwith %}
     </section>
+{% endblock %}
+{% block nav %}
+    {% with previous=collectable.get_previous_by_created_at.get_absolute_url next=collectable.get_next_by_created_at.get_absolute_url %}
+        <section id="navigation">
+            <a href="{{ previous }}"
+               hx-trigger="click, keyup[keyCode==219] from:window"
+               hx-get="{{ previous }}"
+               hx-target="main"
+               hx-select="main">{% translate "Previous" %}</a>
+            <a href="{{ next }}"
+               hx-trigger="click, keyup[keyCode==221] from:window"
+               hx-get="{{ next }}"
+               hx-target="main"
+               hx-select="main">{% translate "Next" %}</a>
+        </section>
+    {% endwith %}
 {% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-13 00:02+0200\n"
+"POT-Creation-Date: 2024-09-13 00:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,11 +27,11 @@ msgstr ""
 msgid "Invalid secret: %(value)s"
 msgstr ""
 
-#: collect/settings.py:170
+#: collect/settings.py:161
 msgid "English"
 msgstr ""
 
-#: collect/settings.py:171
+#: collect/settings.py:162
 msgid "French"
 msgstr ""
 
@@ -73,68 +73,68 @@ msgstr ""
 msgid "%s collectables in database."
 msgstr ""
 
-#: collectable/models.py:23
+#: collectable/models.py:24
 msgid "Tag"
 msgstr ""
 
-#: collectable/models.py:24 collectable/models.py:90
+#: collectable/models.py:25 collectable/models.py:91
 #: collectable/templates/collectable/details.html:28
 msgid "Tags"
 msgstr ""
 
-#: collectable/models.py:74
+#: collectable/models.py:75
 msgid "Identifier"
 msgstr ""
 
-#: collectable/models.py:77
+#: collectable/models.py:78
 msgid "Created at"
 msgstr ""
 
-#: collectable/models.py:79
+#: collectable/models.py:80
 msgid "Modified at"
 msgstr ""
 
-#: collectable/models.py:80 collectable/templates/collectable/details.html:26
+#: collectable/models.py:81 collectable/templates/collectable/details.html:26
 msgid "Description"
 msgstr ""
 
-#: collectable/models.py:82
+#: collectable/models.py:83
 msgid "Photo"
 msgstr ""
 
-#: collectable/models.py:84
+#: collectable/models.py:85
 msgid "Please provide a square JPEG image (.jpg, .jpeg)"
 msgstr ""
 
-#: collectable/models.py:92 collectable/templates/collectable/details.html:55
+#: collectable/models.py:93 collectable/templates/collectable/details.html:55
 msgid "History"
 msgstr ""
 
-#: collectable/models.py:146
+#: collectable/models.py:156
 msgid "Collectable"
 msgstr ""
 
-#: collectable/models.py:147
+#: collectable/models.py:157
 msgid "Collectables"
 msgstr ""
 
-#: collectable/models.py:153
+#: collectable/models.py:163
 msgid "Likes"
 msgstr ""
 
-#: collectable/models.py:154
+#: collectable/models.py:164
 msgid "Wants"
 msgstr ""
 
-#: collectable/models.py:155
+#: collectable/models.py:165
 msgid "Owns"
 msgstr ""
 
-#: collectable/models.py:158
+#: collectable/models.py:168
 msgid "Possession"
 msgstr ""
 
-#: collectable/models.py:159
+#: collectable/models.py:169
 msgid "Possessions"
 msgstr ""
 
@@ -174,7 +174,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: collectable/templates/collectable/collection.html:45
+#: collectable/templates/collectable/collection.html:44
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr ""
@@ -182,6 +182,11 @@ msgstr ""
 #: collectable/templates/collectable/create.html:6
 #: collectable/templates/collectable/create.html:10
 msgid "Create"
+msgstr ""
+
+#: collectable/templates/collectable/details.html:4
+#, python-format
+msgid "Details of %(id)s"
 msgstr ""
 
 #: collectable/templates/collectable/details.html:6
@@ -232,11 +237,15 @@ msgstr ""
 msgid "Similar collectables"
 msgstr ""
 
-#: collectable/templates/collectable/details.html:85
-msgid "No other collectables with the same tags"
+#: collectable/templates/collectable/details.html:79
+msgid "With the same tags"
 msgstr ""
 
 #: collectable/templates/collectable/details.html:88
+msgid "No other collectables found."
+msgstr ""
+
+#: collectable/templates/collectable/details.html:91
 #: collectable/templates/collectable/index.html:13
 #: collectable/templates/collectable/index.html:22
 #: collectable/templates/collectable/index.html:31
@@ -252,7 +261,7 @@ msgstr ""
 msgid "Latest"
 msgstr ""
 
-#: collectable/templates/collectable/index.html:10 collectable/views.py:65
+#: collectable/templates/collectable/index.html:10 collectable/views.py:71
 msgid "No collectable in database."
 msgstr ""
 
@@ -348,35 +357,35 @@ msgstr ""
 msgid "%s is not a square image"
 msgstr ""
 
-#: collectable/views.py:59
+#: collectable/views.py:65
 msgid "Latest collectables"
 msgstr ""
 
-#: collectable/views.py:60
+#: collectable/views.py:66
 msgid "Most liked collectables"
 msgstr ""
 
-#: collectable/views.py:61
+#: collectable/views.py:67
 msgid "Most wanted collectables"
 msgstr ""
 
-#: collectable/views.py:62
+#: collectable/views.py:68
 msgid "Most owned collectables"
 msgstr ""
 
-#: collectable/views.py:66
+#: collectable/views.py:72
 msgid "No liked collectable"
 msgstr ""
 
-#: collectable/views.py:67
+#: collectable/views.py:73
 msgid "No wanted collectable"
 msgstr ""
 
-#: collectable/views.py:68
+#: collectable/views.py:74
 msgid "No owned collectable"
 msgstr ""
 
-#: collectable/views.py:101
+#: collectable/views.py:107
 msgid "Unauthorized"
 msgstr ""
 
