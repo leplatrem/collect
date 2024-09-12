@@ -26,12 +26,12 @@
                 <a href="{% url 'auth:login' %}">{% translate "Log In" %}</a>
             {% endif %}
         </header>
-        <nav>
-            {% block nav %}{% endblock %}
-        </nav>
         <main>
             {% block content %}{% endblock %}
         </main>
+        <nav>
+            {% block nav %}{% endblock %}
+        </nav>
         <footer>
             {% block footer %}{% endblock %}
         </footer>

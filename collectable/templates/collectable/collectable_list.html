@@ -3,9 +3,26 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h1>{{ title }}</h1>
-    {% for collectable in object_list %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {{ empty_msg }}
-    {% endfor %}
+    <section id="collectable-list">
+        {% for collectable in object_list %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {{ empty_msg }}
+        {% endfor %}
+    </section>
+{% endblock %}
+{% block nav %}
+    <div {% if object_list.has_next %} hx-get="?page={{ object_list.next_page_number }}" hx-trigger="revealed" hx-swap="outerHTML" hx-select="#collectable-list,nav" {% endif %}>
+        <noscript>
+            {% if object_list.has_previous %}
+                <a class="first" href="?page=1">{% translate "First page" %}</a>
+                <a class="previous" href="?page={{ object_list.previous_page_number }}">{% translate "Previous" %}</a>
+            {% endif %}
+            <a class="current">{{ object_list.number }}/{{ object_list.num_pages }}</a>
+            {% if object_list.has_next %}
+                <a class="next" href="?page={{ object_list.next_page_number }}">{% translate "Next" %}</a>
+                <a class="last" href="?page={{ object_list.paginator.num_pages }}">{% translate "Last page" %}</a>
+            {% endif %}
+        </noscript>
+    </div>
 {% endblock %}
