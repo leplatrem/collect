@@ -233,3 +233,4 @@ CSRF_TRUSTED_ORIGINS: list[str] = config(
     "DJANGO_CSRF_TRUSTED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
 TAGGIT_TAGS_FROM_STRING = "collect.utils.tags_splitter"
+TAGGIT_STRING_FROM_TAGS = "collect.utils.tags_joiner"

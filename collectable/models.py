@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Count, Prefetch
 from django.db.models.functions import Coalesce
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
@@ -14,6 +16,7 @@ from simple_history.template_utils import HistoricalRecordContextHelper
 from taggit.managers import TaggableManager
 from taggit.models import Tag
 
+from collect.utils import tags_joiner
 from collectable.validators import MimetypeValidator, SquareImageValidator
 
 
@@ -65,11 +68,6 @@ class CollectableManager(models.Manager):
         )
 
 
-# Track changes of tags
-# simple_history.register(taggit.models.Tag)
-# simple_history.register(UUIDTaggedItem)
-
-
 class Collectable(models.Model):
     id = models.UUIDField(
         _("Identifier"), primary_key=True, default=uuid.uuid4, editable=False
@@ -89,10 +87,13 @@ class Collectable(models.Model):
         ],
     )
     tags = TaggableManager(_("Tags"), through=UUIDTaggedItem)
-    history = HistoricalRecords(
-        _("History"), excluded_fields=["modified_at"]
-    )  # m2m_fields=[tags]
     possessions = models.ManyToManyField(settings.AUTH_USER_MODEL, through="Possession")
+
+    history = HistoricalRecords(_("History"), excluded_fields=["modified_at"])
+    # Because of https://github.com/jazzband/django-taggit/issues/918
+    # we use a computed field to track tags changes, with the `post_save` signal
+    # defined below.
+    _computed_tags = models.TextField(_("Tags"))
 
     thumbnail = ImageSpecField(
         source="photo",
@@ -107,6 +108,14 @@ class Collectable(models.Model):
     )
 
     objects = CollectableManager()
+
+    @receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
+    def on_tag_changed(sender, instance, created, **kwargs):
+        item = instance.content_object
+        if not isinstance(item, Collectable):
+            return
+        item._computed_tags = tags_joiner(item.tags.all())
+        item.save(update_fields=["_computed_tags"])
 
     def tags_with_count(self):
         return (
@@ -135,20 +144,22 @@ class Collectable(models.Model):
         """
         previous = None
         history_records = self.history.select_related("history_user").all()
+        filtered = []
         for current in history_records:
             if previous is None:
                 previous = current
                 continue
+
             delta = previous.diff_against(current)
-            if len(delta.changes) == 0 and len(delta.changed_fields) == 0:
-                # See tags https://github.com/jazzband/django-taggit/issues/918
-                # are not tracked
-                pass
+            if len(delta.changes) == 0 or len(delta.changed_fields) == 0:
+                previous = current
+                continue
 
             helper = HistoricalRecordContextHelper(Collectable, previous)
             previous.history_delta_changes = helper.context_for_delta_changes(delta)
+            filtered.append(previous)
             previous = current
-        return history_records
+        return filtered
 
     class Meta:
         verbose_name = _("Collectable")
