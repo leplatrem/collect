@@ -180,7 +180,7 @@ if not DEBUG:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-DEFAULT_MEDIA_URL = "/media"
+DEFAULT_MEDIA_URL = "/media/"
 
 if config("COLLECT_MEDIA_STORAGE", default="local") == "GCS":
     from google.oauth2 import service_account
@@ -216,9 +216,9 @@ COLLECTABLE_THUMBNAIL_QUALITY = config(
 COLLECTABLE_PHOTO_MAX_SIZE = config(
     "COLLECT_COLLECTABLE_PHOTO_MAX_SIZE", default=640, cast=int
 )
-HOME_LIST_COUNT = 6
+HOME_LIST_COUNT = config("COLLECT_HOME_LIST_COUNT", default=6, cast=int)
 DEFAULT_PAGE_SIZE = config("COLLECT_DEFAULT_PAGE_SIZE", default=20, cast=int)
-RELATED_COLLECTABLES_LIST_COUNT = 20
+RELATED_COLLECTABLES_LIST_COUNT = config("COLLECT_RELATED_COLLECTABLES_LIST_COUNT", default=20, cast=int)
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
