@@ -187,7 +187,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TAGGIT_CASE_INSENSITIVE = True
 
-MEDIA_URL = "/media/"
+MEDIA_URL = config("DJANGO_MEDIA_URL", default="/media/")
 MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / "uploads")
 
 ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
