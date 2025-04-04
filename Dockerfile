@@ -14,7 +14,7 @@ RUN python3 -m venv $POETRY_HOME && \
 
 WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
-RUN $POETRY_HOME/bin/poetry install --no-dev --no-root
+RUN $POETRY_HOME/bin/poetry install --no-root
 
 FROM python:3.12.5-slim as production
 
