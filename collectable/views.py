@@ -160,7 +160,9 @@ def collection(request, slugs):
         Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
     )
 
-    collectable_list = Collectable.objects.with_counts_and_possessions(request.user)
+    collectable_list = Collectable.objects.with_counts_and_possessions(
+        request.user
+    ).order_by("-created_at")
 
     for slug in slugs:
         collectable_list = collectable_list.filter(tags__slug=slug)
