@@ -43,6 +43,8 @@ class Command(BaseCommand):
             owner = User.objects.get(username=options["owner"])
 
         images = folder_path.glob("**/*.jpg")
+        count_created = 0
+        count_updated = 0
         for image_path in images:
             # Consider subfolders as tags.
             parent_folder = image_path.parent
@@ -137,10 +139,12 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.SUCCESS(_("Successfully created %s") % collectable)
                 )
+                count_created += 1
             if updated:
                 self.stdout.write(
                     self.style.SUCCESS(_("Successfully updated %s") % collectable)
                 )
+                count_updated += 1
 
             if owner:
                 possession, changed = Possession.objects.get_or_create(
@@ -156,6 +160,13 @@ class Command(BaseCommand):
                             _("Successfully assigned owner of %s") % collectable
                         )
                     )
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                _("%s collectables created, %s updated.")
+                % (count_created, count_updated)
+            )
+        )
 
         self.stdout.write(
             self.style.SUCCESS(
