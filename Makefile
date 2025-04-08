@@ -3,7 +3,7 @@ INSTALL_STAMP := .install.stamp
 ENV_FILE := .env
 POETRY := $(shell command -v poetry 2> /dev/null)
 
-.PHONY: help clean lint format tests
+.PHONY: help clean lint format migrate demo tests
 
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following commands.\n"
@@ -32,6 +32,25 @@ format: $(INSTALL_STAMP)  ## Format code base
 	$(POETRY) run ruff format $(FOLDERS)
 	$(POETRY) run djlint $(FOLDERS) --reformat
 
+migrate:  ## Run pending migrations if needed
+	@echo "Checking for unapplied migrations..."
+	@$(POETRY) run sh -c '\
+		if python manage.py showmigrations --plan | grep "\[ \]" > /dev/null; then \
+			echo "Running migrations..."; \
+			python manage.py migrate; \
+		else \
+			echo "No migrations to apply."; \
+		fi \
+	'
+
+createsuperuser: migrate   ## Create admin user if necessary
+	@echo "Ensuring admin user exists with default password..."
+	DJANGO_SETTINGS_MODULE=collect.settings $(POETRY) run python bin/createsuperuser.py
+
+demo: $(INSTALL_STAMP) $(ENV_FILE) createsuperuser   ## Load demo data
+	$(POETRY) run python manage.py loadfolder admin demo
+	@echo "You can now run 'make start'"
+
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP) $(VERSION_FILE)
 	$(POETRY) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
@@ -39,6 +58,5 @@ tests: $(INSTALL_STAMP) $(VERSION_FILE)
 $(ENV_FILE):
 	cp -n env.local .env
 
-start: $(INSTALL_STAMP) $(ENV_FILE) ## Start the app
-	$(POETRY) run python manage.py migrate
+start: $(INSTALL_STAMP) $(ENV_FILE) migrate  ## Start the app
 	$(POETRY) run python manage.py runserver

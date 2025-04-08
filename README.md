@@ -15,6 +15,10 @@ Publish and track your collectables.
 ### Run locally
 
 ```
+make demo
+```
+
+```
 make start
 ```
 
