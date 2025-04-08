@@ -1,5 +1,6 @@
 import hashlib
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -60,29 +61,53 @@ class Command(BaseCommand):
                 continue
 
             exif = im.getexif()
+
             try:
                 # Use shot date time and camera model as identifier of collectable.
                 # This way pictures can be renamed and still be identified.
                 seed = (
                     exif[ExifTags.Base.DateTime.value]
                     + "-"
-                    + exif[ExifTags.Base.Model.value]
+                    + exif.get(ExifTags.Base.Model.value, "unknown")
                 )
             except KeyError:
                 self.stdout.write(
-                    self.style.ERROR(
-                        _('"%s" has no EXIF metadata, skipping.') % image_path
+                    self.style.WARNING(
+                        _(
+                            '"%s" has no DateTime EXIF metadata, using filename as ID seed.'
+                        )
+                        % image_path
                     )
                 )
-                continue
+                seed = image_path.name
             m = hashlib.md5()
             m.update(str(seed).encode("utf-8"))
             uuid_id = uuid.UUID(m.hexdigest())
+
+            # Extract EXIF description
+            # Extract tags from description (eg. `This is a caption with some hashtags #fun #2025`)
+            exif_description = (
+                exif.get(ExifTags.Base.ImageDescription, "")
+                .encode("latin1")
+                .decode("utf-8", errors="replace")
+            )
+            if match := re.match(
+                r"^(.*?)(?:\s+(#[\w\d]+(?:\s+#[\w\d]+)*))?$", exif_description.strip()
+            ):
+                exif_description = match.group(1).strip()
+                tags_str = match.group(2)
+                taglist += [
+                    t.replace("#", "")
+                    for t in (tags_str.strip().split() if tags_str else [])
+                ]
 
             updated = False
             created = False
             try:
                 collectable = Collectable.objects.get(id=uuid_id)
+
+                if not collectable.description:
+                    collectable.description = exif_description
 
                 if set(taglist) != set(collectable.tags.slugs()):
                     collectable.tags.add(*taglist)
@@ -99,7 +124,9 @@ class Command(BaseCommand):
             except Collectable.DoesNotExist:
                 with image_path.open(mode="rb") as f:
                     photo = File(file=f, name=image_path.name)
-                    collectable = Collectable(id=uuid_id, photo=photo)
+                    collectable = Collectable(
+                        id=uuid_id, photo=photo, description=exif_description
+                    )
                     collectable._history_user = creator
                     collectable.save()
                 collectable.tags.add(*taglist)
