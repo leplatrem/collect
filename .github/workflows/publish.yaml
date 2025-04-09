@@ -49,18 +49,6 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image to GHCR
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/collect:latest
-            ghcr.io/${{ github.repository_owner }}/collect:${{ steps.vars.outputs.sha_short }}
-            ${{ github.ref_type == 'tag' && format('ghcr.io/{0}/collect:{1}', github.repository_owner, steps.vars.outputs.ref_tag) || '' }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-
       - name: Build and push Docker image to Docker Hub
         uses: docker/build-push-action@v5
         with:
