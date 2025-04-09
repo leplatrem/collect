@@ -67,7 +67,7 @@
         <h2>{% translate "Similar collectables" %}</h2>
         <p>
             {% translate "With the same tags" %}
-            {% for tag in collectable.tags_with_count.all %}
+            {% for tag in related_tags %}
                 <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a> ({{ tag.ncollectable|default:0 }})
             {% endfor %}
             :

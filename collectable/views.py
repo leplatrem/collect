@@ -117,16 +117,18 @@ def details(request, id):
     else:
         form = CollectableForm(instance=collectable)
 
+    related_tags = collectable.tags_with_count().filter(ncollectable__gt=1)
     related_collectables = Collectable.objects.with_counts_and_possessions(
         request.user
     ).exclude(id=collectable.id)
-    for tag in collectable.tags.all():
+    for tag in related_tags:
         related_collectables = related_collectables.filter(tags=tag)
 
     context = {
         "collectable": collectable,
         "form_edit": form,
         "form_saved": form_saved,
+        "related_tags": related_tags,
         "related_collectables": related_collectables,
     }
 
