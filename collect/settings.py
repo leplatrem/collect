@@ -176,10 +176,11 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+STATICFILES_BACKEND = "django.contrib.staticfiles.storage.StaticFilesStorage"
 if not DEBUG:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATICFILES_BACKEND = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+STORAGE_BACKEND = "django.core.files.storage.FileSystemStorage"
 DEFAULT_MEDIA_URL = "/media/"
 
 if config("COLLECT_MEDIA_STORAGE", default="local") == "GCS":
@@ -188,12 +189,21 @@ if config("COLLECT_MEDIA_STORAGE", default="local") == "GCS":
     GS_PROJECT_ID = config("GS_PROJECT_ID")
     GS_BUCKET_NAME = config("GS_BUCKET_NAME")
     DEFAULT_MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
-    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    STORAGE_BACKEND = "storages.backends.gcloud.GoogleCloudStorage"
 
     # Load credentials from a JSON file (mounted as secret)
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
         config("GS_CREDENTIALS_FILE")  # path to credentials.json
     )
+
+STORAGES = {
+    "default": {
+        "BACKEND": STORAGE_BACKEND,
+    },
+    "staticfiles": {
+        "BACKEND": STATICFILES_BACKEND,
+    },
+}
 
 MEDIA_URL = config("DJANGO_MEDIA_URL", default=DEFAULT_MEDIA_URL)
 MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / "uploads")
