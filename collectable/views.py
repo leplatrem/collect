@@ -188,6 +188,7 @@ def collection(request, slugs):
         .exclude(slug__in=slugs)
         .annotate(ncollectable=Count("collectable"))
         .order_by("-ncollectable")
+        .filter(ncollectable__gt=1)
     )
 
     context = {
