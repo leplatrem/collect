@@ -1,4 +1,5 @@
 from django import template
+from django.conf import settings
 
 from collectable.forms import PossessionForm
 
@@ -20,4 +21,4 @@ def user_possession_form(context, collectable):
 @register.filter(name="next_page_reveal_index")
 def next_page_reveal_index(value):
     # Start loading the next page when second half of current page is revealed.
-    return int(len(value) / 2)
+    return int(len(value) * settings.PAGE_REVEAL_LOAD_NEXT)
