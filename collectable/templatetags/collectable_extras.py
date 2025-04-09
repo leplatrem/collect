@@ -15,3 +15,9 @@ def user_possession_form(context, collectable):
         "user": user,
         "form": form,
     }
+
+
+@register.filter(name="next_page_reveal_index")
+def next_page_reveal_index(value):
+    # Start loading the next page when second half of current page is revealed.
+    return int(len(value) / 2)

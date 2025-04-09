@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load collectable_extras %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h1>{{ title }}</h1>
     <section id="collectable-list">
         {% for collectable in page_obj %}
+            {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
+                <span hx-get="?page={{ page_obj.next_page_number }}"
+                      hx-swap="beforeend"
+                      hx-target="#collectable-list"
+                      hx-select="#collectable-list > *"
+                      hx-trigger="revealed"></span>
+            {% endif %}
             {% include "collectable/collectable_thumbnail.html" %}
         {% empty %}
             {{ empty_msg }}
@@ -12,5 +20,5 @@
     </section>
 {% endblock %}
 {% block nav %}
-    {% include "paginator.html" with page_obj=page_obj hxselect="#collectable-list" %}
+    {% include "paginator.html" with page_obj=page_obj %}
 {% endblock %}
