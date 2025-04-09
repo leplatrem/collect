@@ -25,6 +25,13 @@ button.link {
     column-count: 4;
 }
 
+a.more {
+    font-size: 150%;
+}
+a.more::before {
+    content: "» ";
+}
+
 .collectable.thumbnail {
     display: inline-block;
     max-width: 324px;
