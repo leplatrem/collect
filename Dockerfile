@@ -61,6 +61,8 @@ WORKDIR /app
 COPY --chown=app:app . .
 COPY env.local .env
 
+ARG COMMANDS_CACHE_BUST=1
+
 # Compile translation messages
 RUN django-admin compilemessages
 
