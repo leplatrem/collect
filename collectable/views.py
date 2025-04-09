@@ -25,6 +25,7 @@ def index(request):
     qs = Collectable.objects.with_counts_and_possessions(request.user)
 
     context = {
+        "total_collectables": len(qs),
         "latest": qs.order_by("-created_at")[: settings.HOME_LIST_COUNT],
         "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[
             : settings.HOME_LIST_COUNT
