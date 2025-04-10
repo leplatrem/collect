@@ -9,41 +9,49 @@
     {{ counter }} collectables.
     {% endblocktranslate %}
     <h2>{% translate "Latest" %}</h2>
-    {% for collectable in latest %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable in database." %}
-    {% endfor %}
-    {% if latest %}
-        <a href="{% url "collectable:latest" %}" class="more">{% translate "More..." %}</a>
-    {% endif %}
+    <div class="collectable-grid">
+        {% for collectable in latest %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable in database." %}
+        {% endfor %}
+        {% if latest %}
+            <a href="{% url "collectable:latest" %}" class="more">{% translate "More..." %}</a>
+        {% endif %}
+    </div>
     <h2>{% translate "Most wanted" %}</h2>
-    {% for collectable in most_wanted %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable wanted." %}
-    {% endfor %}
-    {% if most_wanted %}
-        <a href="{% url "collectable:most-wanted" %}" class="more">{% translate "More..." %}</a>
-    {% endif %}
+    <div class="collectable-grid">
+        {% for collectable in most_wanted %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable wanted." %}
+        {% endfor %}
+        {% if most_wanted %}
+            <a href="{% url "collectable:most-wanted" %}" class="more">{% translate "More..." %}</a>
+        {% endif %}
+    </div>
     <h2>{% translate "Most liked" %}</h2>
-    {% for collectable in most_liked %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable liked." %}
-    {% endfor %}
-    {% if most_liked %}
-        <a href="{% url "collectable:most-liked" %}" class="more">{% translate "More..." %}</a>
-    {% endif %}
+    <div class="collectable-grid">
+        {% for collectable in most_liked %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable liked." %}
+        {% endfor %}
+        {% if most_liked %}
+            <a href="{% url "collectable:most-liked" %}" class="more">{% translate "More..." %}</a>
+        {% endif %}
+    </div>
     <h2>{% translate "Most owned" %}</h2>
-    {% for collectable in most_owned %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable owned." %}
-    {% endfor %}
-    {% if most_owned %}
-        <a href="{% url "collectable:most-owned" %}" class="more">{% translate "More..." %}</a>
-    {% endif %}
+    <div class="collectable-grid">
+        {% for collectable in most_owned %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable owned." %}
+        {% endfor %}
+        {% if most_owned %}
+            <a href="{% url "collectable:most-owned" %}" class="more">{% translate "More..." %}</a>
+        {% endif %}
+    </div>
     <h2>{% translate "Collections" %}</h2>
     <ul class="as-columns">
         {% for tag in tag_list %}

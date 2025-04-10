@@ -46,11 +46,15 @@ a.more::before {
     content: "» ";
 }
 
+.collectable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
 .collectable.thumbnail {
-    display: inline-block;
     width: 100%;
     max-width: 320px;
-    margin: 1rem 1rem 0rem 1rem;
     position: relative;
     overflow: hidden;
 

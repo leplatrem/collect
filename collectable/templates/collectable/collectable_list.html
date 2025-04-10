@@ -4,7 +4,7 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h1>{{ title }}</h1>
-    <section id="collectable-list">
+    <section id="collectable-list" class="collectable-grid">
         {% for collectable in page_obj %}
             {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
                 <span hx-get="?page={{ page_obj.next_page_number }}"

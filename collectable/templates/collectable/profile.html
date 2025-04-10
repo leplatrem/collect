@@ -11,31 +11,37 @@
             {% blocktranslate count counter=collectable_owned.count %}{{counter}} item.{% plural %}{{counter}} items.{% endblocktranslate %}
         </p>
     {% endif %}
-    {% for collectable in collectable_owned %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable owned." %}
-    {% endfor %}
+    <div class="collectable-grid">
+        {% for collectable in collectable_owned %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable owned." %}
+        {% endfor %}
+    </div>
     <h2>{% translate "Liked" %}</h2>
     {% if collectable_liked %}
         <p>
             {% blocktranslate count counter=collectable_liked.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
         </p>
     {% endif %}
-    {% for collectable in collectable_liked %}
-        {% include "collectable/collectable_thumbnail.html" %}
-    {% empty %}
-        {% translate "No collectable liked." %}
-    {% endfor %}
+    <div class="collectable-grid">
+        {% for collectable in collectable_liked %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No collectable liked." %}
+        {% endfor %}
+    </div>
     <h2>{% translate "Wanted" %}</h2>
     {% if collectable_wanted %}
         <p>
             {% blocktranslate count counter=collectable_wanted.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
         </p>
     {% endif %}
-    {% for collectable in collectable_wanted %}
-        <p>{% include "collectable/collectable_thumbnail.html" %}</p>
-    {% empty %}
-        {% translate "No collectable wanted." %}
-    {% endfor %}
+    <div class="collectable-grid">
+        {% for collectable in collectable_wanted %}
+            <p>{% include "collectable/collectable_thumbnail.html" %}</p>
+        {% empty %}
+            {% translate "No collectable wanted." %}
+        {% endfor %}
+    </div>
 {% endblock %}
