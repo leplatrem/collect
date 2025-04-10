@@ -10,6 +10,9 @@
     --input-bg: #fff;
     --input-border: #ccc;
     --error-color: red;
+    --button-bg: #669999;;
+    --button-color: #fff;
+    --button-color-hover: #558888;
 }
 
 /* 🌙 Auto dark mode based on system settings */
@@ -26,6 +29,9 @@
         --input-bg: #000;
         --input-border: #555;
         --error-color: #ff6b6b;
+        --button-bg: #99ccbb;;
+        --button-color: #121212;
+        --button-color-hover: #88bbaa;
     }
 
     .possession-form input[type=checkbox] {
@@ -62,6 +68,32 @@ input[type="text"], input[type="password"] {
     background: var(--input-bg);
     color: inherit;
 }
+
+form button:not(.link) {
+    padding: 0.6rem 1.2rem;
+    margin: 1rem 0;
+
+    background-color: var(--button-bg);
+    color: var(--button-color);
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px  rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+form button:hover {
+    background-color: var(--button-color-hover);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+form button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 
 button.link {
     background: none !important;
