@@ -1,9 +1,44 @@
+:root {
+    --bg-color: #f9f9f9;
+    --text-color: #222;
+    --link-color: #669999; /* Pale teal (subtle, elegant) */
+    --card-bg: #fff;
+    --card-border: #e0e0e0;
+    --card-shadow: rgba(0, 0, 0, 0.04);
+    --card-shadow-hover: rgba(0, 0, 0, 0.08);
+    --tag-bg: rgba(255, 255, 255, 0.5);
+    --input-bg: #fff;
+    --input-border: #ccc;
+    --error-color: red;
+}
+
+/* 🌙 Auto dark mode based on system settings */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --link-color: #99ccbb; /* Pale mint for dark mode */
+        --card-bg: #3b3b3b;
+        --card-border: #333;
+        --card-shadow: rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: rgba(0, 0, 0, 0.3);
+        --tag-bg: rgba(0,0,0, 0.4);
+        --input-bg: #000;
+        --input-border: #555;
+        --error-color: #ff6b6b;
+    }
+
+    .possession-form input[type=checkbox] {
+        filter: invert(1);
+        opacity: 0.8;
+    }
+}
+
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Roboto", "Noto Sans", "Droid Sans", sans-serif;
     line-height: 1.6;
-
-    background: #f9f9f9;
-    color: #222;
+    background: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 1rem;
 }
@@ -12,23 +47,35 @@ header a {
     margin-right: 15px;
 }
 
+a, a:visited {
+    color: var(--link-color);
+}
+
 form.inline {
     display: inline-block;
 }
 
+input[type="text"], input[type="password"] {
+    padding: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: inherit;
+}
+
 button.link {
-    background: none!important;
+    background: none !important;
     border: none;
-    padding: 0!important;
+    padding: 0 !important;
     font-family: unset;
     font-size: unset;
-    color: #0000EE;
+    color: var(--link-color);
     text-decoration: underline;
     cursor: pointer;
 }
 
 .errorlist {
-    color: red;
+    color: var(--error-color);
 }
 
 .as-columns {
@@ -58,35 +105,35 @@ a.more::before {
     position: relative;
     overflow: hidden;
 
-    background: white;
+    background: var(--card-bg);
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 8px var(--card-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .collectable.thumbnail:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 12px var(--card-shadow-hover);
 }
 
 .collectable.thumbnail img {
     width: 100%;
     height: auto;
     display: block;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--card-border);
 }
 
 .collectable.thumbnail .taglist {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
-    background-color: rgba(255, 255, 255, 0.5);
+    top: 0;
+    left: 0;
+    padding: 0 5px;
+    background-color: var(--tag-bg);
 }
 
-section#attributes, section#possession {
+section#attributes,
+section#possession {
     width: 50%;
 }
 
@@ -109,7 +156,7 @@ section#related {
 
 .possession-form p {
     display: inline-block;
-    margin: 0px;
+    margin: 0;
     width: 32%;
     text-align: center;
 }
@@ -120,11 +167,12 @@ section#related {
     height: 30px;
     margin-left: 33%;
     cursor: pointer;
-    -webkit-appearance: none;
-    outline: 0;
+    appearance: none;
+    outline: none;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
+    background-color: transparent;
 }
 
 .possession-form #id_likes {
