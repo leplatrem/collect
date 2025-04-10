@@ -46,7 +46,7 @@ body {
     background: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 1rem;
+    padding: 0;
 }
 
 header a {
@@ -55,6 +55,19 @@ header a {
 
 a, a:visited {
     color: var(--link-color);
+}
+
+body > * {
+    padding: 1rem;
+}
+
+footer {
+    margin-top: 3rem;
+    padding-top: 2rem 1rem;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    text-align: center;
+    font-size: 0.95rem;
 }
 
 form.inline {
