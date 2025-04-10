@@ -6,7 +6,9 @@
     --card-border: #e0e0e0;
     --card-shadow: rgba(0, 0, 0, 0.04);
     --card-shadow-hover: rgba(0, 0, 0, 0.08);
+    --tag-color: #669999;
     --tag-bg: rgba(255, 255, 255, 0.5);
+    --tag-bg-hover: rgba(255, 255, 255, 0.2);
     --input-bg: #fff;
     --input-border: #ccc;
     --error-color: red;
@@ -25,7 +27,9 @@
         --card-border: #333;
         --card-shadow: rgba(0, 0, 0, 0.2);
         --card-shadow-hover: rgba(0, 0, 0, 0.3);
+        --tag-color: #99ccbb;
         --tag-bg: rgba(0,0,0, 0.4);
+        --tag-bg-hover:  rgba(0,0,0, 0.2);
         --input-bg: #000;
         --input-border: #555;
         --error-color: #ff6b6b;
@@ -172,13 +176,40 @@ a.more::before {
     display: block;
     border-bottom: 1px solid var(--card-border);
 }
+.collectable.thumbnail:hover img {
+    transform: scale(1.05); /* Slight zoom-in effect */
+}
 
 .collectable.thumbnail .taglist {
     position: absolute;
-    top: 0;
-    left: 0;
-    padding: 0 5px;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.collectable.thumbnail:hover .taglist {
+    opacity: 1;
+}
+
+.collectable.thumbnail .taglist a {
+    padding: 6px 12px;
     background-color: var(--tag-bg);
+    color: var(--tag-color);
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.collectable.thumbnail .taglist a:hover {
+    background-color: var(--tag-bg-hover);
+    transform: translateY(-2px);
 }
 
 section#attributes,
