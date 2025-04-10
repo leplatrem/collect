@@ -129,6 +129,10 @@ button.link {
     margin-top: 1rem;
 }
 
+.invisible {
+    display: none;
+}
+
 a.more {
     font-size: 1.25rem;
     font-weight: 600;
