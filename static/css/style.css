@@ -165,6 +165,12 @@ a.more::before {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.collectable.thumbnail a {
+    overflow: hidden;
+    display: block;
+    max-height: 260px;
+}
+
 .collectable.thumbnail:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 12px var(--card-shadow-hover);
