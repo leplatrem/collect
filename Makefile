@@ -1,7 +1,7 @@
 FOLDERS := collect collectable
 INSTALL_STAMP := .install.stamp
 ENV_FILE := .env
-POETRY := $(shell command -v poetry 2> /dev/null)
+UV := $(shell command -v uv 2> /dev/null)
 
 .PHONY: help clean lint format migrate demo tests
 
@@ -11,10 +11,10 @@ help:
 	@echo "\nCheck the Makefile to know exactly what each target is doing."
 
 install: $(INSTALL_STAMP)  ## Install dependencies
-$(INSTALL_STAMP): pyproject.toml poetry.lock
-	@if [ -z $(POETRY) ]; then echo "Poetry could not be found. See https://python-poetry.org/docs/"; exit 2; fi
-	$(POETRY) --version
-	$(POETRY) install --no-ansi --no-interaction --verbose
+$(INSTALL_STAMP): pyproject.toml uv.lock
+	@if [ -z $(UV) ]; then echo "uv could not be found. See https://docs.astral.sh/uv/"; exit 2; fi
+	$(UV) --version
+	$(UV) sync
 	touch $(INSTALL_STAMP)
 
 clean:  ## Delete cache files
@@ -22,19 +22,19 @@ clean:  ## Delete cache files
 	rm -rf .install.stamp .coverage .mypy_cache $(VERSION_FILE)
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
-	$(POETRY) run ruff check $(FOLDERS)
-	$(POETRY) run ruff format --check $(FOLDERS)
-	$(POETRY) run mypy $(FOLDERS) --ignore-missing-imports
-	$(POETRY) run djlint $(FOLDERS) --lint
+	$(UV) run ruff check $(FOLDERS)
+	$(UV) run ruff format --check $(FOLDERS)
+	$(UV) run mypy $(FOLDERS) --ignore-missing-imports
+	$(UV) run djlint $(FOLDERS) --lint
 
 format: $(INSTALL_STAMP)  ## Format code base
-	$(POETRY) run ruff check --fix $(FOLDERS)
-	$(POETRY) run ruff format $(FOLDERS)
-	$(POETRY) run djlint $(FOLDERS) --reformat
+	$(UV) run ruff check --fix $(FOLDERS)
+	$(UV) run ruff format $(FOLDERS)
+	$(UV) run djlint $(FOLDERS) --reformat
 
 migrate:  ## Run pending migrations if needed
 	@echo "Checking for unapplied migrations..."
-	@$(POETRY) run sh -c '\
+	@$(UV) run sh -c '\
 		if python manage.py showmigrations --plan | grep "\[ \]" > /dev/null; then \
 			echo "Running migrations..."; \
 			python manage.py migrate; \
@@ -45,18 +45,18 @@ migrate:  ## Run pending migrations if needed
 
 createsuperuser: migrate   ## Create admin user if necessary
 	@echo "Ensuring admin user exists with default password..."
-	DJANGO_SETTINGS_MODULE=collect.settings $(POETRY) run python bin/createsuperuser.py
+	DJANGO_SETTINGS_MODULE=collect.settings $(UV) run bin/createsuperuser.py
 
 demo: $(INSTALL_STAMP) $(ENV_FILE) createsuperuser   ## Load demo data
-	$(POETRY) run python manage.py loadfolder admin demo
+	$(UV) run manage.py loadfolder admin demo
 	@echo "You can now run 'make start'"
 
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP) $(VERSION_FILE)
-	$(POETRY) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
+	$(UV) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
 
 $(ENV_FILE):
 	cp -n env.local .env
 
 start: $(INSTALL_STAMP) $(ENV_FILE) migrate  ## Start the app
-	$(POETRY) run python manage.py runserver
+	$(UV) run manage.py runserver

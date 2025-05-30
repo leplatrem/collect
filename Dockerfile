@@ -3,18 +3,18 @@ FROM python:3.12.5 as python-base
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_NO_CACHE_DIR=off \
-    POETRY_HOME=/opt/poetry\
+    UV_HOME=/opt/uv \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     PYSETUP_PATH="/opt/pysetup"
 
-RUN python3 -m venv $POETRY_HOME && \
-    $POETRY_HOME/bin/pip install poetry && \
-    $POETRY_HOME/bin/poetry --version
+RUN python3 -m venv $UV_HOME && \
+    $UV_HOME/bin/pip install uv && \
+    $UV_HOME/bin/uv --version
 
 WORKDIR $PYSETUP_PATH
-COPY ./poetry.lock ./pyproject.toml ./
-RUN $POETRY_HOME/bin/poetry install --no-root
+COPY ./uv.lock ./pyproject.toml ./
+RUN $UV_HOME/bin/uv sync --no-dev --no-progress
 
 FROM python:3.12.5-slim as production
 
