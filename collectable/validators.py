@@ -1,5 +1,6 @@
 import pylibmagic  # noqa: F401, I001
 import magic
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
@@ -31,4 +32,15 @@ class SquareImageValidator(object):
         if image.width != image.height:
             raise ValidationError(
                 _("%s is not a square image") % image, code="square-image"
+            )
+
+
+@deconstructible
+class MaxFileSizeValidator(object):
+    def __call__(self, fieldfile):
+        if fieldfile.size > settings.COLLECTABLE_MAX_UPLOAD_BYTES:
+            raise ValidationError(
+                _("%s exceeds the maximum file size of %s bytes.")
+                % (fieldfile, settings.COLLECTABLE_MAX_UPLOAD_BYTES),
+                code="max-file-size",
             )

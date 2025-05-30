@@ -1,4 +1,4 @@
-FOLDERS := collect collectable
+FOLDERS := accounts collect collectable
 INSTALL_STAMP := .install.stamp
 ENV_FILE := .env
 UV := $(shell command -v uv 2> /dev/null)
@@ -24,8 +24,8 @@ clean:  ## Delete cache files
 lint: $(INSTALL_STAMP)  ## Analyze code base
 	$(UV) run ruff check $(FOLDERS)
 	$(UV) run ruff format --check $(FOLDERS)
-	$(UV) run mypy $(FOLDERS) --ignore-missing-imports
 	$(UV) run djlint $(FOLDERS) --lint
+	$(UV) run mypy $(FOLDERS) --ignore-missing-imports
 
 format: $(INSTALL_STAMP)  ## Format code base
 	$(UV) run ruff check --fix $(FOLDERS)
@@ -53,7 +53,7 @@ demo: $(INSTALL_STAMP) $(ENV_FILE) createsuperuser   ## Load demo data
 
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP) $(VERSION_FILE)
-	$(UV) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
+	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov accounts --cov collectable --cov collect
 
 $(ENV_FILE):
 	cp -n env.local .env

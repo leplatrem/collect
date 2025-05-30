@@ -1,4 +1,4 @@
-FROM python:3.12.5 as python-base
+FROM python:3.12.5 AS python-base
 
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
@@ -13,10 +13,10 @@ RUN python3 -m venv $UV_HOME && \
     $UV_HOME/bin/uv --version
 
 WORKDIR $PYSETUP_PATH
-COPY ./uv.lock ./pyproject.toml ./
-RUN $UV_HOME/bin/uv sync --no-dev --no-progress
+COPY ./README.md ./uv.lock ./pyproject.toml ./
+RUN $UV_HOME/bin/uv sync --no-progress
 
-FROM python:3.12.5-slim as production
+FROM python:3.12.5-slim AS production
 
 ENV PATH="/opt/pysetup/.venv/bin:$PATH" \
     HOST=0.0.0.0 \

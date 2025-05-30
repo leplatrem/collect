@@ -83,52 +83,66 @@ wheels = [
 [[package]]
 name = "collect"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "dj-database-url" },
     { name = "django" },
-    { name = "django-debug-toolbar" },
     { name = "django-imagekit" },
     { name = "django-simple-history" },
     { name = "django-storages" },
     { name = "django-taggit" },
-    { name = "djlint" },
     { name = "google-cloud-storage" },
     { name = "gunicorn" },
-    { name = "mypy" },
     { name = "pillow" },
     { name = "psycopg2-binary" },
     { name = "pylibmagic" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "python-decouple" },
     { name = "python-magic" },
-    { name = "ruff" },
     { name = "whitenoise" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "django-debug-toolbar" },
+    { name = "djlint" },
+    { name = "factory-boy" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-django" },
+    { name = "pytest-env" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "dj-database-url", specifier = ">=2.2.0,<3" },
     { name = "django", specifier = "~=5.1" },
-    { name = "django-debug-toolbar", specifier = ">=4.4.6,<5" },
     { name = "django-imagekit", specifier = ">=5.0.0,<6" },
     { name = "django-simple-history", specifier = ">=3.7.0,<4" },
     { name = "django-storages", specifier = ">=1.14.6,<2" },
     { name = "django-taggit", specifier = ">=6.0.0,<7" },
-    { name = "djlint", specifier = ">=1.34.1,<2" },
     { name = "google-cloud-storage", specifier = ">=3.1.0,<4" },
     { name = "gunicorn", specifier = ">=23.0.0,<24" },
-    { name = "mypy", specifier = ">=1.11.1,<2" },
     { name = "pillow", specifier = ">=10.4.0,<11" },
     { name = "psycopg2-binary", specifier = ">=2.9.10,<3" },
     { name = "pylibmagic", specifier = ">=0.5.0,<0.6" },
-    { name = "pytest", specifier = ">=8.3.2,<9" },
-    { name = "pytest-cov", specifier = ">=5.0.0,<6" },
     { name = "python-decouple", specifier = "~=3.8" },
     { name = "python-magic", specifier = ">=0.4.27,<0.5" },
-    { name = "ruff", specifier = ">=0.6.1,<0.7" },
     { name = "whitenoise", specifier = ">=6.7.0,<7" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "django-debug-toolbar", specifier = ">=4.4.6,<5" },
+    { name = "djlint", specifier = ">=1.34.1,<2" },
+    { name = "factory-boy", specifier = ">=3.3.3" },
+    { name = "mypy", specifier = ">=1.11.1,<2" },
+    { name = "pytest", specifier = ">=8.3.2,<9" },
+    { name = "pytest-cov", specifier = ">=5.0.0,<6" },
+    { name = "pytest-django", specifier = ">=4.11.1" },
+    { name = "pytest-env", specifier = ">=1.1.4" },
+    { name = "ruff", specifier = ">=0.6.1,<0.7" },
 ]
 
 [[package]]
@@ -317,6 +331,30 @@ name = "editorconfig"
 version = "0.12.4"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3d/85/7b5c2fac7fdc37d959fab714b13b9acb75884490dcc0e8b1dc5e64105084/EditorConfig-0.12.4.tar.gz", hash = "sha256:24857fa1793917dd9ccf0c7810a07e05404ce9b823521c7dce22a4fb5d125f80", size = 13278, upload-time = "2024-02-12T08:33:06.745Z" }
+
+[[package]]
+name = "factory-boy"
+version = "3.3.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "faker" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ba/98/75cacae9945f67cfe323829fc2ac451f64517a8a330b572a06a323997065/factory_boy-3.3.3.tar.gz", hash = "sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03", size = 164146, upload-time = "2025-02-03T09:49:04.433Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/8d/2bc5f5546ff2ccb3f7de06742853483ab75bf74f36a92254702f8baecc79/factory_boy-3.3.3-py2.py3-none-any.whl", hash = "sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc", size = 37036, upload-time = "2025-02-03T09:49:01.659Z" },
+]
+
+[[package]]
+name = "faker"
+version = "37.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/97/4b/5354912eaff922876323f2d07e21408b10867f3295d5f917748341cb6f53/faker-37.3.0.tar.gz", hash = "sha256:77b79e7a2228d57175133af0bbcdd26dc623df81db390ee52f5104d46c010f2f", size = 1901376, upload-time = "2025-05-14T15:24:18.039Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/99/045b2dae19a01b9fbb23b9971bc04f4ef808e7f3a213d08c81067304a210/faker-37.3.0-py3-none-any.whl", hash = "sha256:48c94daa16a432f2d2bc803c7ff602509699fca228d13e97e379cd860a7e216e", size = 1942203, upload-time = "2025-05-14T15:24:16.159Z" },
+]
 
 [[package]]
 name = "google-api-core"
@@ -703,6 +741,30 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/74/67/00efc8d11b630c56f15f4ad9c7f9223f1e5ec275aaae3fa9118c6a223ad2/pytest-cov-5.0.0.tar.gz", hash = "sha256:5837b58e9f6ebd335b0f8060eecce69b662415b16dc503883a02f45dfeb14857", size = 63042, upload-time = "2024-03-24T20:16:34.856Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/78/3a/af5b4fa5961d9a1e6237b530eb87dd04aea6eb83da09d2a4073d81b54ccf/pytest_cov-5.0.0-py3-none-any.whl", hash = "sha256:4f0764a1219df53214206bf1feea4633c3b558a2925c8b59f144f682861ce652", size = 21990, upload-time = "2024-03-24T20:16:32.444Z" },
+]
+
+[[package]]
+name = "pytest-django"
+version = "4.11.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/fb/55d580352db26eb3d59ad50c64321ddfe228d3d8ac107db05387a2fadf3a/pytest_django-4.11.1.tar.gz", hash = "sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991", size = 86202, upload-time = "2025-04-03T18:56:09.338Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/ac/bd0608d229ec808e51a21044f3f2f27b9a37e7a0ebaca7247882e67876af/pytest_django-4.11.1-py3-none-any.whl", hash = "sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10", size = 25281, upload-time = "2025-04-03T18:56:07.678Z" },
+]
+
+[[package]]
+name = "pytest-env"
+version = "1.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/4d/5b11f903b1c253574b15168e13b32ea6482bb95f5964f090142b1cb75755/pytest_env-1.1.4.tar.gz", hash = "sha256:86653658da8f11c6844975db955746c458a9c09f1e64957603161e2ff93f5133", size = 8898, upload-time = "2024-09-07T20:48:57.579Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3b/6d/b5cd281759bfbb81a5ec3ec63142572fe9a91539089621c1aaa57126e680/pytest_env-1.1.4-py3-none-any.whl", hash = "sha256:a4212056d4d440febef311a98fdca56c31256d58fb453d103cba4e8a532b721d", size = 6178, upload-time = "2024-09-07T20:48:56.254Z" },
 ]
 
 [[package]]
