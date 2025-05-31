@@ -20,23 +20,13 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 SECRET_KEY = config("DJANGO_SECRET_KEY", default="not-secret")
 
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS: list[str] = config(
-    "DJANGO_ALLOWED_HOSTS",
-    default="localhost",
-    cast=lambda v: [s.strip() for s in v.split(",")],
-)
-
-SECURE_HSTS_SECONDS = config("DJANGO_SECURE_HSTS_SECONDS", default=0, cast=int)
-SECURE_SSL_REDIRECT = False if DEBUG else True
-SESSION_COOKIE_SECURE = False if DEBUG else True
-CSRF_COOKIE_SECURE = False if DEBUG else True
+ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
 
 # Application definition
 
@@ -141,7 +131,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO",
+        "level": config("LOG_LEVEL", default="INFO"),
     },
 }
 
@@ -208,14 +198,53 @@ STORAGES = {
 MEDIA_URL = config("DJANGO_MEDIA_URL", default=DEFAULT_MEDIA_URL)
 MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / "uploads")
 
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-TAGGIT_CASE_INSENSITIVE = True
+# Django Security Settings
+# https://docs.djangoproject.com/en/5.1/topics/security/#ssl-https
 
-ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
+INTERNAL_IPS: list[str] = config(
+    "DJANGO_INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+ALLOWED_HOSTS: list[str] = config(
+    "DJANGO_ALLOWED_HOSTS",
+    default="localhost",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
+SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = config(
+    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False, cast=bool
+)
+SECURE_HSTS_PRELOAD: bool = config(
+    "DJANGO_SECURE_HSTS_PRELOAD", default=False, cast=bool
+)
+SECURE_HSTS_SECONDS = config("DJANGO_SECURE_HSTS_SECONDS", default=0, cast=int)
+SECURE_SSL_REDIRECT: bool = config(
+    "DJANGO_SECURE_SSL_REDIRECT", default=False if DEBUG else True, cast=bool
+)
+SESSION_COOKIE_SECURE: bool = config(
+    "DJANGO_SESSION_COOKIE_SECURE", default=False if DEBUG else True, cast=bool
+)
+CSRF_COOKIE_SECURE: bool = config(
+    "DJANGO_CSRF_COOKIE_SECURE", default=False if DEBUG else True, cast=bool
+)
+CSRF_TRUSTED_ORIGINS: list[str] = config(
+    "DJANGO_CSRF_TRUSTED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+
+# Third-party apps settings
+
+TAGGIT_CASE_INSENSITIVE = True
+TAGGIT_TAGS_FROM_STRING = "collect.utils.tags_splitter"
+TAGGIT_STRING_FROM_TAGS = "collect.utils.tags_joiner"
+
+# Collect specific settings (`COLLECT_*` in env vars)
 
 COLLECTABLE_THUMBNAIL_SIZE = config(
     "COLLECT_COLLECTABLE_THUMBNAIL_SIZE", default=320, cast=int
@@ -227,7 +256,7 @@ COLLECTABLE_PHOTO_MAX_SIZE = config(
     "COLLECT_COLLECTABLE_PHOTO_MAX_SIZE", default=640, cast=int
 )
 COLLECTABLE_MAX_UPLOAD_BYTES = config(
-    "COLLECTABLE_MAX_UPLOAD_BYTES", default=5 * 1024 * 1024, cast=int
+    "COLLECT_COLLECTABLE_MAX_UPLOAD_BYTES", default=5 * 1024 * 1024, cast=int
 )
 HOME_LIST_COUNT = config("COLLECT_HOME_LIST_COUNT", default=6, cast=int)
 DEFAULT_PAGE_SIZE = config("COLLECT_DEFAULT_PAGE_SIZE", default=20, cast=int)
@@ -237,33 +266,6 @@ PAGE_REVEAL_LOAD_NEXT = config(
 RELATED_COLLECTABLES_LIST_COUNT = config(
     "COLLECT_RELATED_COLLECTABLES_LIST_COUNT", default=20, cast=int
 )
-
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 SIGNUP_SECRETS_WORDS: list[str] = config(
     "COLLECT_SIGNUP_SECRETS_WORDS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
-
-INTERNAL_IPS: list[str] = config(
-    "DJANGO_INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")]
-)
-SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = config(
-    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False, cast=bool
-)
-SECURE_HSTS_PRELOAD: bool = config(
-    "DJANGO_SECURE_HSTS_PRELOAD", default=False, cast=bool
-)
-SECURE_SSL_REDIRECT: bool = config(
-    "DJANGO_SECURE_SSL_REDIRECT", default=False, cast=bool
-)
-SESSION_COOKIE_SECURE: bool = config(
-    "DJANGO_SESSION_COOKIE_SECURE", default=False, cast=bool
-)
-CSRF_COOKIE_SECURE: bool = config("DJANGO_CSRF_COOKIE_SECURE", default=False, cast=bool)
-CSRF_TRUSTED_ORIGINS: list[str] = config(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(",")]
-)
-TAGGIT_TAGS_FROM_STRING = "collect.utils.tags_splitter"
-TAGGIT_STRING_FROM_TAGS = "collect.utils.tags_joiner"

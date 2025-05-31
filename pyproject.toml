@@ -61,12 +61,11 @@ ignore = [
 lines-after-imports = 2
 
 [tool.pytest.ini_options]
-django_find_project = false
 DJANGO_SETTINGS_MODULE = "collect.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 env = [
-    "DEBUG=True",
     "COLLECT_SIGNUP_SECRETS_WORDS=t3st",
+    "DJANGO_DEBUG=True",
     "DJANGO_INTERNAL_IPS=127.0.0.1",
     "DJANGO_CSRF_TRUSTED_ORIGINS=http://127.0.0.1",
     "DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost",
