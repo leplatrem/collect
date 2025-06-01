@@ -14,7 +14,8 @@ install: $(INSTALL_STAMP)  ## Install dependencies
 $(INSTALL_STAMP): pyproject.toml uv.lock
 	@if [ -z $(UV) ]; then echo "uv could not be found. See https://docs.astral.sh/uv/"; exit 2; fi
 	$(UV) --version
-	$(UV) sync
+	$(UV) sync --locked
+	$(UV) run playwright install firefox
 	touch $(INSTALL_STAMP)
 
 clean:  ## Delete cache files
@@ -54,6 +55,9 @@ demo: $(INSTALL_STAMP) $(ENV_FILE) createadminuser   ## Load demo data
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov accounts --cov collectable --cov collect
+
+browser-test: $(INSTALL_STAMP)
+	$(UV) run pytest --base-url http://localhost:8000 collect/tests
 
 $(ENV_FILE):
 	cp -n env.local .env

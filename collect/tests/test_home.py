@@ -9,8 +9,8 @@ def test_login_and_check_version(page: Page, username, password):
     page.fill('input[name="password"]', password)
     page.click('button[type="submit"]')
 
-    # Assumes successful login redirects to home
-    page.wait_for_url("/")
+    # Successful login redirects to 'home', which redirects to 'collection:index'
+    page.wait_for_url("/collectable/")
 
     # Dummy assertion: check for version text on homepage
     assert "Version 1.0" in page.text_content("body")

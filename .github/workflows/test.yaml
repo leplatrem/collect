@@ -61,3 +61,62 @@ jobs:
 
     - name: Run tests
       run: make test
+
+  end2end:
+    runs-on: ubuntu-latest
+    needs: [test]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker container
+      run: docker build -t collect-app .
+
+    - name: Run container
+      run: |
+        docker run --rm \
+          -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          collect-app \
+          uv run manage.py migrate
+        docker run --rm \
+          -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          collect-app \
+          uv run manage.py smart_create_user testuser testpass
+
+    - name: Run container
+      run: |
+        docker run -d -p 8000:8000 --name test-collect-app \
+          -e DJANGO_DEBUG=false \
+          -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          collect-app
+        sleep 10  # Give time to boot
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+
+    - name: Install uv
+      run: pip install uv
+
+    - name: Install dependencies
+      run: make install
+
+    - name: Run Playwright Tests
+      run: make browser-test

@@ -1,45 +1,22 @@
 FROM python:3.12.5 AS python-base
 
-ENV PIP_DEFAULT_TIMEOUT=100 \
+ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_NO_CACHE_DIR=off \
-    UV_HOME=/opt/uv \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    PYSETUP_PATH="/opt/pysetup"
-
-RUN python3 -m venv $UV_HOME && \
-    $UV_HOME/bin/pip install uv && \
-    $UV_HOME/bin/uv --version
-
-WORKDIR $PYSETUP_PATH
-COPY ./README.md ./uv.lock ./pyproject.toml ./
-RUN $UV_HOME/bin/uv sync --no-progress
-
-FROM python:3.12.5-slim AS production
-
-ENV PATH="/opt/pysetup/.venv/bin:$PATH" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    # App vars
     HOST=0.0.0.0 \
     PORT=8000 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app \
-    VENV_PATH="/opt/pysetup/.venv" \
     DJANGO_STATIC_ROOT="/mnt/static"
+
 ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --access-logfile '-' --error-logfile '-' --capture-output"
 
-COPY --from=python-base $VENV_PATH $VENV_PATH
-
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    gettext \
-    libmagic1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential libpq-dev gettext libmagic1 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip install uv
 
 # Set up user and group
 ARG userid=10001
@@ -55,19 +32,22 @@ RUN mkdir /mnt/media && \
     mkdir /mnt/db && \
     chown app:app /mnt/db
 
-USER app
+# Copy application code
+ADD . /app
+COPY env.local .env
 WORKDIR /app
 
-COPY --chown=app:app . .
-COPY env.local .env
+# Install
+RUN uv sync --locked --no-dev --no-progress --no-editable
 
 ARG COMMANDS_CACHE_BUST=1
 
 # Compile translation messages
-RUN django-admin compilemessages
+RUN uv run django-admin compilemessages
 
 # Collect static files
-RUN django-admin collectstatic --noinput --settings=collect.settings
+RUN uv run django-admin collectstatic --noinput --settings=collect.settings
 
+USER app
 EXPOSE $PORT
 CMD ["gunicorn", "collect.wsgi"]
