@@ -2,16 +2,8 @@
 
 import pytest
 from django.urls import reverse
-from django.utils import translation
 
 from collectable.models import Collectable, Possession
-
-
-@pytest.fixture(autouse=True, scope="module")
-def set_language():
-    translation.activate("en")
-    yield
-    translation.deactivate()
 
 
 @pytest.mark.parametrize(

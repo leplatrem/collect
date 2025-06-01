@@ -4,6 +4,7 @@ import tempfile
 import pytest
 from django.conf import settings
 from django.core.management import call_command
+from django.utils import translation
 
 from collectable.tests.factories import (
     CollectableFactory,
@@ -21,6 +22,13 @@ def staticfiles():
         yield
     finally:
         shutil.rmtree(static_root)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_language():
+    translation.activate("fr")
+    yield
+    translation.deactivate()
 
 
 @pytest.fixture
