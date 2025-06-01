@@ -53,10 +53,10 @@ demo: $(INSTALL_STAMP) $(ENV_FILE) createadminuser   ## Load demo data
 
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP)
-	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov accounts --cov collectable --cov collect
+	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
 
-browser-test: $(INSTALL_STAMP)
-	$(UV) run pytest --base-url http://localhost:8000 collect/tests
+browser-test: $(INSTALL_STAMP)  ## Run browser end-to-end tests
+	$(UV) run pytest --base-url http://localhost:8000 tests/
 
 $(ENV_FILE):
 	cp -n env.local .env
