@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PYTHONDONTWRITEBYTECODE=1 \
     UV_COMPILE_BYTECODE=1 \
+    UV_PROJECT_ENVIRONMENT=/app \
     # App vars
     HOST=0.0.0.0 \
     PORT=8000 \
@@ -32,13 +33,14 @@ RUN mkdir /mnt/media && \
     mkdir /mnt/db && \
     chown app:app /mnt/db
 
-# Copy application code
-ADD . /app
-COPY env.local .env
-WORKDIR /app
+# Copy sources, but install into /app (`UV_PROJECT_ENVIRONMENT`)
+ADD . /src
+WORKDIR /src
+RUN uv sync --locked --no-progress
 
-# Install
-RUN uv sync --locked --no-dev --no-progress --no-editable
+WORKDIR /app
+COPY manage.py .
+COPY env.local .env
 
 ARG COMMANDS_CACHE_BUST=1
 
@@ -50,4 +52,4 @@ RUN uv run django-admin collectstatic --noinput --settings=collect.settings
 
 USER app
 EXPOSE $PORT
-CMD ["gunicorn", "collect.wsgi"]
+CMD ["uv", "run", "gunicorn", "collect.wsgi"]

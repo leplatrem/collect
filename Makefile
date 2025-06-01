@@ -1,4 +1,3 @@
-FOLDERS := accounts collect collectable
 INSTALL_STAMP := .install.stamp
 ENV_FILE := .env
 UV := $(shell command -v uv 2> /dev/null)
@@ -23,15 +22,15 @@ clean:  ## Delete cache files
 	rm -rf .install.stamp .coverage .mypy_cache
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
-	$(UV) run ruff check $(FOLDERS)
-	$(UV) run ruff format --check $(FOLDERS)
-	$(UV) run djlint $(FOLDERS) --lint
-	$(UV) run mypy $(FOLDERS) --ignore-missing-imports
+	$(UV) run ruff check src/
+	$(UV) run ruff format --check src/
+	$(UV) run djlint src/ --lint
+	$(UV) run mypy src/ --ignore-missing-imports
 
 format: $(INSTALL_STAMP)  ## Format code base
-	$(UV) run ruff check --fix $(FOLDERS)
-	$(UV) run ruff format $(FOLDERS)
-	$(UV) run djlint $(FOLDERS) --reformat
+	$(UV) run ruff check --fix src/
+	$(UV) run ruff format src/
+	$(UV) run djlint src/ --reformat
 
 migrate:  ## Run pending migrations if needed
 	@echo "Checking for unapplied migrations..."

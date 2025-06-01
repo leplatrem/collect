@@ -13,4 +13,4 @@ def test_login_and_check_version(page: Page, username, password):
     page.wait_for_url("/collectable/")
 
     # Dummy assertion: check for version text on homepage
-    assert "Version 1.0" in page.text_content("body")
+    assert "Version 1.0" in (page.text_content("body") or "")
