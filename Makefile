@@ -19,7 +19,7 @@ $(INSTALL_STAMP): pyproject.toml uv.lock
 
 clean:  ## Delete cache files
 	find . -type d -name "__pycache__" | xargs rm -rf {};
-	rm -rf .install.stamp .coverage .mypy_cache $(VERSION_FILE)
+	rm -rf .install.stamp .coverage .mypy_cache
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
 	$(UV) run ruff check $(FOLDERS)
@@ -43,16 +43,16 @@ migrate:  ## Run pending migrations if needed
 		fi \
 	'
 
-createsuperuser: migrate   ## Create admin user if necessary
+createadminuser: migrate   ## Create admin user if necessary
 	@echo "Ensuring admin user exists with default password..."
-	DJANGO_SETTINGS_MODULE=collect.settings $(UV) run bin/createsuperuser.py
+	$(UV) run manage.py smart_create_user --admin admin s3cr3t
 
-demo: $(INSTALL_STAMP) $(ENV_FILE) createsuperuser   ## Load demo data
+demo: $(INSTALL_STAMP) $(ENV_FILE) createadminuser   ## Load demo data
 	$(UV) run manage.py loadfolder admin demo
 	@echo "You can now run 'make start'"
 
 test: tests  ## Run unit tests
-tests: $(INSTALL_STAMP) $(VERSION_FILE)
+tests: $(INSTALL_STAMP)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov accounts --cov collectable --cov collect
 
 $(ENV_FILE):
