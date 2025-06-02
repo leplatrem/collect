@@ -49,24 +49,31 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
 
-    services:
-      db:
-        image: postgres:15
-        env:
-          POSTGRES_DB: collectdb
-          POSTGRES_USER: dbuser
-          POSTGRES_PASSWORD: dbpassword
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     env:
-      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db.collect-net:5432/collectdb
 
     steps:
+    - name: Create Docker network
+      run: docker network create collect-net
+
+    - name: Start DB service manually
+      run: |
+        docker run --detach --name db \
+          --network collect-net \
+          -e POSTGRES_DB=collectdb \
+          -e POSTGRES_USER=dbuser \
+          -e POSTGRES_PASSWORD=dbpassword \
+          -p 5432:5432 postgres:15
+
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        for i in {1..10}; do
+          docker run --rm --network collect-net postgres:15 \
+            pg_isready -h db -U dbuser && break
+          echo "Waiting for db..."
+          sleep 3
+        done
+
     - name: Checkout code
       uses: actions/checkout@v3
 
@@ -76,26 +83,36 @@ jobs:
     - name: Initialize database
       run: |
         docker run --rm \
+          --network collect-net \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
           collect-app \
           uv run manage.py migrate
         docker run --rm \
+          --network collect-net \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
           collect-app \
           uv run manage.py smart_create_user testuser testpass
 
-    - name: Run container
+    - name: Run app container
       run: |
-        docker run --detach -p 8000:8000 --name test-collect-app \
+        docker run --detach \
+          --network collect-net \
+          -p 8000:8000 \
+          --name test-collect-app \
           -e DJANGO_DEBUG=false \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
           collect-app
 
-    - name: Check readiness
+    - name: Wait for app to be ready
       run: |
-        curl --fail --retry-all-errors \
-          --retry 10 \
-          http://localhost:8000/
+        for i in {1..20}; do
+          curl --fail --silent --location http://127.0.0.1:8000/ && break
+          echo "Waiting for app..."
+          sleep 3
+        done
+
+    - name: Show app logs
+      run: docker logs test-collect-app || true
 
     - name: Set up Python
       uses: actions/setup-python@v4
