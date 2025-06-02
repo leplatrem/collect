@@ -3,6 +3,8 @@ db.sqlite3
 db/
 .install.stamp
 .*_cache/
+test-results/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

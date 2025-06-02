@@ -22,10 +22,10 @@ clean:  ## Delete cache files
 	rm -rf .install.stamp .coverage .*_cache .venv
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
-	$(UV) run ruff check src/
-	$(UV) run ruff format --check src/
+	$(UV) run ruff check src/ tests/
+	$(UV) run ruff format --check src/ tests/
 	$(UV) run djlint src/ --lint
-	$(UV) run mypy src/ --ignore-missing-imports
+	$(UV) run mypy src/ tests/ --ignore-missing-imports
 
 format: $(INSTALL_STAMP)  ## Format code base
 	$(UV) run ruff check --fix src/
@@ -56,7 +56,7 @@ tests: $(INSTALL_STAMP) $(ENV_FILE)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
 
 browser-test: $(INSTALL_STAMP) $(ENV_FILE)  ## Run browser end-to-end tests
-	$(UV) run pytest --base-url http://localhost:8000  --browser firefox tests/
+	$(UV) run pytest --base-url http://localhost:8000  --browser firefox --screenshot on tests/
 
 $(ENV_FILE):
 	cp -n env.local .env
