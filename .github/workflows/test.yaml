@@ -100,19 +100,25 @@ jobs:
           -p 8000:8000 \
           --name test-collect-app \
           -e DJANGO_DEBUG=false \
+          -e DJANGO_SECURE_SSL_REDIRECT=false \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
           collect-app
 
     - name: Wait for app to be ready
       run: |
         for i in {1..20}; do
-          curl --fail --silent --location http://127.0.0.1:8000/ && break
-          echo "Waiting for app..."
+          curl --fail --silent --location http://127.0.0.1:8000/health/ && break
+          echo "Waiting for app to start..."
           sleep 3
         done
 
-    - name: Show app logs
-      run: docker logs test-collect-app || true
+    - name: Check app readiness
+      run: |
+        for i in {1..20}; do
+          curl --fail --silent --location http://127.0.0.1:8000/readiness/ && break
+          echo "Waiting for app to be ready..."
+          sleep 3
+        done
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -125,6 +131,10 @@ jobs:
 
     - name: Run Playwright Tests
       run: make browser-test
+
+    - name: Show app logs
+      if: failure()
+      run: docker logs test-collect-app || true
 
     - name: Upload Playwright test artifacts
       uses: actions/upload-artifact@v4

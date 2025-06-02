@@ -28,8 +28,8 @@ lint: $(INSTALL_STAMP)  ## Analyze code base
 	$(UV) run mypy src/ tests/ --ignore-missing-imports
 
 format: $(INSTALL_STAMP)  ## Format code base
-	$(UV) run ruff check --fix src/
-	$(UV) run ruff format src/
+	$(UV) run ruff check --fix src/ tests/
+	$(UV) run ruff format src/ tests/
 	$(UV) run djlint src/ --reformat
 
 migrate:  ## Run pending migrations if needed
@@ -56,10 +56,10 @@ tests: $(INSTALL_STAMP) $(ENV_FILE)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
 
 browser-test: $(INSTALL_STAMP) $(ENV_FILE)  ## Run browser end-to-end tests
-	$(UV) run pytest --base-url http://127.0.0.1:8000  --browser firefox --screenshot on tests/
+	$(UV) run pytest --base-url http://127.0.0.1:8000 --browser firefox --screenshot on tests/
 
 $(ENV_FILE):
-	cp -n env.local .env
+	cp --update=none env.local .env
 
 start: $(INSTALL_STAMP) $(ENV_FILE) migrate  ## Start the app
 	$(UV) run manage.py runserver

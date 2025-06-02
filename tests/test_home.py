@@ -2,6 +2,16 @@ import pytest
 from playwright.sync_api import Page
 
 
+def test_health_check(page: Page):
+    page.goto("/health/")
+    assert "ok" in (page.text_content("body") or "")
+
+
+def test_readiness_check(page: Page):
+    page.goto("/readiness/")
+    assert "ok" in (page.text_content("body") or "")
+
+
 def test_home_redirect(page: Page):
     page.goto("/")
     # Redirects to 'collection:index'

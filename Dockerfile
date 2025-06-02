@@ -8,7 +8,8 @@ ENV PYTHONUNBUFFERED=1 \
     # App vars
     HOST=0.0.0.0 \
     PORT=8000 \
-    DJANGO_STATIC_ROOT="/mnt/static"
+    DJANGO_STATIC_ROOT="/mnt/static" \
+    DJANGO_DEBUG="false"
 
 ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --access-logfile '-' --error-logfile '-' --capture-output"
 
