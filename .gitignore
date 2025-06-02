@@ -1,8 +1,8 @@
+/uploads/
 db.sqlite3
-uploads/
 db/
 .install.stamp
-.ruff_cache/
+.*_cache/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

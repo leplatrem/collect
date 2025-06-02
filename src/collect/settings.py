@@ -10,12 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
-from decouple import config
+from decouple import Config, RepositoryEnv
 from dj_database_url import parse as db_url
 from django.utils.translation import gettext_lazy as _
 
+
+DOTENV_FILE = os.environ.get("DOTENV_FILE", ".env")
+print(f"Read config from {DOTENV_FILE}")
+config = Config(RepositoryEnv(DOTENV_FILE))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -196,7 +201,7 @@ STORAGES = {
 }
 
 MEDIA_URL = config("DJANGO_MEDIA_URL", default=DEFAULT_MEDIA_URL)
-MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / "uploads")
+MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / ".." / "uploads")
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"

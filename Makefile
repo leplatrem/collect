@@ -19,7 +19,7 @@ $(INSTALL_STAMP): pyproject.toml uv.lock
 
 clean:  ## Delete cache files
 	find . -type d -name "__pycache__" | xargs rm -rf {};
-	rm -rf .install.stamp .coverage .mypy_cache
+	rm -rf .install.stamp .coverage .*_cache .venv
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
 	$(UV) run ruff check src/
@@ -52,10 +52,10 @@ demo: $(INSTALL_STAMP) $(ENV_FILE) createadminuser   ## Load demo data
 	@echo "You can now run 'make start'"
 
 test: tests  ## Run unit tests
-tests: $(INSTALL_STAMP)
+tests: $(INSTALL_STAMP) $(ENV_FILE)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
 
-browser-test: $(INSTALL_STAMP)  ## Run browser end-to-end tests
+browser-test: $(INSTALL_STAMP) $(ENV_FILE)  ## Run browser end-to-end tests
 	$(UV) run pytest --base-url http://localhost:8000 tests/
 
 $(ENV_FILE):

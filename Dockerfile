@@ -40,7 +40,7 @@ RUN uv sync --locked --no-progress
 
 WORKDIR /app
 COPY manage.py .
-COPY env.local .env
+ENV DOTENV_FILE=/src/env.local
 
 ARG COMMANDS_CACHE_BUST=1
 

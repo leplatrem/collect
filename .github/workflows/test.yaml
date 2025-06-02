@@ -90,7 +90,7 @@ jobs:
     - name: Build Docker container
       run: docker build -t collect-app .
 
-    - name: Run container
+    - name: Initialize database
       run: |
         docker run --rm \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
