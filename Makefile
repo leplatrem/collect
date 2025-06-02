@@ -56,7 +56,7 @@ tests: $(INSTALL_STAMP) $(ENV_FILE)
 	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
 
 browser-test: $(INSTALL_STAMP) $(ENV_FILE)  ## Run browser end-to-end tests
-	$(UV) run pytest --base-url http://localhost:8000 tests/
+	$(UV) run pytest --base-url http://localhost:8000  --browser firefox tests/
 
 $(ENV_FILE):
 	cp -n env.local .env
