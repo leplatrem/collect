@@ -125,7 +125,7 @@ requires-dist = [
     { name = "django-taggit", specifier = ">=6.0.0,<7" },
     { name = "google-cloud-storage", specifier = ">=3.1.0,<4" },
     { name = "gunicorn", specifier = ">=23.0.0,<24" },
-    { name = "pillow", specifier = ">=10.4.0,<11" },
+    { name = "pillow", specifier = ">=10.4.0,<12" },
     { name = "psycopg2-binary", specifier = ">=2.9.10,<3" },
     { name = "pylibmagic", specifier = ">=0.5.0,<0.6" },
     { name = "pytest-playwright", specifier = ">=0.7.0" },
