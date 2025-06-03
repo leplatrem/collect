@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
 
     - name: Install uv
       run: pip install uv
@@ -31,10 +31,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
 
     - name: Install uv
       run: pip install uv
@@ -75,7 +75,7 @@ jobs:
         done
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build Docker container
       run: docker build -t collect-app .
@@ -121,7 +121,7 @@ jobs:
         done
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
 
     - name: Install uv
       run: pip install uv
