@@ -93,6 +93,11 @@ jobs:
           collect-app \
           uv run manage.py smart_create_user testuser testpass
 
+    - name: Prepare media folder
+      run: |
+        mkdir -p media-folder/uploads
+        chmod -R 777 media-folder
+
     - name: Load demo data
       run: |
         docker run --rm \
