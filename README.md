@@ -10,6 +10,8 @@ Publish and track your collectables.
 - Discover how much of the collections you own
 - Turn folders of images files into collections (see below)
 
+![Screenshot](screenshot.png)
+
 ## Get started
 
 ### Run locally

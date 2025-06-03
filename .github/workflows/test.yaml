@@ -93,15 +93,29 @@ jobs:
           collect-app \
           uv run manage.py smart_create_user testuser testpass
 
+    - name: Prepare media folder
+      run: |
+        mkdir -p media-folder/uploads
+        chmod -R 777 media-folder
+
+    - name: Load demo data
+      run: |
+        docker run --rm \
+          --network collect-net \
+          -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          -v `pwd`/demo:/mnt/demo \
+          -v `pwd`/media-folder:/mnt/media:rw \
+          collect-app \
+          uv run manage.py loadfolder testuser /mnt/demo/
+
     - name: Run app container
       run: |
         docker run --detach \
           --network collect-net \
           -p 8000:8000 \
           --name test-collect-app \
-          -e DJANGO_DEBUG=false \
-          -e DJANGO_SECURE_SSL_REDIRECT=false \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          -v `pwd`/media-folder:/mnt/media:rw \
           collect-app
 
     - name: Wait for app to be ready
