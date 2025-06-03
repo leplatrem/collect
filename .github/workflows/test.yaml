@@ -93,6 +93,15 @@ jobs:
           collect-app \
           uv run manage.py smart_create_user testuser testpass
 
+    - name: Load demo data
+      run: |
+        docker run --rm \
+          --network collect-net \
+          -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          -v `pwd`/demo:/mnt/demo \
+          collect-app \
+          uv run manage.py loadfolder testuser /mnt/demo/
+
     - name: Run app container
       run: |
         docker run --detach \
