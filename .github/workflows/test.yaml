@@ -99,6 +99,7 @@ jobs:
           --network collect-net \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
           -v `pwd`/demo:/mnt/demo \
+          -v `pwd`/media:/mnt/media:rw \
           collect-app \
           uv run manage.py loadfolder testuser /mnt/demo/
 
@@ -111,6 +112,7 @@ jobs:
           -e DJANGO_DEBUG=false \
           -e DJANGO_SECURE_SSL_REDIRECT=false \
           -e DJANGO_DATABASE_URL=${DJANGO_DATABASE_URL} \
+          -v `pwd`/media:/mnt/media:rw \
           collect-app
 
     - name: Wait for app to be ready
