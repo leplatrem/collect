@@ -1,7 +1,6 @@
-FOLDERS := collect collectable
 INSTALL_STAMP := .install.stamp
 ENV_FILE := .env
-POETRY := $(shell command -v poetry 2> /dev/null)
+UV := $(shell command -v uv 2> /dev/null)
 
 .PHONY: help clean lint format migrate demo tests
 
@@ -11,30 +10,31 @@ help:
 	@echo "\nCheck the Makefile to know exactly what each target is doing."
 
 install: $(INSTALL_STAMP)  ## Install dependencies
-$(INSTALL_STAMP): pyproject.toml poetry.lock
-	@if [ -z $(POETRY) ]; then echo "Poetry could not be found. See https://python-poetry.org/docs/"; exit 2; fi
-	$(POETRY) --version
-	$(POETRY) install --no-ansi --no-interaction --verbose
+$(INSTALL_STAMP): pyproject.toml uv.lock
+	@if [ -z $(UV) ]; then echo "uv could not be found. See https://docs.astral.sh/uv/"; exit 2; fi
+	$(UV) --version
+	$(UV) sync --locked
+	$(UV) run playwright install firefox
 	touch $(INSTALL_STAMP)
 
 clean:  ## Delete cache files
 	find . -type d -name "__pycache__" | xargs rm -rf {};
-	rm -rf .install.stamp .coverage .mypy_cache $(VERSION_FILE)
+	rm -rf .install.stamp .coverage .*_cache .venv
 
 lint: $(INSTALL_STAMP)  ## Analyze code base
-	$(POETRY) run ruff check $(FOLDERS)
-	$(POETRY) run ruff format --check $(FOLDERS)
-	$(POETRY) run mypy $(FOLDERS) --ignore-missing-imports
-	$(POETRY) run djlint $(FOLDERS) --lint
+	$(UV) run ruff check src/ tests/
+	$(UV) run ruff format --check src/ tests/
+	$(UV) run djlint src/ --lint
+	$(UV) run mypy src/ tests/ --ignore-missing-imports
 
 format: $(INSTALL_STAMP)  ## Format code base
-	$(POETRY) run ruff check --fix $(FOLDERS)
-	$(POETRY) run ruff format $(FOLDERS)
-	$(POETRY) run djlint $(FOLDERS) --reformat
+	$(UV) run ruff check --fix src/ tests/
+	$(UV) run ruff format src/ tests/
+	$(UV) run djlint src/ --reformat
 
 migrate:  ## Run pending migrations if needed
 	@echo "Checking for unapplied migrations..."
-	@$(POETRY) run sh -c '\
+	@$(UV) run sh -c '\
 		if python manage.py showmigrations --plan | grep "\[ \]" > /dev/null; then \
 			echo "Running migrations..."; \
 			python manage.py migrate; \
@@ -43,20 +43,23 @@ migrate:  ## Run pending migrations if needed
 		fi \
 	'
 
-createsuperuser: migrate   ## Create admin user if necessary
+createadminuser: migrate   ## Create admin user if necessary
 	@echo "Ensuring admin user exists with default password..."
-	DJANGO_SETTINGS_MODULE=collect.settings $(POETRY) run python bin/createsuperuser.py
+	$(UV) run manage.py smart_create_user --admin admin s3cr3t
 
-demo: $(INSTALL_STAMP) $(ENV_FILE) createsuperuser   ## Load demo data
-	$(POETRY) run python manage.py loadfolder admin demo
+demo: $(INSTALL_STAMP) $(ENV_FILE) createadminuser   ## Load demo data
+	$(UV) run manage.py loadfolder admin demo
 	@echo "You can now run 'make start'"
 
 test: tests  ## Run unit tests
-tests: $(INSTALL_STAMP) $(VERSION_FILE)
-	$(POETRY) run pytest tests --cov-report term-missing --cov-fail-under 100 --cov $(FOLDERS)
+tests: $(INSTALL_STAMP) $(ENV_FILE)
+	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
+
+browser-test: $(INSTALL_STAMP) $(ENV_FILE)  ## Run browser end-to-end tests
+	$(UV) run pytest --base-url http://127.0.0.1:8000 --browser firefox --screenshot on tests/
 
 $(ENV_FILE):
-	cp -n env.local .env
+	cp --update=none env.local .env
 
 start: $(INSTALL_STAMP) $(ENV_FILE) migrate  ## Start the app
-	$(POETRY) run python manage.py runserver
+	$(UV) run manage.py runserver

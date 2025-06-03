@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
@@ -46,7 +44,7 @@ class CollectableListView(ListView):
     sort_by = "-created_at"
     paginate_by = settings.DEFAULT_PAGE_SIZE
 
-    def get_queryset(self) -> QuerySet[Any]:
+    def get_queryset(self) -> QuerySet[Collectable]:
         qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
             self.sort_by, "-created_at"
         )
@@ -117,12 +115,8 @@ def details(request, id):
     else:
         form = CollectableForm(instance=collectable)
 
-    related_tags = collectable.tags_with_count().filter(ncollectable__gt=1)
-    related_collectables = Collectable.objects.with_counts_and_possessions(
-        request.user
-    ).exclude(id=collectable.id)
-    for tag in related_tags:
-        related_collectables = related_collectables.filter(tags=tag)
+    related_tags = collectable.related_tags()
+    related_collectables = collectable.related_collectables(request.user)
 
     context = {
         "collectable": collectable,
@@ -208,12 +202,9 @@ def collection(request, slugs):
 @login_required
 def profile(request):
     qs = Collectable.objects.with_counts_and_possessions(request.user)
-    liked = qs.filter(possession__user=request.user, possession__likes=True)
-    wanted = qs.filter(possession__user=request.user, possession__wants=True)
-    owned = qs.filter(possession__user=request.user, possession__owns=True)
     context = {
-        "collectable_liked": liked,
-        "collectable_wanted": wanted,
-        "collectable_owned": owned,
+        "collectable_liked": qs.liked_by(request.user),
+        "collectable_wanted": qs.wanted_by(request.user),
+        "collectable_owned": qs.owned_by(request.user),
     }
     return render(request, "collectable/profile.html", context)

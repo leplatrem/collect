@@ -26,9 +26,9 @@ make start
 
 Users can sign-up using a secret word. See ``SIGNUP_SECRETS_WORDS`` in your ``.env`` file.
 
-To create an admin super-user:
+In order to create an admin super-user:
 ```
-poetry run python manage.py createsuperuser
+uv run manage.py createsuperuser
 ```
 You can then access to http://localhost:8000/admin/
 
@@ -43,7 +43,7 @@ If all collectables belong to the same owner, specify the username with `--owner
 
 Example:
 ```
-poetry run python ./manage.py loadfolder user ~/stickaz/ --owner=user --tags=tag1 --tags=tag2
+uv run manage.py loadfolder user ~/stickaz/ --owner=user --tags=tag1 --tags=tag2
 ```
 
 The command can be executed multiple times with the same folder, and only new files will be added.
