@@ -71,7 +71,7 @@ jobs:
     - name: Run application containers
       run: docker compose up -d
 
-    - name: Wait for app to be ready
+    - name: Check app liveliness
       run: |
         for i in {1..20}; do
           curl --fail --silent --location http://127.0.0.1:8000/health/ && break
