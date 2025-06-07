@@ -53,10 +53,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Prepare media folder
+    - name: Prepare folders
       run: |
         mkdir -p media-folder/uploads
         chmod -R 777 media-folder
+        cp env.local .env
 
     - name: Build Docker container
       run: docker compose build
