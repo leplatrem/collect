@@ -23,7 +23,15 @@ urlpatterns = i18n_patterns(
 
 if settings.ADMIN_ENABLED:
     urlpatterns.append(path("admin/", admin.site.urls))
+else:
+    print("Admin UI disabled.")
 
-if settings.DEBUG:
+if settings.MEDIA_FILES_SERVED:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    print("Media files not served.")
+
+if settings.DEBUG_TOOLBAR_ENABLED:
     urlpatterns += debug_toolbar_urls()
+else:
+    print("Debug Toolbar disabled.")

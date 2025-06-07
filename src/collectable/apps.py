@@ -6,4 +6,4 @@ class CollectableConfig(AppConfig):
     name = "collectable"
 
     def ready(self) -> None:
-        print(f"Starting {self.name} app...")
+        print(f"{self.name} app started.")
