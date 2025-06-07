@@ -1,16 +1,72 @@
 services:
   web:
-    build: .
+    image: collect:latest
+    build:
+      context: .
     ports:
-      - 10001:8000
+      - "8000:8000"
+    environment:
+      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      DJANGO_MEDIA_ROOT: /mnt/media
     # Let the init system handle signals for us.
     # among other things this helps shutdown be fast
     init: true
     volumes:
       - ./.env:/app/.env
-      - db-folder:/mnt/db:rw
       - media-folder:/mnt/media:rw
+    depends_on:
+      - db
+      - init
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=collectdb
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "collectdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    ports:
+      - "5432:5432"
+
+  init:
+    image: collect:latest
+    build:
+      context: .
+    environment:
+      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+    command: uv run manage.py migrate --noinput
+    volumes:
+      - ./.env:/app/.env
+    depends_on:
+      - db
+
+  demo:
+    image: collect:latest
+    build:
+      context: .
+    environment:
+      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      DJANGO_MEDIA_ROOT: /mnt/media
+    command: >
+      sh -c "
+        uv run manage.py smart_create_user --admin admin s3cr3t &&
+        uv run manage.py smart_create_user testuser testpass &&
+        uv run manage.py loadfolder testuser /mnt/demo
+      "
+    volumes:
+      - ./.env:/app/.env
+      - ./demo:/mnt/demo
+      - media-folder:/mnt/media:rw
+    depends_on:
+      - init
 
 volumes:
-  db-folder:
   media-folder:
+  pgdata:

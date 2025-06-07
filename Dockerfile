@@ -11,7 +11,8 @@ ENV PYTHONUNBUFFERED=1 \
     DJANGO_MEDIA_ROOT=/mnt/media/uploads \
     DJANGO_STATIC_ROOT=/mnt/static \
     DJANGO_DEBUG=false \
-    DJANGO_SECURE_SSL_REDIRECT=false
+    DJANGO_SECURE_SSL_REDIRECT=false \
+    DJANGO_MEDIA_FILE_SERVED=true
 
 ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --access-logfile '-' --error-logfile '-' --capture-output"
 

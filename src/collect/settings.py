@@ -32,6 +32,9 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", default="not-secret")
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
 ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
+DEBUG_TOOLBAR_ENABLED = config("DJANGO_DEBUG_TOOLBAR_ENABLED", default=DEBUG, cast=bool)
+MEDIA_FILES_SERVED = config("DJANGO_MEDIA_FILES_SERVED", default=DEBUG, cast=bool)
+
 
 # Application definition
 
@@ -49,7 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
-if DEBUG:
+if DEBUG_TOOLBAR_ENABLED:
     INSTALLED_APPS += [
         "debug_toolbar",
     ]
@@ -67,7 +70,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
-if DEBUG:
+if DEBUG_TOOLBAR_ENABLED:
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
@@ -84,7 +87,9 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "collect.context_processors.constants",
-                "django.template.context_processors.debug",
+            ]
+            + (["django.template.context_processors.debug"] if DEBUG else [])
+            + [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -202,7 +207,7 @@ STORAGES = {
 }
 
 MEDIA_URL = config("DJANGO_MEDIA_URL", default=DEFAULT_MEDIA_URL)
-MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / ".." / "uploads")
+MEDIA_ROOT = config("DJANGO_MEDIA_ROOT", default=BASE_DIR / ".." / "media-folder")
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
