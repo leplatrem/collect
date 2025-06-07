@@ -68,7 +68,7 @@ jobs:
       run: docker compose run demo
 
     - name: Run application containers
-      run: docker compose up
+      run: docker compose up -d
 
     - name: Wait for app to be ready
       run: |
