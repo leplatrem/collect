@@ -1,0 +1,16 @@
+{
+  "name": "collect",
+  "version": "0.0.0",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.30",
+    "prettier": "^3.5.3",
+    "undici-types": "^6.21.0"
+  }
+}

@@ -1,4 +1,4 @@
-.install.stamp
+.install*.stamp
 .*_cache/
 test-results/
 db-folder/
@@ -137,3 +137,9 @@ dmypy.json
 # IDEs
 .idea/
 .vscode/
+
+# Playwright
+node_modules/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
