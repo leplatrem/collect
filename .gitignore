@@ -137,3 +137,9 @@ dmypy.json
 # IDEs
 .idea/
 .vscode/
+
+# Playwright
+node_modules/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

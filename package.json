@@ -1,0 +1,29 @@
+{
+  "name": "collect",
+  "version": "0.0.0",
+  "description": "Publish and track your collectables.",
+  "homepage": "https://github.com/leplatrem/collect#readme",
+  "bugs": {
+    "url": "https://github.com/leplatrem/collect/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leplatrem/collect.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "npx playwright test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "playwright": "^1.52.0",
+    "playwright-core": "^1.52.0",
+    "undici-types": "^6.21.0"
+  }
+}

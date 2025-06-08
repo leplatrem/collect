@@ -16,12 +16,30 @@ Publish and track your collectables.
 
 ### Run locally
 
-```
-make demo
-```
+| Using Docker          | From sources   |
+|-----------------------|----------------|
+| ``docker compose up`` | ``make start`` |
+
+### Demo data
+
+Creates ``admin`` and ``testuser`` users and a few collectables...
+
+| Using Docker          | From sources   |
+|-----------------------|----------------|
+| ``docker run demo``   | ``make demo`` |
+
+### Run tests
+
+Unit tests
 
 ```
-make start
+make test
+```
+
+or browser tests on `http://localhost:8000` using [Playwright](https://playwright.dev/):
+
+```
+make browser-test
 ```
 
 ### Create users
