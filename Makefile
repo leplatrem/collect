@@ -10,27 +10,35 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo "\nCheck the Makefile to know exactly what each target is doing."
 
-install: $(INSTALL_STAMP_PYTHON)  ## Install dependencies
+install: $(INSTALL_STAMP_PYTHON)  ## Install Python dependencies
 $(INSTALL_STAMP_PYTHON): pyproject.toml uv.lock
 	@if [ -z $(UV) ]; then echo "uv could not be found. See https://docs.astral.sh/uv/"; exit 2; fi
 	$(UV) --version
 	$(UV) sync --locked
 	touch $(INSTALL_STAMP_PYTHON)
 
+install-node: $(INSTALL_STAMP_NODE)  ## Install Node dependencies
+$(INSTALL_STAMP_NODE): package.json package-lock.json
+	npm ci
+	npx playwright install firefox
+	touch $(INSTALL_STAMP_NODE)
+
 clean:  ## Delete cache files
 	find . -type d -name "__pycache__" | xargs rm -rf {};
-	rm -rf $(INSTALL_STAMP_PYTHON) $(INSTALL_STAMP_NODE) .coverage .*_cache .venv
+	rm -rf $(INSTALL_STAMP_PYTHON) $(INSTALL_STAMP_NODE) ./node_modules/ .coverage .*_cache .venv
 
-lint: $(INSTALL_STAMP_PYTHON)  ## Analyze code base
-	$(UV) run ruff check src/ tests/
-	$(UV) run ruff format --check src/ tests/
+lint: $(INSTALL_STAMP_PYTHON) $(INSTALL_STAMP_NODE)  ## Analyze code base
+	$(UV) run ruff check src/
+	$(UV) run ruff format --check src/
 	$(UV) run djlint src/ --lint
-	$(UV) run mypy src/ tests/ --ignore-missing-imports
+	$(UV) run mypy src/ --ignore-missing-imports
+	npx prettier --check tests/
 
-format: $(INSTALL_STAMP_PYTHON)  ## Format code base
-	$(UV) run ruff check --fix src/ tests/
-	$(UV) run ruff format src/ tests/
+format: $(INSTALL_STAMP_PYTHON) $(INSTALL_STAMP_NODE)  ## Format code base
+	$(UV) run ruff check --fix src/
+	$(UV) run ruff format src/
 	$(UV) run djlint src/ --reformat
+	npx prettier --write tests/
 
 migrate:  ## Run pending migrations if needed
 	@echo "Checking for unapplied migrations..."
@@ -58,12 +66,6 @@ $(ENV_FILE):
 
 start: $(INSTALL_STAMP_PYTHON) $(ENV_FILE) migrate  ## Start the app
 	$(UV) run manage.py runserver
-
-install: $(INSTALL_STAMP_NODE)  ## Install browser tests dependencies
-$(INSTALL_STAMP_NODE): package.json
-	npm ci
-	npx playwright install firefox
-	touch $(INSTALL_STAMP_NODE)
 
 browser-test: $(INSTALL_STAMP_NODE)  ## Run browser end-to-end tests
 	npx playwright test

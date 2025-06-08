@@ -20,10 +20,10 @@
   "scripts": {
     "test": "npx playwright test"
   },
-  "dependencies": {},
   "devDependencies": {
     "playwright": "^1.52.0",
     "playwright-core": "^1.52.0",
+    "prettier": "^3.5.3",
     "undici-types": "^6.21.0"
   }
 }
