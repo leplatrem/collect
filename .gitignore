@@ -1,4 +1,4 @@
-.install.stamp
+.install*.stamp
 .*_cache/
 test-results/
 db-folder/
