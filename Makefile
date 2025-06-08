@@ -67,5 +67,6 @@ $(ENV_FILE):
 start: $(INSTALL_STAMP_PYTHON) $(ENV_FILE) migrate  ## Start the app
 	$(UV) run manage.py runserver
 
+browser-test: browser-tests
 browser-tests: $(INSTALL_STAMP_NODE)  ## Run browser end-to-end tests
 	npx playwright test
