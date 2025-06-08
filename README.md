@@ -39,7 +39,7 @@ make test
 or browser tests on `http://localhost:8000` using [Playwright](https://playwright.dev/):
 
 ```
-make browser-test
+make browser-tests
 ```
 
 ### Create users

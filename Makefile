@@ -3,7 +3,7 @@ INSTALL_STAMP_NODE := .install.node.stamp
 ENV_FILE := .env
 UV := $(shell command -v uv 2> /dev/null)
 
-.PHONY: help clean lint format migrate demo tests
+.PHONY: help clean lint format migrate demo tests browser-tests
 
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following commands.\n"
@@ -67,5 +67,5 @@ $(ENV_FILE):
 start: $(INSTALL_STAMP_PYTHON) $(ENV_FILE) migrate  ## Start the app
 	$(UV) run manage.py runserver
 
-browser-test: $(INSTALL_STAMP_NODE)  ## Run browser end-to-end tests
+browser-tests: $(INSTALL_STAMP_NODE)  ## Run browser end-to-end tests
 	npx playwright test
