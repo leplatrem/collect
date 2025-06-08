@@ -14,7 +14,6 @@ $(INSTALL_STAMP): pyproject.toml uv.lock
 	@if [ -z $(UV) ]; then echo "uv could not be found. See https://docs.astral.sh/uv/"; exit 2; fi
 	$(UV) --version
 	$(UV) sync --locked
-	$(UV) run playwright install firefox
 	touch $(INSTALL_STAMP)
 
 clean:  ## Delete cache files

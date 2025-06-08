@@ -87,14 +87,9 @@ jobs:
           sleep 3
         done
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-
-    - name: Install uv
-      run: pip install uv
-
-    - name: Install dependencies
-      run: make install
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
 
     - name: Run Playwright Tests
       run: make browser-test
