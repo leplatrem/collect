@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load collectable_extras %}
+{% block title %}
+    {% blocktranslate with id=collectable.id %}Details of {{ id }}{% endblocktranslate %}
+{% endblock %}
+{% block content %}
+    <h1>{% translate "Duplicate" %}</h1>
+    <section id="attributes">
+        {# Same as collectable_thumbnail.html but without link #}
+        <div class="collectable thumbnail">
+            <img alt="{% if report.duplicate.description %}{{ report.duplicate.description }}{% else %}{% blocktranslate with obj=report.duplicate %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}"
+                 height="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
+                 width="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
+                 src="{{ duplicate.thumbnail.url }}" />
+            <p>{% translate "is duplicate of" %}</p>
+            {% include "collectable/collectable_thumbnail.html" with collectable=report.original %}
+            <p>
+                {% blocktranslate with reporter=reporter confirmations=report.confirmations_count %}Reported by {{ report.reporter }} on {{ report.created_at }} and confirmed by {{ confirmations }} users.{% endblocktranslate %}
+            </p>
+            <p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit">{% translate "Confirm" %}</button>
+                </form>
+            </p>
+        </section>
+    {% endblock %}

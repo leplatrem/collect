@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models.query import QuerySet
@@ -11,7 +12,7 @@ from taggit.models import Tag
 
 from collect.utils import paginate
 from collectable.forms import CollectableForm, PossessionForm
-from collectable.models import Collectable, Possession
+from collectable.models import Collectable, DuplicateReport, Possession
 
 
 def index(request):
@@ -85,6 +86,7 @@ def create(request):
             Possession.objects.create(
                 user=request.user, collectable=collectable, owns=True
             )
+            messages.info(request, _("Collectable created."))
             return redirect(collectable)
     else:
         form = CollectableForm()
@@ -96,9 +98,14 @@ def create(request):
 
 @require_http_methods(["GET", "POST"])
 def details(request, id):
+    # Note: hidden collectable will be 404.
     collectable = get_object_or_404(
         Collectable.objects.with_counts_and_possessions(request.user), id=id
     )
+
+    # Redirect to duplicate page if this collectable is a duplicate of another one.
+    if report := DuplicateReport.objects.filter(duplicate=collectable).first():
+        return redirect(report.original)
 
     form_saved = False
     if request.method == "POST":
@@ -117,6 +124,12 @@ def details(request, id):
 
     related_tags = collectable.related_tags()
     related_collectables = collectable.related_collectables(request.user)
+    duplicates = DuplicateReport.objects.filter(
+        original=collectable, duplicate__hidden=False
+    )
+
+    # TODO
+    # duplicate_form = DuplicateReportForm()
 
     context = {
         "collectable": collectable,
@@ -124,9 +137,34 @@ def details(request, id):
         "form_saved": form_saved,
         "related_tags": related_tags,
         "related_collectables": related_collectables,
+        "duplicates": duplicates,
     }
 
     return render(request, "collectable/details.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def duplicate(request, id):
+    # Rely on Django high-level methods to return 404 if not found etc.
+    duplicate = get_object_or_404(Collectable.objects.all().visible(), id=id)
+
+    # Just a safety check in case the URL is reached manually.
+    report = DuplicateReport.objects.filter(duplicate=duplicate).first()
+    if not report:
+        # Not report found, redirect to basic details page.
+        return redirect(duplicate)
+
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return HttpResponse(_("Unauthorized"), status=401)
+        report.confirm(request.user)
+        messages.info(request, _("Duplicate confirmed."))
+        return redirect(report.original)
+
+    context = {
+        "report": report,
+    }
+    return render(request, "collectable/duplicate.html", context)
 
 
 @require_http_methods(["POST"])

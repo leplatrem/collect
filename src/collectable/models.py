@@ -2,6 +2,8 @@ import uuid
 
 import taggit.models
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
@@ -42,6 +44,9 @@ class CollectableQuerySet(models.QuerySet):
     Custom QuerySet for Collectable model to include methods for prefetching.
     """
 
+    def visible(self):
+        return self.filter(hidden=False)
+
     def with_tags(self):
         return self.prefetch_related(Prefetch("tags", to_attr="tags_list"))
 
@@ -73,7 +78,7 @@ class CollectableQuerySet(models.QuerySet):
         This uses the related field from the Possession model to count the number of
         possessions that have likes, wants, and owns set to True.
         """
-        return self.annotate(
+        return self.visible().annotate(
             nlikes=Coalesce(
                 Count("possessions", filter=Q(**{"possession__likes": True})), 0
             ),
@@ -97,7 +102,13 @@ class CollectableManager(models.Manager):
         return CollectableQuerySet(self.model, using=self._db)
 
     def with_counts_and_possessions(self, user):
-        return self.get_queryset().with_tags().for_user(user).with_possession_counts()
+        return (
+            self.get_queryset()
+            .visible()
+            .with_tags()
+            .for_user(user)
+            .with_possession_counts()
+        )
 
 
 class Collectable(models.Model):
@@ -145,6 +156,7 @@ class Collectable(models.Model):
         format="JPEG",
         options={"quality": settings.COLLECTABLE_THUMBNAIL_QUALITY},
     )
+    hidden = models.BooleanField(_("Hidden"), default=False)
 
     objects = CollectableManager()
 
@@ -235,6 +247,12 @@ class Collectable(models.Model):
             previous = current
         return filtered
 
+    def hide(self):
+        """Mark this collectable as hidden (eg. duplicate)."""
+        if not self.hidden:
+            self.hidden = True
+            self.save(update_fields=["hidden"])
+
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
@@ -256,3 +274,121 @@ class Possession(models.Model):
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
         unique_together = ("user", "collectable")
+
+
+def get_unknown_user():
+    """
+    Returns the system 'unknown' user. Creates it if not already present.
+    Prevents reports to be deleted in cascade when user is deleted.
+    """
+    User = get_user_model()
+    user, _ = User.objects.get_or_create(
+        username="unknown",
+        defaults={
+            "email": "unknown@example.com",
+            "is_active": False,  # prevents login
+        },
+    )
+    return user
+
+
+class DuplicateReport(models.Model):
+    id = models.UUIDField(
+        _("Identifier"), primary_key=True, default=uuid.uuid4, editable=False
+    )
+    original = models.ForeignKey(
+        "Collectable",
+        on_delete=models.CASCADE,
+        related_name="duplicate_reports_1",
+    )
+    duplicate = models.ForeignKey(
+        "Collectable",
+        on_delete=models.CASCADE,
+        related_name="duplicate_reports_2",
+    )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        default=get_unknown_user,
+        related_name="duplicate_reports_made",
+    )
+    created_at = models.DateTimeField(_("Reported at"), auto_now_add=True)
+
+    confirmed_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="duplicate_reports_confirmed",
+        blank=True,
+    )
+
+    def get_absolute_url(self):
+        return reverse_lazy("collectable:duplicate", kwargs={"id": self.duplicate.id})
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(original=models.F("duplicate")),
+                name="prevent_self_duplicate",
+            ),
+            models.UniqueConstraint(
+                fields=["original", "duplicate", "reporter"],
+                name="unique_duplicate_report",
+            ),
+        ]
+
+    def confirmations_count(self):
+        return self.confirmed_by.count()
+
+    def is_threshold_reached(self):
+        return self.confirmations_count() >= settings.DUPLICATE_CONFIRMATION_THRESHOLD
+
+    def confirm(self, user):
+        """Confirm duplicate and hide both if threshold reached."""
+        if user == self.reporter:
+            # Cannot confirm their own report
+            return
+        if self.confirmed_by.filter(pk=user.pk).exists():
+            # Cannot confirm twice
+            return
+        self.confirmed_by.add(user)
+        if self.is_threshold_reached():
+            self.duplicate.hide()
+
+    def clean(self):
+        # Prevent self-links
+        if self.original == self.duplicate:
+            raise ValidationError("A collectable cannot be a duplicate of itself.")
+
+        # Prevent loops
+        if self._creates_cycle():
+            raise ValidationError("Adding this duplicate would create a loop.")
+
+    def _creates_cycle(self):
+        """
+        Check if adding this duplicate would create a cycle in the duplicates graph
+        using BFS graph traversal
+        """
+        visited = set()
+        queue = [self.duplicate.id]
+
+        while queue:
+            current_id = queue.pop(0)
+            if current_id == self.original.id:
+                return True  # cycle detected
+
+            visited.add(current_id)
+
+            neighbors_1 = DuplicateReport.objects.filter(
+                original_id=current_id
+            ).values_list("duplicate_id", flat=True)
+            neighbors_2 = DuplicateReport.objects.filter(
+                duplicate_id=current_id
+            ).values_list("original_id", flat=True)
+            for n in set(neighbors_1).union(neighbors_2):
+                if n not in visited:
+                    queue.append(n)
+
+        return False
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # runs `clean()` before saving
+        super().save(*args, **kwargs)

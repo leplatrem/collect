@@ -8,6 +8,7 @@ from django.utils import translation
 
 from collectable.tests.factories import (
     CollectableFactory,
+    DuplicateReportFactory,
     PossessionFactory,
     UserFactory,
 )
@@ -39,6 +40,11 @@ def user(db):
 @pytest.fixture
 def collectable(db):
     return CollectableFactory()
+
+
+@pytest.fixture
+def duplicate_report(db):
+    return DuplicateReportFactory()
 
 
 @pytest.fixture
