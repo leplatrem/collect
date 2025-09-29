@@ -1,6 +1,7 @@
 from django.forms import ModelForm, TextInput
 
 from collectable.models import Collectable, Possession
+from cropper.widget import SquareImageCropper
 
 
 class CollectableForm(ModelForm):
@@ -8,6 +9,7 @@ class CollectableForm(ModelForm):
         model = Collectable
         fields = ["photo", "description", "tags"]
         widgets = {
+            "photo": SquareImageCropper(),
             "description": TextInput(),
         }
 

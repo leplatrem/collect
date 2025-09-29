@@ -4,6 +4,9 @@
 {% block title %}
     {% blocktranslate with id=collectable.id %}Details of {{ id }}{% endblocktranslate %}
 {% endblock %}
+{% block head %}
+    {{ form_edit.media.css }}
+{% endblock head %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
     <section id="attributes">
@@ -106,3 +109,6 @@
         </section>
     {% endwith %}
 {% endblock %}
+{% block foot %}
+    {{ form_edit.media.js }}
+{% endblock foot %}

@@ -12,6 +12,8 @@
         <meta name="description" content="" />
         <meta name="keywords" content="" />
         <script src="{% static 'js/htmx-2.0.2.min.js' %}"></script>
+        {% block head %}
+        {% endblock head %}
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <header>
@@ -35,7 +37,6 @@
             {% block nav %}{% endblock %}
         </nav>
         <footer>
-            {% block footer %}{% endblock %}
             <p>
                 {% blocktranslate %}
                 🚀 This project is <strong>free</strong> and <strong>open source</strong> —
@@ -43,5 +44,7 @@
                 {% endblocktranslate %}
             </p>
         </footer>
+        {% block foot %}
+        {% endblock foot %}
     </body>
 </html>

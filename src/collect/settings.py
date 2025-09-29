@@ -41,6 +41,7 @@ MEDIA_FILES_SERVED = config("DJANGO_MEDIA_FILES_SERVED", default=DEBUG, cast=boo
 INSTALLED_APPS = [
     "collectable.apps.CollectableConfig",
     "accounts",
+    "cropper",
     # 3rd party
     "simple_history",
     "taggit",
