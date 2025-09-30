@@ -4,6 +4,14 @@
 {% block title %}
     {% blocktranslate with id=collectable.id %}Details of {{ id }}{% endblocktranslate %}
 {% endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ collectable }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url"
+          content="{% fullurl collectable.get_absolute_url %}" />
+    <meta property="og:image" content="{% fullurl collectable.thumbnail.url %}" />
+    {% for slug in collectable.tags.slugs %}<meta property="article:tag" content="{{ slug }}" />{% endfor %}
+{% endblock meta %}
 {% block head %}
     {{ form_edit.media.css }}
 {% endblock head %}
