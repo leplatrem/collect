@@ -42,6 +42,10 @@ def test_create_view_authenticated_post(db, logged_in_client, collectable):
         "description": "Created via test",
         "tags": "tag1,tag2",
         "photo": collectable.photo,
+        "photo_x": 0,
+        "photo_y": 0,
+        "photo_w": 400,
+        "photo_h": 400,
     }
     response = logged_in_client.post(url, data)
     assert response.status_code == 302
@@ -56,6 +60,10 @@ def test_details_view_authenticated_post(db, logged_in_client, collectable):
         "description": "Edited via test",
         "tags": "tag1,tag2",
         "photo": collectable.photo,
+        "photo_x": 0,
+        "photo_y": 0,
+        "photo_w": 400,
+        "photo_h": 400,
     }
     response = logged_in_client.post(url, data)
     assert response.status_code == 200
