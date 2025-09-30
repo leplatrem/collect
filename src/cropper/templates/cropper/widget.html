@@ -1,0 +1,16 @@
+{% load i18n %}
+<div class="square-cropper-widget">
+    <input type="file"
+           name="{{ widget.name }}"
+           {% include "django/forms/widgets/attrs.html" %}>
+    <input type="hidden" name="{{ widget.name }}_x">
+    <input type="hidden" name="{{ widget.name }}_y">
+    <input type="hidden" name="{{ widget.name }}_w">
+    <input type="hidden" name="{{ widget.name }}_h">
+    <div class="cropper-controls hidden">
+        <div class="crop-area">
+            <canvas id="canvas-{{ widget.name }}"></canvas>
+        </div>
+        <input type="range" min="0.5" max="3" step="0.01" disabled>
+    </div>
+</div>

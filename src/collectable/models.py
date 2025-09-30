@@ -12,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
 from simple_history.models import HistoricalRecords
-from simple_history.template_utils import HistoricalRecordContextHelper
 from taggit.managers import TaggableManager
 from taggit.models import Tag
 
@@ -210,30 +209,49 @@ class Collectable(models.Model):
         Return the history entries with delta information.
 
         We wish this was built-in to simple_history, but it is not.
-        This method filters out history records that do not have any changes
-        or changed fields, and adds a `history_delta_changes` attribute to each
-        historical record, which contains the context for the delta changes.
-        This method is used in the template to display the history of changes
-        for the collectable item, showing only the records that have actual changes.
         """
-        previous = None
-        history_records = self.history.select_related("history_user").all()
+        history_records = (
+            self.history.select_related("history_user").all().order_by("history_date")
+        )
         filtered = []
-        for current in history_records:
+
+        previous = None
+        for record in history_records:
             if previous is None:
-                previous = current
+                previous = record
                 continue
 
-            delta = previous.diff_against(current)
-            if len(delta.changes) == 0 or len(delta.changed_fields) == 0:
-                previous = current
-                continue
+            changes = []
 
-            helper = HistoricalRecordContextHelper(Collectable, previous)
-            previous.history_delta_changes = helper.context_for_delta_changes(delta)
+            # Explicitly include tag changes from _computed_tags
+            print(previous._computed_tags, "---", record._computed_tags)
+            if previous._computed_tags != record._computed_tags:
+                changes.append(
+                    {
+                        "field": "tags",
+                        "old": previous._computed_tags,
+                        "new": record._computed_tags,
+                    }
+                )
+
+            delta = record.diff_against(previous)
+
+            # Add field-level changes from simple_history
+            for change in delta.changes:
+                changes.append(
+                    {
+                        "field": change.field,
+                        "old": change.old,
+                        "new": change.new,
+                    }
+                )
+
+            previous.history_delta_changes = changes
             filtered.append(previous)
-            previous = current
-        return filtered
+
+            previous = record
+
+        return list(reversed(filtered))
 
     class Meta:
         verbose_name = _("Collectable")
