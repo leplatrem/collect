@@ -2,6 +2,9 @@
 {% load i18n %}
 {% load collectable_extras %}
 {% block title %}Create{% endblock %}
+{% block head %}
+    {{ form.media.css }}
+{% endblock head %}
 {% block content %}
     <h1>{% translate "Create" %}</h1>
     <form method="post" enctype="multipart/form-data">
@@ -10,3 +13,6 @@
         <button type="submit">{% translate "Create" %}</button>
     </form>
 {% endblock %}
+{% block foot %}
+    {{ form.media.js }}
+{% endblock foot %}
