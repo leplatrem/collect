@@ -1,34 +1,16 @@
 {% load i18n %}
 <div class="square-cropper-widget">
-    {% if widget.is_initial %}
-        <p>
-            {% translate "Photo:" %} <a href="{{ widget.value.url }}">{{ widget.value.name }}</a>
-        </p>
-        {% if not widget.required %}
-            <label>
-                <input type="checkbox" name="{{ widget.checkbox_name }}">
-                {{ widget.clear_checkbox_label }}
-            </label>
-        {% endif %}
-    {% endif %}
-    <label class="upload-btn">
-        {% translate "Select a file" %}
-        <input type="file"
-               name="{{ widget.name }}"
-               {% include "django/forms/widgets/attrs.html" %}>
-    </label>
-    <span class="file-name"></span>
-    <div class="crop-area">
-        <canvas id="canvas-{{ widget.name }}"></canvas>
+    <input type="file"
+           name="{{ widget.name }}"
+           {% include "django/forms/widgets/attrs.html" %}>
+    <input type="hidden" name="{{ widget.name }}_x">
+    <input type="hidden" name="{{ widget.name }}_y">
+    <input type="hidden" name="{{ widget.name }}_w">
+    <input type="hidden" name="{{ widget.name }}_h">
+    <div class="cropper-controls hidden">
+        <div class="crop-area">
+            <canvas id="canvas-{{ widget.name }}"></canvas>
+        </div>
+        <input type="range" min="0.5" max="3" step="0.01" disabled>
     </div>
-    <input id="zoom-{{ widget.name }}"
-           type="range"
-           min="1"
-           max="3"
-           step="0.01"
-           value="0"
-           disabled />
-    <input type="hidden"
-           name="{{ widget.name }}_cropped"
-           id="{{ widget.name }}-cropped" />
 </div>

@@ -8,9 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = CANVAS_SIZE_PIXELS;
     const ctx = canvas.getContext("2d");
 
-    const fileInput = widget.querySelector("input[type=file]");    
+    const fileInput = widget.querySelector("input[type=file]");
+    const fieldName = fileInput.getAttribute("name");
     const zoomInput = widget.querySelector("input[type=range]");
-    const hiddenInput = widget.querySelector("input[type=hidden]");
 
     let img = new Image();
     let imgLoaded = false;
@@ -33,32 +33,28 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.drawImage(img, pos.x, pos.y, w, h);
     }
 
-    function exportCroppedImage() {
-      if (!imgLoaded) return;
-
-      // Determine the crop rectangle in original image coordinates
-      const sx = (-pos.x / scale);
-      const sy = (-pos.y / scale);
+    function updateCropCoords() {
+      // Convert canvas crop area back to original image coordinates
+      const sx = Math.max(0, -pos.x / scale);
+      const sy = Math.max(0, -pos.y / scale);
       const sWidth = CANVAS_SIZE_PIXELS / scale;
       const sHeight = CANVAS_SIZE_PIXELS / scale;
 
-      // Create an offscreen canvas at original resolution
-      const exportCanvas = document.createElement("canvas");
-      exportCanvas.width = sWidth;
-      exportCanvas.height = sHeight;
-      const exportCtx = exportCanvas.getContext("2d");
-
-      exportCtx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
-
-      // Export to hidden input as JPEG
-      hiddenInput.value = exportCanvas.toDataURL("image/jpeg");
+      widget.querySelector(`input[name="${fieldName}_x"]`).value = Math.round(sx);
+      widget.querySelector(`input[name="${fieldName}_y"]`).value = Math.round(sy);
+      widget.querySelector(`input[name="${fieldName}_w"]`).value = Math.round(sWidth);
+      widget.querySelector(`input[name="${fieldName}_h"]`).value = Math.round(sHeight);
     }
 
     fileInput.addEventListener("change", e => {
       const file = e.target.files[0];
       if (!file) {
+        widget.querySelector(".cropper-controls").classList.add("hidden");
         return;
       }
+      // Show cropper controls
+       widget.querySelector(".cropper-controls").classList.remove("hidden");
+
       const url = URL.createObjectURL(file);
       img = new Image();
       img.onload = () => {
@@ -79,8 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pos.y = (CANVAS_SIZE_PIXELS - img.height * scale) / 2;
 
         drawPreview();
-        exportCroppedImage();
-        URL.revokeObjectURL(url);
+        updateCropCoords();
       }
       img.src = url;
     });
@@ -104,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       scale = newScale;
       drawPreview();
-      exportCroppedImage();
+      updateCropCoords();
     });
 
     canvas.addEventListener("pointerdown", e=>{
@@ -128,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pos.x += dx;
       pos.y += dy;
       drawPreview();
-      exportCroppedImage();
+      updateCropCoords();
     });
 
     canvas.addEventListener("pointerup", () => {
@@ -137,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pos.x = Math.max(Math.min(pos.x, 0), CANVAS_SIZE_PIXELS - img.width * scale);
       pos.y = Math.max(Math.min(pos.y, 0), CANVAS_SIZE_PIXELS - img.height * scale);
       drawPreview();
-      exportCroppedImage();
+      updateCropCoords();
     });
 
     canvas.addEventListener("pointercancel", () => {
