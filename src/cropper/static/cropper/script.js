@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const CANVAS_SIZE_PIXELS = 400;
   const BACKGROUND_COLOR = "#fff";
 
-  document.querySelectorAll(".square-cropper-widget").forEach(widget => {
+  document.querySelectorAll(".square-cropper-widget").forEach((widget) => {
     const canvas = widget.querySelector("canvas");
     canvas.width = CANVAS_SIZE_PIXELS;
     canvas.height = CANVAS_SIZE_PIXELS;
@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let img = new Image();
     let imgLoaded = false;
     let scale = 0;
-    let pos = {x: 0, y: 0};
+    let pos = { x: 0, y: 0 };
     // Drag state
-    let origin = {x: 0, y: 0};
+    let origin = { x: 0, y: 0 };
     let isDragging = false;
 
-    function drawPreview(){
+    function drawPreview() {
       if (!imgLoaded) {
         return;
       }
@@ -40,20 +40,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const sWidth = CANVAS_SIZE_PIXELS / scale;
       const sHeight = CANVAS_SIZE_PIXELS / scale;
 
-      widget.querySelector(`input[name="${fieldName}_x"]`).value = Math.round(sx);
-      widget.querySelector(`input[name="${fieldName}_y"]`).value = Math.round(sy);
-      widget.querySelector(`input[name="${fieldName}_w"]`).value = Math.round(sWidth);
-      widget.querySelector(`input[name="${fieldName}_h"]`).value = Math.round(sHeight);
+      widget.querySelector(`input[name="${fieldName}_x"]`).value =
+        Math.round(sx);
+      widget.querySelector(`input[name="${fieldName}_y"]`).value =
+        Math.round(sy);
+      widget.querySelector(`input[name="${fieldName}_w"]`).value =
+        Math.round(sWidth);
+      widget.querySelector(`input[name="${fieldName}_h"]`).value =
+        Math.round(sHeight);
     }
 
-    fileInput.addEventListener("change", e => {
+    fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) {
         widget.querySelector(".cropper-controls").classList.add("hidden");
         return;
       }
       // Show cropper controls
-       widget.querySelector(".cropper-controls").classList.remove("hidden");
+      widget.querySelector(".cropper-controls").classList.remove("hidden");
 
       const url = URL.createObjectURL(file);
       img = new Image();
@@ -64,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Fit the image to canvas (smallest side)
         scale = Math.max(
           CANVAS_SIZE_PIXELS / img.width,
-          CANVAS_SIZE_PIXELS / img.height
+          CANVAS_SIZE_PIXELS / img.height,
         );
         zoomInput.min = scale.toFixed(2);
         zoomInput.max = (scale * 3).toFixed(2);
@@ -76,11 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         drawPreview();
         updateCropCoords();
-      }
+      };
       img.src = url;
     });
 
-    zoomInput.addEventListener("input", e=>{
+    zoomInput.addEventListener("input", (e) => {
       if (!imgLoaded) {
         return;
       }
@@ -94,16 +98,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       pos.x -= (wNew - wOld) / 2;
       pos.y -= (hNew - hOld) / 2;
-      pos.x = Math.max(Math.min(pos.x, 0), CANVAS_SIZE_PIXELS - img.width * newScale);
-      pos.y = Math.max(Math.min(pos.y, 0), CANVAS_SIZE_PIXELS - img.height * newScale);
+      pos.x = Math.max(
+        Math.min(pos.x, 0),
+        CANVAS_SIZE_PIXELS - img.width * newScale,
+      );
+      pos.y = Math.max(
+        Math.min(pos.y, 0),
+        CANVAS_SIZE_PIXELS - img.height * newScale,
+      );
 
       scale = newScale;
       drawPreview();
       updateCropCoords();
     });
 
-    canvas.addEventListener("pointerdown", e=>{
-      if(!imgLoaded) {
+    canvas.addEventListener("pointerdown", (e) => {
+      if (!imgLoaded) {
         return;
       }
       isDragging = true;
@@ -112,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.setPointerCapture(e.pointerId);
     });
 
-    canvas.addEventListener("pointermove", e=>{
+    canvas.addEventListener("pointermove", (e) => {
       if (!isDragging) {
         return;
       }
@@ -129,8 +139,14 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.addEventListener("pointerup", () => {
       isDragging = false;
 
-      pos.x = Math.max(Math.min(pos.x, 0), CANVAS_SIZE_PIXELS - img.width * scale);
-      pos.y = Math.max(Math.min(pos.y, 0), CANVAS_SIZE_PIXELS - img.height * scale);
+      pos.x = Math.max(
+        Math.min(pos.x, 0),
+        CANVAS_SIZE_PIXELS - img.width * scale,
+      );
+      pos.y = Math.max(
+        Math.min(pos.y, 0),
+        CANVAS_SIZE_PIXELS - img.height * scale,
+      );
       drawPreview();
       updateCropCoords();
     });
