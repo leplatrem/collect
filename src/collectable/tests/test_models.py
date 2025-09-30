@@ -48,6 +48,21 @@ def test_history_with_deltas(collectable):
     assert len(history) > 0
 
 
+def test_history_with_tags_deltas(collectable):
+    collectable.tags.add("tag1")
+    collectable.save()
+    collectable.tags.add("tag2")
+    collectable.save()
+
+    history = collectable.history_with_deltas()
+    assert [r.history_delta_changes for r in history] == [
+        [{"field": "tags", "old": "#tag1, #tag2", "new": ""}],
+        [{"field": "tags", "old": "", "new": "#tag1, #tag2"}],
+        [{"field": "tags", "old": "#tag1", "new": ""}],
+        [{"field": "tags", "old": "", "new": "#tag1"}],
+    ]
+
+
 def test_manager_with_counts_and_possessions(user):
     # Create 2 collectables with user possession
     c1 = CollectableFactory()

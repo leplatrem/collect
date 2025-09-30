@@ -46,15 +46,15 @@
         <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
         <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
         <ul>
-            {% for history in collectable.history_with_deltas %}
+            {% for record in collectable.history_with_deltas %}
                 <li>
-                    {{ history.history_date }}:
-                    {% blocktranslate with action=history.get_history_type_display user=history.history_user %}
-                {{ action }} by {{ user }}
-                {% endblocktranslate %}
-                    {% if history.history_delta_changes %}
+                    {{ record.history_date }}:
+                    {% blocktranslate with action=record.get_history_type_display user=record.history_user %}
+                        {{ action }} by {{ user }}
+                    {% endblocktranslate %}
+                    {% if record.history_delta_changes %}
                         <ul>
-                            {% for change in history.history_delta_changes %}
+                            {% for change in record.history_delta_changes %}
                                 <li>
                                     <strong>{{ change.field }}:</strong>
                                     {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
