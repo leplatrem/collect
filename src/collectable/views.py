@@ -85,6 +85,7 @@ def create(request):
             Possession.objects.create(
                 user=request.user, collectable=collectable, owns=True
             )
+            messages.info(request, _("Collectable created."))
             return redirect(collectable)
     else:
         form = CollectableForm()
