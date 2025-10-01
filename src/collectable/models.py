@@ -2,6 +2,8 @@ import uuid
 
 import taggit.models
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
@@ -290,3 +292,99 @@ class Possession(models.Model):
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
         unique_together = ("user", "collectable")
+
+
+def get_unknown_user():
+    """
+    Returns the system 'unknown' user. Creates it if not already present.
+    Prevents reports to be deleted in cascade when user is deleted.
+    """
+    User = get_user_model()
+    user, _ = User.objects.get_or_create(
+        username="unknown",
+        defaults={
+            "email": "unknown@example.com",
+            "is_active": False,  # prevents login
+        },
+    )
+    return user
+
+
+class DuplicateReport(models.Model):
+    pk = models.CompositePrimaryKey("original_id", "duplicate_id")
+    original = models.ForeignKey(
+        "Collectable",
+        on_delete=models.CASCADE,
+        related_name="duplicate_reports_1",
+    )
+    duplicate = models.ForeignKey(
+        "Collectable",
+        on_delete=models.CASCADE,
+        related_name="duplicate_reports_2",
+    )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET(get_unknown_user),
+        related_name="duplicate_reports_made",
+    )
+    created_at = models.DateTimeField(_("Reported at"), auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(original=models.F("duplicate")),
+                name="prevent_self_duplicate",
+            ),
+            models.UniqueConstraint(
+                fields=["original", "duplicate", "reporter"],
+                name="unique_duplicate_report",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # runs `clean()` before saving
+        # If the threshold is reached, hide the duplicate collectable.
+        if len(self.confirmations()) >= settings.DUPLICATE_CONFIRMATION_THRESHOLD:
+            self.duplicate.hide()
+        super().save(*args, **kwargs)
+
+    def confirmations(self):
+        return DuplicateReport.objects.filter(
+            original=self.original, duplicate=self.duplicate
+        ).values_list("reporter__username", flat=True)
+
+    def clean(self):
+        # Prevent self-links
+        if self.original == self.duplicate:
+            raise ValidationError("A collectable cannot be a duplicate of itself.")
+
+        # Prevent loops
+        if self._creates_cycle():
+            raise ValidationError("Adding this duplicate would create a loop.")
+
+    def _creates_cycle(self):
+        """
+        Check if adding this duplicate would create a cycle in the duplicates graph
+        using BFS graph traversal
+        """
+        visited = set()
+        queue = [self.duplicate.id]
+
+        while queue:
+            current_id = queue.pop(0)
+            if current_id == self.original.id:
+                return True  # cycle detected
+
+            visited.add(current_id)
+
+            neighbors_1 = DuplicateReport.objects.filter(
+                original_id=current_id
+            ).values_list("duplicate_id", flat=True)
+            neighbors_2 = DuplicateReport.objects.filter(
+                duplicate_id=current_id
+            ).values_list("original_id", flat=True)
+            for n in set(neighbors_1).union(neighbors_2):
+                if n not in visited:
+                    queue.append(n)
+
+        return False
