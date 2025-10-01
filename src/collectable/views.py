@@ -99,6 +99,7 @@ def details(request, id):
     collectable = get_object_or_404(
         Collectable.objects.with_counts_and_possessions(request.user), id=id
     )
+    # Note: hidden collectable with be 404.
 
     form_saved = False
     if request.method == "POST":

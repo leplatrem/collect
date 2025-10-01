@@ -41,6 +41,9 @@ class CollectableQuerySet(models.QuerySet):
     Custom QuerySet for Collectable model to include methods for prefetching.
     """
 
+    def visible(self):
+        return self.filter(hidden=False)
+
     def with_tags(self):
         return self.prefetch_related(Prefetch("tags", to_attr="tags_list"))
 
@@ -72,7 +75,7 @@ class CollectableQuerySet(models.QuerySet):
         This uses the related field from the Possession model to count the number of
         possessions that have likes, wants, and owns set to True.
         """
-        return self.annotate(
+        return self.visible().annotate(
             nlikes=Coalesce(
                 Count("possessions", filter=Q(**{"possession__likes": True})), 0
             ),
@@ -96,7 +99,13 @@ class CollectableManager(models.Manager):
         return CollectableQuerySet(self.model, using=self._db)
 
     def with_counts_and_possessions(self, user):
-        return self.get_queryset().with_tags().for_user(user).with_possession_counts()
+        return (
+            self.get_queryset()
+            .visible()
+            .with_tags()
+            .for_user(user)
+            .with_possession_counts()
+        )
 
 
 class Collectable(models.Model):
@@ -144,6 +153,7 @@ class Collectable(models.Model):
         format="JPEG",
         options={"quality": settings.COLLECTABLE_THUMBNAIL_QUALITY},
     )
+    hidden = models.BooleanField(_("Hidden"), default=False)
 
     objects = CollectableManager()
 
@@ -252,6 +262,12 @@ class Collectable(models.Model):
             previous = record
 
         return list(reversed(filtered))
+
+    def hide(self):
+        """Mark this collectable as hidden (eg. duplicate)."""
+        if not self.hidden:
+            self.hidden = True
+            self.save(update_fields=["hidden"])
 
     class Meta:
         verbose_name = _("Collectable")
