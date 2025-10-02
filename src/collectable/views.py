@@ -11,7 +11,7 @@ from django.views.generic import ListView
 from taggit.models import Tag
 
 from collect.utils import paginate
-from collectable.forms import CollectableForm, PossessionForm
+from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
 from collectable.models import Collectable, DuplicateReport, Possession
 
 
@@ -104,9 +104,15 @@ def details(request, id):
     )
 
     # Redirect to duplicate page if this collectable is a duplicate of another one.
-    if report := DuplicateReport.objects.filter(duplicate=collectable).first():
-        return redirect(report.original)
+    if request.method == "GET":
+        if report := DuplicateReport.objects.filter(duplicate=collectable).first():
+            context = {
+                "report": report,
+                "form": DuplicateReportForm(instance=report),
+            }
+            return render(request, "collectable/details_duplicate.html", context)
 
+    # Simple details page and form.
     form_saved = False
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -143,28 +149,34 @@ def details(request, id):
     return render(request, "collectable/details.html", context)
 
 
-@require_http_methods(["GET", "POST"])
-def duplicate(request, id):
-    # Rely on Django high-level methods to return 404 if not found etc.
-    duplicate = get_object_or_404(Collectable.objects.all().visible(), id=id)
+@require_http_methods(["POST"])
+@login_required
+def report_duplicate(request, id):
+    collectable = get_object_or_404(Collectable, id=id)
 
-    # Just a safety check in case the URL is reached manually.
-    report = DuplicateReport.objects.filter(duplicate=duplicate).first()
-    if not report:
-        # Not report found, redirect to basic details page.
-        return redirect(duplicate)
+    report = DuplicateReport(
+        reporter=request.user, duplicate=collectable, original=None
+    )
 
-    if request.method == "POST":
-        if not request.user.is_authenticated:
-            return HttpResponse(_("Unauthorized"), status=401)
-        report.confirm(request.user)
-        messages.info(request, _("Duplicate confirmed."))
-        return redirect(report.original)
+    form = DuplicateReportForm(request.POST, instance=report)
 
-    context = {
-        "report": report,
-    }
-    return render(request, "collectable/duplicate.html", context)
+    # TODO:
+    # existing_report = DuplicateReport.objects.filter(duplicate=collectable, original=form.instance.original).first()
+    # if existing_report:
+    #     existing_report.confirm(request.user)
+    #     messages.info(request, _("Thanks! Duplicate confirmed."))
+    #     return redirect(existing_report.original)
+
+    if form.is_valid():
+        report = form.save()
+        messages.info(request, _("Thanks! Duplicate reported."))
+        status = 201
+    else:
+        status = 400
+
+    return render(
+        request, "collectable/duplicate_form.html", {"form": form}, status=status
+    )
 
 
 @require_http_methods(["POST"])

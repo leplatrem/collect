@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load collectable_extras %}
 {% block title %}
-    {% blocktranslate with id=collectable.id %}Details of {{ id }}{% endblocktranslate %}
+    {% blocktranslate with id=report.collectable.id %}Details of {{ id }}{% endblocktranslate %}
 {% endblock %}
 {% block content %}
     <h1>{% translate "Duplicate" %}</h1>
@@ -18,11 +18,21 @@
             <p>
                 {% blocktranslate with reporter=reporter confirmations=report.confirmations_count %}Reported by {{ report.reporter }} on {{ report.created_at }} and confirmed by {{ confirmations }} users.{% endblocktranslate %}
             </p>
-            <p>
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit">{% translate "Confirm" %}</button>
-                </form>
-            </p>
-        </section>
-    {% endblock %}
+            {% if user.is_authenticated %}
+                {% if user != report.reporter and not user in report.confirmations.all %}
+                    <p id="duplicate-confirmation-form-{{ report.id }}">
+                        <form hx-post="{% url 'collectable:duplicate' form.instance.duplicate.id %}"
+                              hx-target="#duplicate-confirmation-form-{{ report.id }}"
+                              hx-trigger="change">
+                            <input type="hidden" name="original" value="{{ report.original.id }}" />
+                            {% csrf_token %}
+                            <button type="submit">{% translate "Confirm" %}</button>
+                        </form>
+                    </p>
+                {% else %}
+                    <p>{% translate "You have already confirmed this duplicate." %}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

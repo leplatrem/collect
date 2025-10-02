@@ -297,14 +297,14 @@ class DuplicateReport(models.Model):
         _("Identifier"), primary_key=True, default=uuid.uuid4, editable=False
     )
     original = models.ForeignKey(
-        "Collectable",
+        Collectable,
         on_delete=models.CASCADE,
-        related_name="duplicate_reports_1",
+        related_name="duplicate_reports_original",
     )
     duplicate = models.ForeignKey(
-        "Collectable",
+        Collectable,
         on_delete=models.CASCADE,
-        related_name="duplicate_reports_2",
+        related_name="duplicate_reports_duplicate",
     )
     reporter = models.ForeignKey(
         settings.AUTH_USER_MODEL,

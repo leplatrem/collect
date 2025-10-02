@@ -21,4 +21,4 @@ class PossessionForm(ModelForm):
 class DuplicateReportForm(ModelForm):
     class Meta:
         model = DuplicateReport
-        fields = ["duplicate"]
+        fields = ["original"]
