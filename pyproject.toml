@@ -33,6 +33,7 @@ dev = [
     "pytest-env>=1.1.4",
     "django-debug-toolbar>=4.4.6,<5",
     "djlint>=1.34.1,<2",
+    "pytest-xdist>=3.8.0",
 ]
 
 [build-system]

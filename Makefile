@@ -59,7 +59,7 @@ demo: $(INSTALL_STAMP_PYTHON) $(ENV_FILE) migrate   ## Create demo data
 
 test: tests  ## Run unit tests
 tests: $(INSTALL_STAMP_PYTHON) $(ENV_FILE)
-	$(UV) run pytest --cov-report term-missing --cov-fail-under 90 --cov src src/
+	$(UV) run pytest -n auto --cov-report term-missing --cov-fail-under 90 --cov src src/
 
 $(ENV_FILE):
 	cp --update=none env.local .env
