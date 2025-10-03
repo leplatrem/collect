@@ -43,7 +43,9 @@ jobs:
       run: make install
 
     - name: Compile translation files
-      run: uv run django-admin compilemessages
+      run: |
+        sudo apt-get install gettext
+        uv run django-admin compilemessages
 
     - name: Run tests
       run: make test
