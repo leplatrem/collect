@@ -47,8 +47,26 @@
         {% endif %}
     </section>
     <section id="possession">
+        <h2>{% translate "Possessions" %}</h2>
+        {% if user.is_authenticated %}
+            <p>{% translate "Mark if you like, own or want this collectable." %}</p>
+        {% endif %}
         {% user_possession_form collectable %}
     </section>
+    {% if user.is_authenticated %}
+        <section id="report-duplicate">
+            <h2>{% translate "Report duplicate" %}</h2>
+            <p>{% translate "If you think this collectable is a duplicate of another one, please report it." %}</p>
+            <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
+                  hx-select="#report-duplicate form"
+                  hx-target="#report-duplicate form"
+                  hx-swap="outerHTML">
+                {% csrf_token %}
+                {{ duplicate_form }}
+                <button type="submit">{% translate "Report" %}</button>
+            </form>
+        </section>
+    {% endif %}
     <section id="history">
         <h2>{% translate "History" %}</h2>
         <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
@@ -100,6 +118,17 @@
             {% endwith %}
         {% endwith %}
     </section>
+    {% if duplicates %}
+        <section id="duplicates">
+            <h2>{% translate "Duplicates" %}</h2>
+            <p>{% translate "This collectable has been reported as the original version of the following collectables:" %}</p>
+            <div class="collectable-grid">
+                {% for duplicate in duplicates %}
+                    {% include "collectable/collectable_thumbnail.html" with collectable=duplicate %}
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
 {% block nav %}
     {% with previous=collectable.get_previous_by_created_at.get_absolute_url next=collectable.get_next_by_created_at.get_absolute_url %}

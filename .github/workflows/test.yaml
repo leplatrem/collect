@@ -42,6 +42,11 @@ jobs:
     - name: Install dependencies
       run: make install
 
+    - name: Compile translation files
+      run: |
+        sudo apt-get install gettext
+        uv run django-admin compilemessages --ignore .venv
+
     - name: Run tests
       run: make test
 

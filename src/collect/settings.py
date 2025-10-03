@@ -281,3 +281,7 @@ RELATED_COLLECTABLES_LIST_COUNT = config(
 SIGNUP_SECRETS_WORDS: list[str] = config(
     "COLLECT_SIGNUP_SECRETS_WORDS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
+
+DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
+    "COLLECT_DUPLICATE_CONFIRMATION_THRESHOLD", default=2, cast=int
+)

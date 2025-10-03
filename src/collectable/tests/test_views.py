@@ -1,9 +1,15 @@
 # Additions to your existing test_views.py file
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
-from collectable.models import Collectable, Possession
+from collectable.models import Collectable, DuplicateReport, Possession
+from collectable.tests.factories import (
+    CollectableFactory,
+    DuplicateReportFactory,
+    UserFactory,
+)
 
 
 @pytest.mark.parametrize(
@@ -110,3 +116,93 @@ def test_profile_view(db, logged_in_client):
     response = logged_in_client.get(url)
     assert response.status_code == 200
     assert "collectable_liked" in response.context
+
+
+@pytest.mark.django_db
+def test_duplicate_get_no_report(client, collectable):
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = client.get(url, follow_redirects=False)
+    assert response.status_code == 302  # redirect
+    assert reverse("collectable:details", kwargs={"id": collectable.id}) in response.url
+
+
+@pytest.mark.django_db
+def test_duplicate_get_with_report_not_hidden(
+    client, collectable, another_collectable, user
+):
+    DuplicateReportFactory(
+        original=another_collectable, duplicate=collectable, reporter=user
+    )
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context["collectable"] == collectable
+    assert response.context["original"] == another_collectable
+
+
+@pytest.mark.django_db
+def test_duplicate_get_with_report_hidden_redirects_to_original(
+    client, collectable, another_collectable, user
+):
+    for _ in range(settings.DUPLICATE_CONFIRMATION_THRESHOLD + 1):
+        DuplicateReportFactory(
+            original=another_collectable, duplicate=collectable, reporter=UserFactory()
+        )
+    collectable.refresh_from_db()
+    assert collectable.hidden
+
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = client.get(url, follow_redirects=False)
+    assert response.status_code == 302
+    assert (
+        reverse("collectable:details", kwargs={"id": another_collectable.id})
+        in response.url
+    )
+
+
+@pytest.mark.django_db
+def test_duplicate_get_with_report_hidden_redirects_to_original_in_chain(
+    client, collectable, another_collectable, user
+):
+    c0 = CollectableFactory()
+    c1 = CollectableFactory()
+    c2 = CollectableFactory()
+    c3 = CollectableFactory()
+    DuplicateReportFactory(original=c0, duplicate=c1, reporter=user)
+    DuplicateReportFactory(original=c0, duplicate=c2, reporter=user)
+    DuplicateReportFactory(original=c2, duplicate=c3, reporter=user)
+    c2.hidden = True
+    c2.save()
+    c3.hidden = True
+    c3.save()
+
+    url = reverse("collectable:duplicate", kwargs={"id": c3.id})
+    response = client.get(url, follow=True)
+    assert response.status_code == 200
+    assert response.context["collectable"] == c0
+    # c1 is also a duplicate of c0, but not hidden.
+    assert list(response.context["duplicates"]) == [c1]
+
+
+@pytest.mark.django_db
+def test_duplicate_post_invalid_form(logged_in_client, collectable):
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = logged_in_client.post(url, {"original_input": ""})  # invalid
+    assert response.status_code == 200
+    assert "form" in response.context
+    assert "Ce champ est obligatoire" in str(response.context["form"].errors)
+    assert response.context["collectable"] == collectable
+
+
+@pytest.mark.django_db
+def test_duplicate_post_valid_form(logged_in_client, collectable, another_collectable):
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = logged_in_client.post(url, {"original_input": another_collectable.id})
+    assert response.status_code == 200
+    assert DuplicateReport.objects.filter(
+        original=another_collectable, duplicate=collectable
+    ).exists()
+    assert response.context["original"] == another_collectable
+    assert "reports" in response.context
+    assert response.headers["HX-Retarget"] == "main"
+    assert response.headers["HX-Reselect"] == "main"
