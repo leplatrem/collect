@@ -15,6 +15,8 @@
     --button-bg: #669999;;
     --button-color: #fff;
     --button-color-hover: #558888;
+     --disabled-bg: #ccc;
+    --disabled-color: #999;
 }
 
 /* 🌙 Auto dark mode based on system settings */
@@ -36,6 +38,8 @@
         --button-bg: #99ccbb;;
         --button-color: #121212;
         --button-color-hover: #88bbaa;
+        --disabled-bg: #555;
+        --disabled-color: #888;
     }
 
     .possession-form input[type=checkbox] {
@@ -109,6 +113,14 @@ form button:hover {
 form button:active {
     transform: scale(0.97);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+form button[type=submit]:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-color);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 

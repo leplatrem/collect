@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models.query import QuerySet
+from django.forms import widgets as django_widgets
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
@@ -10,8 +12,8 @@ from django.views.generic import ListView
 from taggit.models import Tag
 
 from collect.utils import paginate
-from collectable.forms import CollectableForm, PossessionForm
-from collectable.models import Collectable, Possession
+from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
+from collectable.models import Collectable, DuplicateReport, Possession
 
 
 def index(request):
@@ -96,11 +98,20 @@ def create(request):
 
 @require_http_methods(["GET", "POST"])
 def details(request, id):
+    # Note: hidden collectable with be 404.
     collectable = get_object_or_404(
         Collectable.objects.with_counts_and_possessions(request.user), id=id
     )
-    # Note: hidden collectable with be 404.
 
+    # If this collectable has been reported as duplicate, show that page instead.
+    if (
+        request.method == "GET"
+        and "_skip_duplicate" not in request.GET
+        and collectable.is_duplicate()
+    ):
+        return redirect("collectable:duplicate", id=collectable.id)
+
+    # Simple details page and form.
     form_saved = False
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -118,16 +129,90 @@ def details(request, id):
 
     related_tags = collectable.related_tags()
     related_collectables = collectable.related_collectables(request.user)
+    duplicates = collectable.duplicates(request.user)
+
+    duplicate_form = DuplicateReportForm()
 
     context = {
         "collectable": collectable,
         "form_edit": form,
+        "duplicate_form": duplicate_form,
         "form_saved": form_saved,
         "related_tags": related_tags,
         "related_collectables": related_collectables,
+        "duplicates": duplicates,
     }
 
     return render(request, "collectable/details.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def duplicate(request, id):
+    """
+    This collectable has been reported as a duplicate of another one.
+
+    If POST, user is reporting this collectable as a duplicate of another one.
+    If GET, show the original collectable it is a duplicate of.
+    """
+    headers = {}
+    collectable = get_object_or_404(Collectable, id=id)
+
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return HttpResponse(_("Unauthorized"), status=401)
+
+        # Original is posted in form.
+        form = DuplicateReportForm(request.POST)
+        form.instance.duplicate = collectable
+        form.instance.reporter = request.user
+
+        if not form.is_valid():
+            # Show invalid form.
+            return render(
+                request,
+                "collectable/details_duplicate.html",
+                {"collectable": collectable, "form": form},
+            )
+
+        # Save the report!
+        form.save()
+        messages.info(request, _("Duplicate reported! Thank you!"))
+        headers["HX-Retarget"] = "main"
+        headers["HX-Reselect"] = "main"
+
+    # Render the details page of a duplicate, showing the original.
+    originals = collectable.originals(request.user)
+    if not originals:
+        messages.info(
+            request, _("This collectable has not been reported as duplicate.")
+        )
+        return redirect("collectable:details", id=collectable.id)
+
+    # Show the first original.
+    original = originals[0]
+    # The confirmation form will have the original pre-selected.
+    form = DuplicateReportForm(initial={"original": original})
+    form.fields["original"].widget = django_widgets.HiddenInput()
+
+    # Show details of who reported and when.
+    reports = DuplicateReport.objects.filter(
+        original=original, duplicate=collectable
+    ).select_related("reporter")
+    already_reported = request.user.is_authenticated and request.user.username in {
+        r.reporter.username for r in reports
+    }
+
+    context = {
+        "form": form,
+        "already_reported": already_reported,
+        "collectable": collectable,
+        "original": original,
+        "reports": reports,
+    }
+    response = render(request, "collectable/details_duplicate.html", context)
+    for k, v in headers.items():
+        response.headers[k] = v
+    return response
 
 
 @require_http_methods(["POST"])

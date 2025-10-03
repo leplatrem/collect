@@ -1,3 +1,4 @@
+import re
 import uuid
 
 import taggit.models
@@ -22,6 +23,11 @@ from collectable.validators import (
     MaxFileSizeValidator,
     MimetypeValidator,
     SquareImageValidator,
+)
+
+
+UUID_REGEX = re.compile(
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
 
 
@@ -271,6 +277,32 @@ class Collectable(models.Model):
             self.hidden = True
             self.save(update_fields=["hidden"])
 
+    def is_duplicate(self) -> bool:
+        """
+        Return True if this collectable has been reported as a duplicate of another one.
+        """
+        return self.reports_as_duplicate.exists()
+
+    def duplicates(self, user):
+        """
+        Return the list of collectables that have been reported as duplicates of this one.
+        """
+        duplicate_reports = self.reports_as_original.select_related("duplicate")
+        duplicates = Collectable.objects.with_counts_and_possessions(user).filter(
+            id__in=[r.duplicate.id for r in duplicate_reports]
+        )
+        return duplicates
+
+    def originals(self, user):
+        """
+        Return the list of collectables that have been reported as originals of this one.
+        """
+        original_reports = self.reports_as_duplicate.select_related("original")
+        originals = Collectable.objects.with_counts_and_possessions(user).filter(
+            id__in=[r.original.id for r in original_reports]
+        )
+        return originals
+
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
@@ -311,21 +343,21 @@ def get_unknown_user():
 
 
 class DuplicateReport(models.Model):
-    pk = models.CompositePrimaryKey("original_id", "duplicate_id")
+    pk = models.CompositePrimaryKey("original_id", "duplicate_id", "reporter_id")
     original = models.ForeignKey(
-        "Collectable",
+        Collectable,
         on_delete=models.CASCADE,
-        related_name="duplicate_reports_1",
+        related_name="reports_as_original",
     )
     duplicate = models.ForeignKey(
-        "Collectable",
+        Collectable,
         on_delete=models.CASCADE,
-        related_name="duplicate_reports_2",
+        related_name="reports_as_duplicate",
     )
     reporter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_unknown_user),
-        related_name="duplicate_reports_made",
+        related_name="duplicate_reports",
     )
     created_at = models.DateTimeField(_("Reported at"), auto_now_add=True)
 
@@ -343,48 +375,67 @@ class DuplicateReport(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()  # runs `clean()` before saving
+        # Tag the duplicate as such.
+        self.duplicate.tags.add("duplicate")
         # If the threshold is reached, hide the duplicate collectable.
         if len(self.confirmations()) >= settings.DUPLICATE_CONFIRMATION_THRESHOLD:
             self.duplicate.hide()
         super().save(*args, **kwargs)
 
     def confirmations(self):
-        return DuplicateReport.objects.filter(
-            original=self.original, duplicate=self.duplicate
-        ).values_list("reporter__username", flat=True)
+        return (
+            DuplicateReport.objects.filter(
+                original=self.original, duplicate=self.duplicate
+            )
+            .exclude(reporter=self.reporter)
+            .values_list("reporter__username", flat=True)
+        )
 
     def clean(self):
+        # If the model instance is not fully initialized, skip validation.
+        if not all([self.original_id, self.duplicate_id, self.reporter_id]):
+            return  # Skip validation if any ID is missing
         # Prevent self-links
         if self.original == self.duplicate:
             raise ValidationError("A collectable cannot be a duplicate of itself.")
 
+        # Prevent duplicate reports by the same user
+        if DuplicateReport.objects.filter(
+            original=self.original, duplicate=self.duplicate, reporter=self.reporter
+        ).exists():
+            raise ValidationError("You have already reported this duplicate.")
         # Prevent loops
         if self._creates_cycle():
             raise ValidationError("Adding this duplicate would create a loop.")
 
     def _creates_cycle(self):
         """
-        Check if adding this duplicate would create a cycle in the duplicates graph
-        using BFS graph traversal
+        Detect if adding this duplicate would create a cycle in the duplicates graph.
+        Multiple reports of the same edge do NOT count as a loop.
         """
         visited = set()
         queue = [self.duplicate.id]
 
+        # Build a graph of all edges as (original -> duplicate)
+        edges = DuplicateReport.objects.exclude(
+            original=self.original, duplicate=self.duplicate
+        ).values_list("original_id", "duplicate_id")
+
+        graph = {}
+        for orig, dup in edges:
+            graph.setdefault(orig, set()).add(dup)
+
+        # Include the new edge
+        graph.setdefault(self.original.id, set()).add(self.duplicate.id)
+
         while queue:
-            current_id = queue.pop(0)
-            if current_id == self.original.id:
+            current = queue.pop(0)
+            if current == self.original.id and current != self.duplicate.id:
                 return True  # cycle detected
 
-            visited.add(current_id)
-
-            neighbors_1 = DuplicateReport.objects.filter(
-                original_id=current_id
-            ).values_list("duplicate_id", flat=True)
-            neighbors_2 = DuplicateReport.objects.filter(
-                duplicate_id=current_id
-            ).values_list("original_id", flat=True)
-            for n in set(neighbors_1).union(neighbors_2):
-                if n not in visited:
-                    queue.append(n)
+            visited.add(current)
+            for neighbor in graph.get(current, []):
+                if neighbor not in visited:
+                    queue.append(neighbor)
 
         return False

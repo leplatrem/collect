@@ -7,7 +7,7 @@ from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 from PIL import Image
 
-from collectable.models import Collectable, Possession
+from collectable.models import Collectable, DuplicateReport, Possession
 
 
 class UserFactory(DjangoModelFactory):
@@ -45,3 +45,12 @@ class PossessionFactory(DjangoModelFactory):
     likes = FuzzyChoice([True, False])
     wants = FuzzyChoice([True, False])
     owns = FuzzyChoice([True, False])
+
+
+class DuplicateReportFactory(DjangoModelFactory):
+    class Meta:
+        model = DuplicateReport
+
+    reporter = SubFactory(UserFactory)
+    duplicate = SubFactory(CollectableFactory)
+    original = SubFactory(CollectableFactory)

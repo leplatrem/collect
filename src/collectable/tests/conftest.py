@@ -8,6 +8,7 @@ from django.utils import translation
 
 from collectable.tests.factories import (
     CollectableFactory,
+    DuplicateReportFactory,
     PossessionFactory,
     UserFactory,
 )
@@ -51,3 +52,8 @@ def logged_in_client(client, user):
     client.force_login(user)
     client.user = user
     return client
+
+
+@pytest.fixture
+def duplicate_report(db):
+    return DuplicateReportFactory()
