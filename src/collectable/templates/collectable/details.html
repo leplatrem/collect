@@ -48,7 +48,9 @@
     </section>
     <section id="possession">
         <h2>{% translate "Possessions" %}</h2>
-        <p>{% translate "Mark if you like, own or want this collectable." %}</p>
+        {% if user.is_authenticated %}
+            <p>{% translate "Mark if you like, own or want this collectable." %}</p>
+        {% endif %}
         {% user_possession_form collectable %}
     </section>
     {% if user.is_authenticated %}

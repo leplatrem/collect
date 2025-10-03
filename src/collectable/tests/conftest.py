@@ -43,6 +43,11 @@ def collectable(db):
 
 
 @pytest.fixture
+def another_collectable(db):
+    return CollectableFactory()
+
+
+@pytest.fixture
 def possession(user, collectable):
     return PossessionFactory(user=user, collectable=collectable)
 

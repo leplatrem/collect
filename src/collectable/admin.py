@@ -1,7 +1,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Collectable, Possession
+from .models import Collectable, DuplicateReport, Possession
 
 
 @admin.register(Collectable)
@@ -20,3 +20,4 @@ class CollectableAdmin(SimpleHistoryAdmin):
 
 
 admin.site.register(Possession)
+admin.site.register(DuplicateReport)

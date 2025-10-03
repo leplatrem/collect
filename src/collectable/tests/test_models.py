@@ -4,7 +4,7 @@ from django.urls import reverse
 from taggit.models import Tag
 
 from collect.utils import tags_joiner
-from collectable.models import Collectable
+from collectable.models import Collectable, DuplicateReport
 from collectable.tests.factories import (
     CollectableFactory,
     DuplicateReportFactory,
@@ -136,7 +136,7 @@ def test_duplicate_report_confirm(duplicate_report):
 def test_duplicate_report_loops():
     c0 = CollectableFactory()
     with pytest.raises(ValidationError) as exc:
-        DuplicateReportFactory(reporter=UserFactory(), duplicate=c0, original=c0)
+        DuplicateReport(reporter=UserFactory(), duplicate=c0, original=c0).full_clean()
     assert "itself" in str(exc.value).lower()
 
     c1 = CollectableFactory()
@@ -153,5 +153,15 @@ def test_duplicate_report_loops():
 
     # Now creating a report c3 -> c1 should raise an error
     with pytest.raises(ValidationError) as exc:
-        DuplicateReportFactory(reporter=UserFactory(), duplicate=c3, original=c1)
+        DuplicateReport(reporter=UserFactory(), duplicate=c3, original=c1).full_clean()
     assert "create a loop" in str(exc.value).lower()
+
+
+@pytest.mark.django_db
+def test_duplicate_not_deleted_on_user_delete(duplicate_report):
+    user = duplicate_report.reporter
+
+    user.delete()
+
+    duplicate_report.refresh_from_db()
+    assert duplicate_report.reporter.username == "unknown"

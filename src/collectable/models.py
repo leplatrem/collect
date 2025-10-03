@@ -242,7 +242,6 @@ class Collectable(models.Model):
             changes = []
 
             # Explicitly include tag changes from _computed_tags
-            print(previous._computed_tags, "---", record._computed_tags)
             if previous._computed_tags != record._computed_tags:
                 changes.append(
                     {
@@ -287,21 +286,13 @@ class Collectable(models.Model):
         """
         Return the list of collectables that have been reported as duplicates of this one.
         """
-        duplicate_reports = self.reports_as_original.select_related("duplicate")
+        duplicate_reports = self.reports_as_original.values_list(
+            "duplicate_id", flat=True
+        )
         duplicates = Collectable.objects.with_counts_and_possessions(user).filter(
-            id__in=[r.duplicate.id for r in duplicate_reports]
+            id__in=duplicate_reports
         )
         return duplicates
-
-    def originals(self, user):
-        """
-        Return the list of collectables that have been reported as originals of this one.
-        """
-        original_reports = self.reports_as_duplicate.select_related("original")
-        originals = Collectable.objects.with_counts_and_possessions(user).filter(
-            id__in=[r.original.id for r in original_reports]
-        )
-        return originals
 
     class Meta:
         verbose_name = _("Collectable")
@@ -343,7 +334,6 @@ def get_unknown_user():
 
 
 class DuplicateReport(models.Model):
-    pk = models.CompositePrimaryKey("original_id", "duplicate_id", "reporter_id")
     original = models.ForeignKey(
         Collectable,
         on_delete=models.CASCADE,
@@ -374,7 +364,6 @@ class DuplicateReport(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # runs `clean()` before saving
         # Tag the duplicate as such.
         self.duplicate.tags.add("duplicate")
         # If the threshold is reached, hide the duplicate collectable.
@@ -395,9 +384,14 @@ class DuplicateReport(models.Model):
         # If the model instance is not fully initialized, skip validation.
         if not all([self.original_id, self.duplicate_id, self.reporter_id]):
             return  # Skip validation if any ID is missing
+
         # Prevent self-links
         if self.original == self.duplicate:
             raise ValidationError("A collectable cannot be a duplicate of itself.")
+
+        # Prevent reporting hidden collectables
+        if self.duplicate.hidden or self.original.hidden:
+            raise ValidationError("Cannot report a hidden collectable.")
 
         # Prevent duplicate reports by the same user
         if DuplicateReport.objects.filter(

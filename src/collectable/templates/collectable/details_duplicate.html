@@ -47,7 +47,7 @@
                         <button type="submit"
                                 name="action"
                                 value="confirm"
-                                {% if already_reported %}disabled title="{% translate "You have already reported this collectable." %}"{% endif %}>
+                                {% if already_reported %}disabled title="{% translate "You have already reported this duplicate." %}"{% endif %}>
                             Confirm
                         </button>
                         <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>

@@ -1,6 +1,6 @@
 import urllib
 
-from django.forms import ModelForm, TextInput, ValidationError
+from django.forms import CharField, ModelForm, TextInput, ValidationError
 from django.urls import Resolver404, resolve
 from django.utils.translation import gettext_lazy as _
 
@@ -30,22 +30,39 @@ class PossessionForm(ModelForm):
 
 
 class DuplicateReportForm(ModelForm):
+    original_input = CharField(
+        label=_("Original"),
+        widget=TextInput(attrs={"placeholder": _("ID or URL of the object")}),
+    )
+
     class Meta:
         model = DuplicateReport
-        fields = ["original"]
-        widgets = {
-            "original": TextInput(attrs={"placeholder": "URL or ID of the original"}),
-        }
+        fields = ["original_input"]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance
 
     def clean(self):
         cleaned_data = super().clean()
-        original_input = self.data.get("original", "").strip()
+        if original := self.cleaned_data.get("original_input"):
+            self.instance.original = original
+        return cleaned_data
+
+    def clean_original_input(self):
+        original_input = self.cleaned_data["original_input"].strip()
 
         if not original_input:
             raise ValidationError(_("This field is required."))
 
         # Possibly the user entered a URL instead of an ID
-        if isinstance(original_input, str) and original_input.startswith("http"):
+        if UUID_REGEX.match(original_input):
+            original_id = original_input
+
+        # Possibly the user entered an ID instead of a URL
+        elif original_input.startswith("http"):
             try:
                 parsed = urllib.parse.urlparse(original_input)
             except ValueError:
@@ -62,17 +79,14 @@ class DuplicateReportForm(ModelForm):
                     _("The URL does not point to a collectable details page.")
                 )
             original_id = endpoint.kwargs["id"]
-            original_obj = Collectable.objects.filter(id=original_id).first()
-            if not original_obj:
-                raise ValidationError(_("No collectable found at the given URL."))
 
-        # Possibly the user entered an ID instead of a URL
-        elif isinstance(original_input, str) and UUID_REGEX.match(original_input):
-            original_obj = Collectable.objects.filter(id=original_input).first()
-            if not original_obj:
-                raise ValidationError(_("No collectable found with this ID."))
         else:
             raise ValidationError(_("Enter a valid URL or ID."))
 
-        cleaned_data["original"] = original_obj
-        return cleaned_data
+        # Check if RelatedModel exists
+        try:
+            original_obj = Collectable.objects.get(id=original_id)
+        except Collectable.DoesNotExist:
+            raise ValidationError("Related object not found.")
+
+        return original_obj
