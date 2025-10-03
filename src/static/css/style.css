@@ -82,7 +82,7 @@ form.inline {
     display: inline-block;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], textarea, select {
     padding: 0.5rem;
     border: 1px solid var(--input-border);
     border-radius: 6px;
@@ -235,7 +235,7 @@ section#possession {
     width: 50%;
 }
 
-section#attributes input[type="text"] {
+section#attributes input[type="text"], section#attributes textarea {
     width: 95%;
 }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 01:30+0200\n"
+"POT-Creation-Date: 2025-10-04 01:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,31 +35,35 @@ msgstr "Anglais"
 msgid "French"
 msgstr "Français"
 
-#: src/collectable/forms.py:34
+#: src/collectable/forms.py:18
+msgid "Description, author, history, links to source, ..."
+msgstr "Description, auteur, histoire, liens vers la source, ..."
+
+#: src/collectable/forms.py:37
 msgid "Original"
 msgstr "Original"
 
-#: src/collectable/forms.py:35
+#: src/collectable/forms.py:38
 msgid "ID or URL of the object"
 msgstr "ID ou URL de l'object"
 
-#: src/collectable/forms.py:58
+#: src/collectable/forms.py:61
 msgid "This field is required."
 msgstr "Ce champ est obligatoire"
 
-#: src/collectable/forms.py:69
+#: src/collectable/forms.py:72
 msgid "Enter a valid URL"
 msgstr "Saisir une URL valide"
 
-#: src/collectable/forms.py:73
+#: src/collectable/forms.py:76
 msgid "Enter a collectable URL"
 msgstr "Saisir l'URL d'un objet"
 
-#: src/collectable/forms.py:79
+#: src/collectable/forms.py:82
 msgid "The URL does not point to a collectable details page."
 msgstr "Cette URL ne pointe pas vers la page détail d'un objet"
 
-#: src/collectable/forms.py:84
+#: src/collectable/forms.py:87
 msgid "Enter a valid URL or ID."
 msgstr "Saisir une URL valide"
 
@@ -385,11 +389,14 @@ msgid "Ignore"
 msgstr "Ignorer"
 
 #: src/collectable/templates/collectable/details_duplicate.html:61
+#, python-format
+msgid ""
+"\n"
+"                    %(missing)s more confirmation before merging.\n"
+"                "
 msgid_plural "%(missing)s more confirmations before merging."
-msgstr[0] ""
-"%(missing)s confirmation avant la fusion."
-msgstr[1] ""
-"%(missing)s confirmations avant la fusion."
+msgstr[0] "%(missing)s confirmation avant la fusion."
+msgstr[1] "%(missing)s confirmations avant la fusion."
 
 #: src/collectable/templates/collectable/index.html:5
 msgid "Explore"

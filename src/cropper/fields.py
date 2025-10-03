@@ -2,6 +2,7 @@ from io import BytesIO
 
 from django import forms
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 from .widgets import CropImageWidget
@@ -27,9 +28,11 @@ class CropImageField(forms.ImageField):
         h = min(h, height - y)
 
         if w <= 0 or h <= 0:
-            raise forms.ValidationError("Invalid crop dimensions.")
+            raise forms.ValidationError(_("Invalid crop dimensions."))
 
-        cropped = image.crop((x, y, x + w, y + h))
+        # Force crop to square.
+        size = min(w, h)
+        cropped = image.crop((x, y, x + size, y + size))
 
         buf = BytesIO()
         cropped.save(buf, format=image.format or "JPEG")

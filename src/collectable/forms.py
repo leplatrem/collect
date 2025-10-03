@@ -1,6 +1,6 @@
 import urllib
 
-from django.forms import CharField, ModelForm, TextInput, ValidationError
+from django.forms import CharField, ModelForm, Textarea, TextInput, ValidationError
 from django.urls import Resolver404, resolve
 from django.utils.translation import gettext_lazy as _
 
@@ -14,12 +14,15 @@ class CollectableForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["photo"].widget.attrs.update({"accept": "image/jpeg"})
+        self.fields["description"].widget.attrs.update(
+            {"placeholder": _("Description, author, history, links to source, ...")}
+        )
 
     class Meta:
         model = Collectable
         fields = ["photo", "description", "tags"]
         widgets = {
-            "description": TextInput(),
+            "description": Textarea(attrs={"rows": "5"}),
         }
 
 
