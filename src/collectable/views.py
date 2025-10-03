@@ -233,6 +233,8 @@ def duplicate(request, id):
         "collectable": collectable,
         "original": original,
         "reports": reports,
+        "missing_confirmations": settings.DUPLICATE_CONFIRMATION_THRESHOLD
+        - (len(reports) - 1),
     }
     response = render(request, "collectable/details_duplicate.html", context)
     for k, v in headers.items():

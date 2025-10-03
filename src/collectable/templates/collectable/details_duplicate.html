@@ -48,7 +48,7 @@
                                 name="action"
                                 value="confirm"
                                 {% if already_reported %}disabled title="{% translate "You have already reported this duplicate." %}"{% endif %}>
-                            Confirm
+                            {% translate "Confirm" %} <span aria-hidden="true">✔️</span>
                         </button>
                         <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
                     </form>
@@ -57,6 +57,11 @@
                         <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
                     </p>
                 {% endif %}
+                <p>
+                    {% blocktranslate count missing=missing_confirmations %}
+                    {{ missing }} more confirmation before merging.
+                {% plural %}{{ missing }} more confirmations before merging.{% endblocktranslate %}
+                </p>
             </p>
         {% endif %}
     </section>

@@ -107,6 +107,19 @@ def test_hidden_collectable_is_not_in_default_manager(db, user):
 
 
 def test_duplicate_report_confirm(duplicate_report):
+    duplicate_report.duplicate.tags.add("tag1", "tag2")
+    duplicate_report.duplicate.description = "Coucou"
+    duplicate_report.duplicate.save()
+    PossessionFactory(
+        user=duplicate_report.reporter,
+        collectable=duplicate_report.duplicate,
+        owns=True,
+        likes=True,
+    )
+    duplicate_report.original.tags.add("tag2", "tag4", "tag5")
+    duplicate_report.original.description = "Hola"
+    duplicate_report.original.save()
+
     assert len(duplicate_report.confirmations()) == 0
     assert "duplicate" in duplicate_report.duplicate.tags.names()
 
@@ -130,6 +143,18 @@ def test_duplicate_report_confirm(duplicate_report):
     assert len(duplicate_report.confirmations()) == 2
     # Now the duplicate should be hidden.
     assert duplicate_report.duplicate.hidden
+    # And original merged.
+    assert duplicate_report.original.tags.count() == 5
+    assert "Hola\n---\nCoucou" in duplicate_report.original.description
+    # The reporter should now own and like the original.
+    possessed = Collectable.objects.with_counts_and_possessions(
+        duplicate_report.reporter
+    )
+    assert possessed.count() == 1
+    assert possessed[0].id == duplicate_report.original.id
+    assert possessed[0].nlikes == 1
+    assert possessed[0].nowns == 1
+    assert possessed[0].nwants == 0
 
 
 @pytest.mark.django_db

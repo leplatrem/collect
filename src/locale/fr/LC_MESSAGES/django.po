@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-03 18:50+0000\n"
+"POT-Creation-Date: 2025-10-04 01:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,11 +35,11 @@ msgstr "Anglais"
 msgid "French"
 msgstr "Français"
 
-#: src/collectable/forms.py:35
+#: src/collectable/forms.py:34
 msgid "Original"
 msgstr "Original"
 
-#: src/collectable/forms.py:36
+#: src/collectable/forms.py:35
 msgid "ID or URL of the object"
 msgstr "ID ou URL de l'object"
 
@@ -154,36 +154,36 @@ msgstr "Historique"
 msgid "Hidden"
 msgstr "Masqué"
 
-#: src/collectable/models.py:298
+#: src/collectable/models.py:315
 msgid "Collectable"
 msgstr "Objet"
 
-#: src/collectable/models.py:299
+#: src/collectable/models.py:316
 msgid "Collectables"
 msgstr "Objets"
 
-#: src/collectable/models.py:310
+#: src/collectable/models.py:327
 msgid "Likes"
 msgstr "Aime"
 
-#: src/collectable/models.py:311
+#: src/collectable/models.py:328
 msgid "Wants"
 msgstr "Recherche"
 
-#: src/collectable/models.py:312
+#: src/collectable/models.py:329
 msgid "Owns"
 msgstr "Possède"
 
-#: src/collectable/models.py:315
+#: src/collectable/models.py:332
 msgid "Possession"
 msgstr "Possession"
 
-#: src/collectable/models.py:316
+#: src/collectable/models.py:333
 #: src/collectable/templates/collectable/details.html:50
 msgid "Possessions"
 msgstr "Possessions"
 
-#: src/collectable/models.py:352
+#: src/collectable/models.py:369
 msgid "Reported at"
 msgstr "Signalé le"
 
@@ -375,10 +375,21 @@ msgstr ""
 msgid "You have already reported this duplicate."
 msgstr "Vous avez déjà signalé ce doublon."
 
+#: src/collectable/templates/collectable/details_duplicate.html:51
+msgid "Confirm"
+msgstr "Confirmer"
+
 #: src/collectable/templates/collectable/details_duplicate.html:53
 #: src/collectable/templates/collectable/details_duplicate.html:57
 msgid "Ignore"
 msgstr "Ignorer"
+
+#: src/collectable/templates/collectable/details_duplicate.html:61
+msgid_plural "%(missing)s more confirmations before merging."
+msgstr[0] ""
+"%(missing)s confirmation avant la fusion."
+msgstr[1] ""
+"%(missing)s confirmations avant la fusion."
 
 #: src/collectable/templates/collectable/index.html:5
 msgid "Explore"
@@ -506,7 +517,8 @@ msgstr "\"%s\" n'est pas une image carrée"
 
 #: src/collectable/validators.py:43
 msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
-msgstr "{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
+msgstr ""
+"{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
 
 #: src/collectable/views.py:66
 msgid "Latest collectables"
@@ -544,7 +556,9 @@ msgstr "Interdit"
 msgid ""
 "This collectable has been hidden as it was reported as a duplicate. You are "
 "being redirected to the original."
-msgstr "Cet objet a été masqué car étant signalé comme doublon. Vous avez été redirigé vers l'original."
+msgstr ""
+"Cet objet a été masqué car étant signalé comme doublon. Vous avez été "
+"redirigé vers l'original."
 
 #: src/collectable/views.py:178
 msgid "This collectable has not been reported as duplicate."

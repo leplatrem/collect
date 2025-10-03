@@ -270,11 +270,28 @@ class Collectable(models.Model):
 
         return list(reversed(filtered))
 
-    def hide(self):
-        """Mark this collectable as hidden (eg. duplicate)."""
+    def merge_into(self, original):
+        """Merge this collectable into the original one."""
         if not self.hidden:
             self.hidden = True
             self.save(update_fields=["hidden"])
+        # Merge tags
+        original.tags.add(*self.tags.all())
+        # Merge descriptions
+        original.description = original.description + "\n---\n" + self.description
+        original.save(update_fields=["description"])
+        # Reassign possessions
+        for possession in self.possession_set.all():
+            poss, _ = Possession.objects.get_or_create(
+                user=possession.user, collectable=original
+            )
+            if possession.likes:
+                poss.likes = True
+            if possession.wants:
+                poss.wants = True
+            if possession.owns:
+                poss.owns = True
+            poss.save()
 
     def is_duplicate(self) -> bool:
         """
@@ -366,9 +383,9 @@ class DuplicateReport(models.Model):
     def save(self, *args, **kwargs):
         # Tag the duplicate as such.
         self.duplicate.tags.add("duplicate")
-        # If the threshold is reached, hide the duplicate collectable.
+        # If the threshold is reached, merge the duplicate with the original.
         if len(self.confirmations()) >= settings.DUPLICATE_CONFIRMATION_THRESHOLD:
-            self.duplicate.hide()
+            self.duplicate.merge_into(self.original)
         super().save(*args, **kwargs)
 
     def confirmations(self):
