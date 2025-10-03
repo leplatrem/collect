@@ -40,7 +40,10 @@ class MaxFileSizeValidator(object):
     def __call__(self, fieldfile):
         if fieldfile.size > settings.COLLECTABLE_MAX_UPLOAD_BYTES:
             raise ValidationError(
-                _("%s exceeds the maximum file size of %s bytes.")
-                % (fieldfile, settings.COLLECTABLE_MAX_UPLOAD_BYTES),
+                _("{{ file }} exceeds the maximum file size of {{ max_size }} bytes.")
+                % {
+                    "file": fieldfile,
+                    "max_size": settings.COLLECTABLE_MAX_UPLOAD_BYTES,
+                },
                 code="max-file-size",
             )

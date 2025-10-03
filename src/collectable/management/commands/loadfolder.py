@@ -163,13 +163,14 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                _("%s collectables created, %s updated.")
-                % (count_created, count_updated)
+                _("{{ num_created }} collectables created, {{ num_updated }} updated.")
+                % {"num_created": count_created, "num_updated": count_updated}
             )
         )
 
         self.stdout.write(
             self.style.SUCCESS(
-                _("%s collectables in database.") % Collectable.objects.count()
+                _("{{ total }} collectables in database.")
+                % {"total": Collectable.objects.count()}
             )
         )
