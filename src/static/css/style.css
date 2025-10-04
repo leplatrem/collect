@@ -1,121 +1,144 @@
 :root {
-    --bg-color: #f9f9f9;
-    --text-color: #222;
-    --link-color: #669999; /* Pale teal (subtle, elegant) */
-    --card-bg: #fff;
-    --card-border: #e0e0e0;
-    --card-shadow: rgba(0, 0, 0, 0.04);
-    --card-shadow-hover: rgba(0, 0, 0, 0.08);
-    --tag-color: #669999;
-    --tag-bg: rgba(255, 255, 255, 0.5);
-    --tag-bg-hover: rgba(255, 255, 255, 0.2);
-    --input-bg: #fff;
-    --input-border: #ccc;
-    --error-color: red;
-    --button-bg: #669999;;
-    --button-color: #fff;
-    --button-color-hover: #558888;
-     --disabled-bg: #ccc;
-    --disabled-color: #999;
+  --bg-color: #f9f9f9;
+  --text-color: #222;
+  --link-color: #669999; /* Pale teal (subtle, elegant) */
+  --card-bg: #fff;
+  --card-border: #e0e0e0;
+  --card-shadow: rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: rgba(0, 0, 0, 0.08);
+  --tag-color: #669999;
+  --tag-bg: rgba(255, 255, 255, 0.5);
+  --tag-bg-hover: rgba(255, 255, 255, 0.2);
+  --input-bg: #fff;
+  --input-border: #ccc;
+  --error-color: red;
+  --button-bg: #669999;
+  --button-color: #fff;
+  --button-color-hover: #558888;
+  --disabled-bg: #ccc;
+  --disabled-color: #999;
 }
 
 /* 🌙 Auto dark mode based on system settings */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #121212;
-        --text-color: #e0e0e0;
-        --link-color: #99ccbb; /* Pale mint for dark mode */
-        --card-bg: #3b3b3b;
-        --card-border: #333;
-        --card-shadow: rgba(0, 0, 0, 0.2);
-        --card-shadow-hover: rgba(0, 0, 0, 0.3);
-        --tag-color: #99ccbb;
-        --tag-bg: rgba(0,0,0, 0.4);
-        --tag-bg-hover:  rgba(0,0,0, 0.2);
-        --input-bg: #000;
-        --input-border: #555;
-        --error-color: #ff6b6b;
-        --button-bg: #99ccbb;;
-        --button-color: #121212;
-        --button-color-hover: #88bbaa;
-        --disabled-bg: #555;
-        --disabled-color: #888;
-    }
+  :root {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --link-color: #99ccbb; /* Pale mint for dark mode */
+    --card-bg: #3b3b3b;
+    --card-border: #333;
+    --card-shadow: rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: rgba(0, 0, 0, 0.3);
+    --tag-color: #99ccbb;
+    --tag-bg: rgba(0, 0, 0, 0.4);
+    --tag-bg-hover: rgba(0, 0, 0, 0.2);
+    --input-bg: #000;
+    --input-border: #555;
+    --error-color: #ff6b6b;
+    --button-bg: #99ccbb;
+    --button-color: #121212;
+    --button-color-hover: #88bbaa;
+    --disabled-bg: #555;
+    --disabled-color: #888;
+  }
 
-    .possession-form input[type=checkbox] {
-        filter: invert(1);
-        opacity: 0.8;
-    }
+  .possession-form input[type="checkbox"] {
+    filter: invert(1);
+    opacity: 0.8;
+  }
 }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Roboto", "Noto Sans", "Droid Sans", sans-serif;
-    line-height: 1.6;
-    background: var(--bg-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Ubuntu",
+    "Roboto",
+    "Noto Sans",
+    "Droid Sans",
+    sans-serif;
+  line-height: 1.6;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
 }
 
 header a {
-    margin-right: 15px;
+  margin-right: 15px;
 }
 
-a, a:visited {
-    color: var(--link-color);
+a,
+a:visited {
+  color: var(--link-color);
 }
 
 body > * {
-    padding: 1rem;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 footer {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    background-color: var(--card-bg);
-    border-top: 1px solid var(--card-border);
-    text-align: center;
-    font-size: 0.95rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  text-align: center;
+  font-size: 0.95rem;
 }
 
 form.inline {
-    display: inline-block;
+  display: inline-block;
 }
 
-input[type="text"], input[type="password"], textarea, select {
-    padding: 0.5rem;
-    border: 1px solid var(--input-border);
-    border-radius: 6px;
-    background: var(--input-bg);
-    color: inherit;
+input[type="text"],
+input[type="search"],
+input[type="password"],
+textarea,
+select {
+  padding: 0.5rem;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: inherit;
 }
 
 form button:not(.link) {
-    padding: 0.6rem 1.2rem;
-    margin: 1rem 0;
+  padding: 0.6rem 1.2rem;
+  margin: 1rem 0;
 
-    background-color: var(--button-bg);
-    color: var(--button-color);
-    font-weight: 600;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px  rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  background-color: var(--button-bg);
+  color: var(--button-color);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
 }
 
 form button:hover {
-    background-color: var(--button-color-hover);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background-color: var(--button-color-hover);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 form button:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-form button[type=submit]:disabled {
+form button[type="submit"]:disabled {
   background-color: var(--disabled-bg);
   color: var(--disabled-color);
   cursor: not-allowed;
@@ -123,171 +146,175 @@ form button[type=submit]:disabled {
   transform: none;
 }
 
-
 button.link {
-    background: none !important;
-    border: none;
-    padding: 0 !important;
-    font-family: unset;
-    font-size: unset;
-    color: var(--link-color);
-    text-decoration: underline;
-    cursor: pointer;
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-family: unset;
+  font-size: unset;
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .errorlist {
-    color: var(--error-color);
+  color: var(--error-color);
 }
 
 .as-columns {
-    column-count: 4;
-    column-gap: 2rem;
-    margin-top: 1rem;
+  column-count: 4;
+  column-gap: 2rem;
+  margin-top: 1rem;
 }
 
 .invisible {
-    display: none;
+  display: none;
 }
 
 a.more {
-    font-size: 1.25rem;
-    font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 a.more::before {
-    content: "» ";
+  content: "» ";
 }
 
 .collectable-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .collectable.thumbnail {
-    width: 100%;
-    max-width: 320px;
-    position: relative;
-    overflow: hidden;
+  width: 100%;
+  max-width: 320px;
+  position: relative;
+  overflow: hidden;
 
-    background: var(--card-bg);
-    border-radius: 12px;
-    border: 1px solid var(--card-border);
-    box-shadow: 0 4px 8px var(--card-shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 8px var(--card-shadow);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .collectable.thumbnail a {
-    overflow: hidden;
-    display: block;
-    max-height: 260px;
+  overflow: hidden;
+  display: block;
+  max-height: 260px;
 }
 
 .collectable.thumbnail:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px var(--card-shadow-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px var(--card-shadow-hover);
 }
 
 .collectable.thumbnail img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-bottom: 1px solid var(--card-border);
+  width: 100%;
+  height: auto;
+  display: block;
+  border-bottom: 1px solid var(--card-border);
 }
 .collectable.thumbnail:hover img {
-    transform: scale(1.05); /* Slight zoom-in effect */
+  transform: scale(1.05); /* Slight zoom-in effect */
 }
 
 .collectable.thumbnail .taglist {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    transition: opacity 0.3s ease-in-out;
-    opacity: 0;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
 }
 
 .collectable.thumbnail:hover .taglist {
-    opacity: 1;
+  opacity: 1;
 }
 
 .collectable.thumbnail .taglist a {
-    padding: 6px 12px;
-    background-color: var(--tag-bg);
-    color: var(--tag-color);
-    text-decoration: none;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    cursor: pointer;
+  padding: 6px 12px;
+  background-color: var(--tag-bg);
+  color: var(--tag-color);
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+  cursor: pointer;
 }
 
 .collectable.thumbnail .taglist a:hover {
-    background-color: var(--tag-bg-hover);
-    transform: translateY(-2px);
+  background-color: var(--tag-bg-hover);
+  transform: translateY(-2px);
 }
 
 section#attributes,
 section#possession {
-    width: 50%;
+  width: 50%;
 }
 
-section#attributes input[type="text"], section#attributes textarea {
-    width: 95%;
+section#attributes input[type="text"],
+section#attributes textarea {
+  width: 95%;
 }
 
 section#history ul {
-    max-height: 10em;
-    overflow-y: auto;
+  max-height: 10em;
+  overflow-y: auto;
 }
 
 section#related {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 .possession-form label {
-    display: none;
+  display: none;
 }
 
 .possession-form p {
-    display: inline-block;
-    margin: 0;
-    width: 32%;
-    text-align: center;
+  display: inline-block;
+  margin: 0;
+  width: 32%;
+  text-align: center;
 }
 
-.possession-form input[type=checkbox] {
-    display: block;
-    width: 30px;
-    height: 30px;
-    margin-left: 33%;
-    cursor: pointer;
-    appearance: none;
-    outline: none;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-    background-color: transparent;
+.possession-form input[type="checkbox"] {
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin-left: 33%;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  background-color: transparent;
 }
 
 .possession-form #id_likes {
-    background-image: url(../icons/unliked.svg);
+  background-image: url(../icons/unliked.svg);
 }
 .possession-form #id_likes:checked {
-    background-image: url(../icons/liked.svg);
+  background-image: url(../icons/liked.svg);
 }
 .possession-form #id_wants {
-    background-image: url(../icons/unwanted.svg);
+  background-image: url(../icons/unwanted.svg);
 }
 .possession-form #id_wants:checked {
-    background-image: url(../icons/wanted.svg);
+  background-image: url(../icons/wanted.svg);
 }
 .possession-form #id_owns {
-    background-image: url(../icons/unowned.svg);
+  background-image: url(../icons/unowned.svg);
 }
 .possession-form #id_owns:checked {
-    background-image: url(../icons/owned.svg);
+  background-image: url(../icons/owned.svg);
 }

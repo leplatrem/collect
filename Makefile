@@ -38,7 +38,7 @@ format: $(INSTALL_STAMP_PYTHON) $(INSTALL_STAMP_NODE)  ## Format code base
 	$(UV) run ruff check --fix src/
 	$(UV) run ruff format src/
 	$(UV) run djlint src/ --reformat
-	npx prettier --write tests/
+	npx prettier --write tests/ src/**/*.css src/**/script.js
 
 migrate:  ## Run pending migrations if needed
 	@echo "Checking for unapplied migrations..."
