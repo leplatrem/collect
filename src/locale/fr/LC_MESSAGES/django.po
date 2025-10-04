@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 03:16+0200\n"
+"POT-Creation-Date: 2025-10-04 19:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,43 +71,52 @@ msgstr "Saisir une URL valide"
 msgid "Username for creator of imported collectables"
 msgstr "Nom d'utilisateur pour le créateur des objets importés"
 
+#: src/collectable/management/commands/loadfolder.py:29
+msgid "Text to prepend to description"
+msgstr "Texte à ajouter à la fin des descriptions"
+
 #: src/collectable/management/commands/loadfolder.py:30
+msgid "Text to append to description"
+msgstr "Texte à ajouter au début descriptions"
+
+#: src/collectable/management/commands/loadfolder.py:32
 msgid "Username for owner of imported collectables"
 msgstr "Nom d'utilisateur pour le propriétaire des objets importés"
 
-#: src/collectable/management/commands/loadfolder.py:60
+#: src/collectable/management/commands/loadfolder.py:64
 #, python-format
 msgid "\"%s\" is not a square image, skipping."
 msgstr "\"%s\" n'est pas une image carrée, ignore image."
 
-#: src/collectable/management/commands/loadfolder.py:79
+#: src/collectable/management/commands/loadfolder.py:83
 #, python-format
 msgid "\"%s\" has no DateTime EXIF metadata, using filename as ID seed."
-msgstr ""
-"\"%s\" n'a pas de métadonnées EXIF, nom de fichier utilisé comme source."
+msgstr "\"%s\" n'a pas de métadonnées EXIF, nom de fichier utilisé comme source."
 
-#: src/collectable/management/commands/loadfolder.py:140
+#: src/collectable/management/commands/loadfolder.py:151
 #, python-format
 msgid "Successfully created %s"
 msgstr "%s créé avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:145
+#: src/collectable/management/commands/loadfolder.py:156
 #, python-format
 msgid "Successfully updated %s"
 msgstr "%s mis à jour avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:160
+#: src/collectable/management/commands/loadfolder.py:171
 #, python-format
 msgid "Successfully assigned owner of %s"
 msgstr "Propriétaire de %s assigné avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:166
-msgid "{{ num_created }} collectables created, {{ num_updated }} updated."
-msgstr "{{ num_created }} collectables crées, {{ num_updated }} mis à jour."
+#: src/collectable/management/commands/loadfolder.py:177
+#| msgid "{{ num_created }} collectables created, {{ num_updated }} updated."
+msgid "%(num_created)s collectables created, %(num_updated)s updated."
+msgstr "%(num_created)s collectables crées, {{ num_updated }} mis à jour."
 
-#: src/collectable/management/commands/loadfolder.py:173
-msgid "{{ total }} collectables in database."
-msgstr "{{ total }} objets dans la base de données."
+#: src/collectable/management/commands/loadfolder.py:184
+#| msgid "{{ total }} collectables in database."
+msgid "%(total)s collectables in database."
+msgstr "%(total)s objets dans la base de données."
 
 #: src/collectable/management/commands/verifyuploads.py:28
 #, python-format
@@ -279,8 +288,7 @@ msgstr "Signaler un doublon"
 msgid ""
 "If you think this collectable is a duplicate of another one, please report "
 "it."
-msgstr ""
-"Si vous pensez que cet objet est le doublon d'un autre, veuillez le signaler."
+msgstr "Si vous pensez que cet objet est le doublon d'un autre, veuillez le signaler."
 
 #: src/collectable/templates/collectable/details.html:66
 #: src/collectable/templates/collectable/details_duplicate.html:16
@@ -545,7 +553,7 @@ msgstr "Derniers objets"
 #: src/collectable/views.py:84
 #, python-format
 msgid "Search results for '%(q)s'"
-msgstr ""
+msgstr "Résultats de la recherche '%(q)s'"
 
 #: src/collectable/views.py:85
 msgid "Most liked collectables"

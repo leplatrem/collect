@@ -27,6 +27,18 @@ class Command(BaseCommand):
         parser.add_argument("folder", type=str)
         # Optional
         parser.add_argument(
+            "--prepend-description",
+            type=str,
+            help=_("Text to prepend to description"),
+            default="",
+        )
+        parser.add_argument(
+            "--append-description",
+            type=str,
+            help=_("Text to append to description"),
+            default="",
+        )
+        parser.add_argument(
             "--owner", type=str, help=_("Username for owner of imported collectables")
         )
         parser.add_argument("--tags", action="append")
@@ -42,10 +54,12 @@ class Command(BaseCommand):
         if options["owner"]:
             owner = User.objects.get(username=options["owner"])
 
-        images = folder_path.glob("**/*.jpg")
+        images = folder_path.glob("**/*.*")
         count_created = 0
         count_updated = 0
         for image_path in images:
+            if image_path.suffix.lower() not in [".jpg", ".jpeg"]:
+                continue  # skip non-image files
             # Consider subfolders as tags.
             parent_folder = image_path.parent
             relative_folder = parent_folder.relative_to(folder_path)
@@ -103,13 +117,20 @@ class Command(BaseCommand):
                     for t in (tags_str.strip().split() if tags_str else [])
                 ]
 
+            description = (
+                options["prepend_description"]
+                + exif_description
+                + options["append_description"]
+            )
+
             updated = False
             created = False
             try:
                 collectable = Collectable.objects.get(id=uuid_id)
 
                 if not collectable.description:
-                    collectable.description = exif_description
+                    collectable.description = description
+                    updated = True
 
                 if set(taglist) != set(collectable.tags.slugs()):
                     collectable.tags.add(*taglist)
@@ -123,11 +144,15 @@ class Command(BaseCommand):
                     collectable.thumbnail.generate()
                     updated = True
 
+                if updated:
+                    collectable._history_user = creator
+                    collectable.save()
+
             except Collectable.DoesNotExist:
                 with image_path.open(mode="rb") as f:
                     photo = File(file=f, name=image_path.name)
                     collectable = Collectable(
-                        id=uuid_id, photo=photo, description=exif_description
+                        id=uuid_id, photo=photo, description=description
                     )
                     collectable._history_user = creator
                     collectable.save()
@@ -163,14 +188,14 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                _("{{ num_created }} collectables created, {{ num_updated }} updated.")
+                _("%(num_created)s collectables created, %(num_updated)s updated.")
                 % {"num_created": count_created, "num_updated": count_updated}
             )
         )
 
         self.stdout.write(
             self.style.SUCCESS(
-                _("{{ total }} collectables in database.")
+                _("%(total)s collectables in database.")
                 % {"total": Collectable.objects.count()}
             )
         )
