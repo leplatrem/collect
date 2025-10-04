@@ -23,6 +23,19 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'collectable:profile' %}">{{ user }}</a>
                 <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
+            {% endif %}
+            <form hx-get="{% url 'collectable:search' %}"
+                  class="inline"
+                  hx-target="main"
+                  hx-select="main"
+                  hx-push-url="true"
+                  hx-trigger="submit, keyup changed delay:300ms from:input">
+                <input type="search"
+                       name="q"
+                       placeholder="{% translate "Search collectables..." %}"
+                       value="{{ request.GET.q|default_if_none:'' }}" />
+            </form>
+            {% if user.is_authenticated %}
                 <a href="{% url 'auth:password_change' %}">{% translate "Password Change" %}</a>
                 <form action="{% url 'auth:logout' %}" method="post" class="inline">
                     {% csrf_token %}

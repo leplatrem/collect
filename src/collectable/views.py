@@ -43,37 +43,56 @@ def index(request):
 
 class CollectableListView(ListView):
     model = Collectable
-    sort_by = "-created_at"
+    kind = "latest"
     paginate_by = settings.DEFAULT_PAGE_SIZE
 
     def get_queryset(self) -> QuerySet[Collectable]:
+        sort_by = {
+            "latest": "-created_at",
+            "search": "-created_at",
+            "most_liked": "-nlikes",
+            "most_wanted": "-nwants",
+            "most_owned": "-nowns",
+        }[self.kind]
         qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
-            self.sort_by, "-created_at"
+            sort_by, "-created_at"
         )
 
-        if self.sort_by == "-nlikes":
+        if self.kind == "most_liked":
             qs = qs.filter(nlikes__gt=0)
-        elif self.sort_by == "-nwants":
+        elif self.kind == "most_wanted":
             qs = qs.filter(nwants__gt=0)
-        elif self.sort_by == "-nowns":
+        elif self.kind == "most_owned":
             qs = qs.filter(nowns__gt=0)
 
+        # Search in description insentitive, and in tags.
+        for q in self.search_keywords().split(" "):
+            qs = qs.filter(tags__name__in=[q]) | qs.filter(description__icontains=q)
+        qs = qs.distinct()
+
         return qs
+
+    def search_keywords(self) -> str:
+        if self.kind == "search" and (q := self.request.GET.get("q")):
+            return q
+        return ""
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = {
-            "-created_at": _("Latest collectables"),
-            "-nlikes": _("Most liked collectables"),
-            "-nwants": _("Most wanted collectables"),
-            "-nowns": _("Most owned collectables"),
-        }[self.sort_by]
+            "latest": _("Latest collectables"),
+            "search": _("Search results for '%(q)s'") % {"q": self.search_keywords()},
+            "most_liked": _("Most liked collectables"),
+            "most_wanted": _("Most wanted collectables"),
+            "most_owned": _("Most owned collectables"),
+        }[self.kind]
         context["empty_msg"] = {
-            "-created_at": _("No collectable in database."),
-            "-nlikes": _("No liked collectable"),
-            "-nwants": _("No wanted collectable"),
-            "-nowns": _("No owned collectable"),
-        }[self.sort_by]
+            "latest": _("No collectable in database."),
+            "search": _("No collectable found."),
+            "most_liked": _("No liked collectable"),
+            "most_wanted": _("No wanted collectable"),
+            "most_owned": _("No owned collectable"),
+        }[self.kind]
         return context
 
 
