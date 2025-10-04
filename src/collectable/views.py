@@ -106,7 +106,10 @@ def create(request):
             Possession.objects.create(
                 user=request.user, collectable=collectable, owns=True
             )
+            messages.info(request, _("Collectable created successfully."))
             return redirect(collectable)
+        else:
+            messages.warning(request, _("Invalid fields, please correct them."))
     else:
         form = CollectableForm()
     context = {
@@ -131,16 +134,16 @@ def details(request, id):
         return redirect("collectable:duplicate", id=collectable.id)
 
     # Simple details page and form.
-    form_saved = False
     if request.method == "POST":
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
         form = CollectableForm(request.POST, request.FILES, instance=collectable)
         backup_photo = collectable.photo
         if form.is_valid():
-            form_saved = True
             collectable = form.save()
+            messages.info(request, _("Collectable updated successfully."))
         else:
+            messages.warning(request, _("Invalid fields, please correct them."))
             # Why `is_valid()` is altering `collectable.photo`??
             collectable.photo = backup_photo
     else:
@@ -156,7 +159,6 @@ def details(request, id):
         "collectable": collectable,
         "form_edit": form,
         "duplicate_form": duplicate_form,
-        "form_saved": form_saved,
         "related_tags": related_tags,
         "related_collectables": related_collectables,
         "duplicates": duplicates,
@@ -211,6 +213,7 @@ def duplicate(request, id):
         form.instance.reporter = request.user
 
         if not form.is_valid():
+            messages.warning(request, _("Invalid fields, please correct them."))
             # Show invalid form.
             return render(
                 request,

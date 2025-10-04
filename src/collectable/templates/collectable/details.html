@@ -26,16 +26,13 @@
             <form hx-encoding='multipart/form-data'
                   hx-post="{% url 'collectable:details' collectable.id %}"
                   hx-select="#attributes"
-                  hx-select-oob="#history,#related"
+                  hx-select-oob="#messages,#history,#related"
                   hx-target="#attributes"
                   hx-trigger="submit, keyup[keyCode==13] from:input"
                   hx-swap="outerHTML">
                 {{ form_edit }}
                 <button type="submit">{% translate "Save" %}</button>
             </form>
-            {% if form_saved %}
-                <p>{% translate "Saved ✅" %}</p>
-            {% endif %}
         {% else %}
             <p>{% translate "Description" %}: {{ collectable.description }}</p>
             <p>
@@ -60,6 +57,7 @@
             <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
                   hx-select="#report-duplicate form"
                   hx-target="#report-duplicate form"
+                  hx-select-oob="#messages"
                   hx-swap="outerHTML">
                 {% csrf_token %}
                 {{ duplicate_form }}
