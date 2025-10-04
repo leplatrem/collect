@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 01:54+0200\n"
+"POT-Creation-Date: 2025-10-04 03:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -240,7 +240,7 @@ msgid "No collectable with tags %(slugs)s"
 msgstr "Aucun objet avec les étiquettes %(slugs)s"
 
 #: src/collectable/templates/collectable/create.html:9
-#: src/collectable/templates/collectable/create.html:13
+#: src/collectable/templates/collectable/create.html:14
 msgid "Create"
 msgstr "Ajouter"
 
@@ -389,14 +389,25 @@ msgid "Ignore"
 msgstr "Ignorer"
 
 #: src/collectable/templates/collectable/details_duplicate.html:61
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "                    %(missing)s more confirmation before merging.\n"
+#| "                "
+#| msgid_plural ""
+#| "\n"
+#| "%(missing)s more confirmations before merging."
 msgid ""
 "\n"
 "                    %(missing)s more confirmation before merging.\n"
 "                "
 msgid_plural "%(missing)s more confirmations before merging."
-msgstr[0] "%(missing)s confirmation avant la fusion."
-msgstr[1] "%(missing)s confirmations avant la fusion."
+msgstr[0] ""
+"\n"
+"%(missing)s confirmation avant la fusion."
+msgstr[1] ""
+"\n"
+"%(missing)s confirmations avant la fusion."
 
 #: src/collectable/templates/collectable/index.html:5
 msgid "Explore"
@@ -426,7 +437,7 @@ msgid "Latest"
 msgstr "Derniers"
 
 #: src/collectable/templates/collectable/index.html:16
-#: src/collectable/views.py:72
+#: src/collectable/views.py:90
 msgid "No collectable in database."
 msgstr "Aucun objet dans la base de données."
 
@@ -527,39 +538,48 @@ msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
 msgstr ""
 "{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
 
-#: src/collectable/views.py:66
+#: src/collectable/views.py:83
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
-#: src/collectable/views.py:67
+#: src/collectable/views.py:84
+#, python-format
+msgid "Search results for '%(q)s'"
+msgstr ""
+
+#: src/collectable/views.py:85
 msgid "Most liked collectables"
 msgstr "Objets les plus aimés"
 
-#: src/collectable/views.py:68
+#: src/collectable/views.py:86
 msgid "Most wanted collectables"
 msgstr "Objets les plus recherchés"
 
-#: src/collectable/views.py:69
+#: src/collectable/views.py:87
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-#: src/collectable/views.py:73
+#: src/collectable/views.py:91
+msgid "No collectable found."
+msgstr "Aucun objet trouvé."
+
+#: src/collectable/views.py:92
 msgid "No liked collectable"
 msgstr "Aucun objet aimé"
 
-#: src/collectable/views.py:74
+#: src/collectable/views.py:93
 msgid "No wanted collectable"
 msgstr "Aucun objet recherché"
 
-#: src/collectable/views.py:75
+#: src/collectable/views.py:94
 msgid "No owned collectable"
 msgstr "Aucun objet possédé"
 
-#: src/collectable/views.py:118 src/collectable/views.py:187
+#: src/collectable/views.py:137 src/collectable/views.py:206
 msgid "Unauthorized"
 msgstr "Interdit"
 
-#: src/collectable/views.py:169
+#: src/collectable/views.py:188
 msgid ""
 "This collectable has been hidden as it was reported as a duplicate. You are "
 "being redirected to the original."
@@ -567,13 +587,17 @@ msgstr ""
 "Cet objet a été masqué car étant signalé comme doublon. Vous avez été "
 "redirigé vers l'original."
 
-#: src/collectable/views.py:178
+#: src/collectable/views.py:197
 msgid "This collectable has not been reported as duplicate."
 msgstr "Cet objet n'a pas été signalé comme doublon."
 
-#: src/collectable/views.py:204
+#: src/collectable/views.py:223
 msgid "Duplicate reported! Thank you!"
 msgstr "Doublon signalé! Merci!"
+
+#: src/cropper/fields.py:31
+msgid "Invalid crop dimensions."
+msgstr ""
 
 #: src/templates/base.html:22
 msgid "Home"
@@ -583,19 +607,23 @@ msgstr "Accueil"
 msgid "Create collectable"
 msgstr "Ajouter un objet"
 
-#: src/templates/base.html:26
+#: src/templates/base.html:35
+msgid "Search collectables..."
+msgstr "Recherche des objects..."
+
+#: src/templates/base.html:39
 msgid "Password Change"
 msgstr "Changer mot de passe"
 
-#: src/templates/base.html:29
+#: src/templates/base.html:42
 msgid "Log Out"
 msgstr "Se déconnecter"
 
-#: src/templates/base.html:32 src/templates/registration/login.html:11
+#: src/templates/base.html:45 src/templates/registration/login.html:11
 msgid "Log In"
 msgstr "Se connecter"
 
-#: src/templates/base.html:50
+#: src/templates/base.html:63
 msgid ""
 "\n"
 "                🚀 This project is <strong>free</strong> and <strong>open "
