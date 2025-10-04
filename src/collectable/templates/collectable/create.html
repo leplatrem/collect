@@ -7,11 +7,13 @@
 {% endblock head %}
 {% block content %}
     <h1>{% translate "Create" %}</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <button type="submit">{% translate "Create" %}</button>
-    </form>
+    <section id="attributes">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">{% translate "Create" %}</button>
+        </form>
+    </section>
 {% endblock %}
 {% block foot %}
     {{ form.media.js }}
