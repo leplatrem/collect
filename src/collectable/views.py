@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.forms import widgets as django_widgets
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
@@ -243,7 +244,7 @@ def details(request, id):
     return render(request, "collectable/details.html", context)
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "POST", "DELETE"])
 def duplicate(request, id):
     """
     This collectable has been reported as a duplicate of another one.
@@ -279,6 +280,23 @@ def duplicate(request, id):
     headers = {}
 
     # Handle duplicate report (or confirmation).
+    if request.method == "DELETE":
+        if not request.user.is_authenticated:
+            return HttpResponse(_("Unauthorized"), status=401)
+        # User is cancelling their report.
+        try:
+            report = DuplicateReport.objects.get(
+                reporter=request.user, duplicate=collectable
+            )
+        except DuplicateReport.DoesNotExist:
+            messages.warning(request, _("You have not reported this duplicate."))
+            return HttpResponse(_("Not Found"), status=404)
+        report.delete()
+        messages.success(request, _("Your duplicate report has been cancelled."))
+        response = HttpResponse(status=204)  # No content
+        response["HX-Redirect"] = reverse("collectable:details", args=[collectable.id])
+        return response
+
     if request.method == "POST":
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
@@ -314,7 +332,7 @@ def duplicate(request, id):
     )
 
     # The confirmation form will have the original pre-selected.
-    form = DuplicateReportForm(initial={"original": original})
+    form = DuplicateReportForm(initial={"original_input": original.id})
     form.fields["original_input"].widget = django_widgets.HiddenInput()
 
     # Show details of who reported and when.

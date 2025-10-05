@@ -39,30 +39,32 @@
             </p>
             <p>
                 {% if user.is_authenticated %}
-                    <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
-                          hx-select="body"
-                          hx-target="body">
-                        {% csrf_token %}
-                        {{ form }}
-                        <button type="submit"
-                                name="action"
-                                value="confirm"
-                                {% if already_reported %}disabled title="{% translate "You have already reported this duplicate." %}"{% endif %}>
-                            {% translate "Confirm" %} <span aria-hidden="true">✔️</span>
-                        </button>
-                        <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
-                    </form>
-                {% else %}
-                    <p>
-                        <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
-                    </p>
+                    {% if already_reported %}
+                        <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
+                              hx-select="body"
+                              hx-target="body">
+                            {% csrf_token %}
+                            {{ form }}
+                            <button type="submit">{% translate "Cancel" %}</button>
+                        </form>
+                    {% else %}
+                        <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
+                              hx-select="body"
+                              hx-target="body">
+                            {% csrf_token %}
+                            {{ form }}
+                            <button type="submit">{% translate "Confirm" %}</button>
+                        </form>
+                    {% endif %}
                 {% endif %}
                 <p>
                     {% blocktranslate count missing=missing_confirmations %}
                     {{ missing }} more confirmation before merging the two collectables.
                 {% plural %}{{ missing }} more confirmations before merging the two collectables.{% endblocktranslate %}
                 </p>
-            </p>
-        {% endif %}
-    </section>
-{% endblock %}
+                <p>
+                    <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
+                </p>
+            {% endif %}
+        </section>
+    {% endblock %}

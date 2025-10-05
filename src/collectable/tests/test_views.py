@@ -141,6 +141,16 @@ def test_duplicate_get_with_report_not_hidden(
 
 
 @pytest.mark.django_db
+def test_duplicate_delete(logged_in_client, collectable, another_collectable, user):
+    DuplicateReportFactory(
+        original=another_collectable, duplicate=collectable, reporter=user
+    )
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+    response = logged_in_client.delete(url)
+    assert response.status_code == 204
+
+
+@pytest.mark.django_db
 def test_duplicate_get_with_report_hidden_redirects_to_original(
     client, collectable, another_collectable, user
 ):

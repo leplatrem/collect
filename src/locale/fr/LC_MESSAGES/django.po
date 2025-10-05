@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-05 19:36+0200\n"
+"POT-Creation-Date: 2025-10-05 20:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -341,7 +341,7 @@ msgstr "Doublons"
 #: src/collectable/templates/collectable/details.html:123
 msgid ""
 "The following collectables have been reported as duplicates of this one:"
-msgstr "Les objets suivants ont été signalés comme des doublons of this one:"
+msgstr "Les objets suivants ont été signalés comme des doublons de cet objet:"
 
 #: src/collectable/templates/collectable/details.html:140
 #: src/templates/paginator.html:5
@@ -359,7 +359,7 @@ msgstr "Suivant"
 
 #: src/collectable/templates/collectable/details.html:155
 msgid "Press <kbd>]</kbd> to navigate to next"
-msgstr "Appuyez sur <kbd>[</kbd> pour aller au suivant"
+msgstr "Appuyez sur <kbd>]</kbd> pour aller au suivant"
 
 #: src/collectable/templates/collectable/details_duplicate.html:8
 msgid "Duplicate"
@@ -388,18 +388,13 @@ msgstr ""
 "  %(who)s le %(when)s\n"
 "  "
 
-#: src/collectable/templates/collectable/details_duplicate.html:50
-msgid "You have already reported this duplicate."
-msgstr "Vous avez déjà signalé ce doublon."
+#: src/collectable/templates/collectable/details_duplicate.html:48
+msgid "Cancel"
+msgstr "Annuler"
 
-#: src/collectable/templates/collectable/details_duplicate.html:51
+#: src/collectable/templates/collectable/details_duplicate.html:56
 msgid "Confirm"
 msgstr "Confirmer"
-
-#: src/collectable/templates/collectable/details_duplicate.html:53
-#: src/collectable/templates/collectable/details_duplicate.html:57
-msgid "Ignore"
-msgstr "Ignorer"
 
 #: src/collectable/templates/collectable/details_duplicate.html:61
 #, fuzzy, python-format
@@ -424,6 +419,10 @@ msgstr[0] ""
 msgstr[1] ""
 "\n"
 "%(missing)s confirmations avant la fusion des deux objets."
+
+#: src/collectable/templates/collectable/details_duplicate.html:66
+msgid "Ignore"
+msgstr "Ignorer"
 
 #: src/collectable/templates/collectable/index.html:5
 msgid "Explore"
@@ -453,7 +452,7 @@ msgid "Latest"
 msgstr "Derniers"
 
 #: src/collectable/templates/collectable/index.html:16
-#: src/collectable/views.py:127
+#: src/collectable/views.py:128
 msgid "No collectable in database."
 msgstr "Aucun objet dans la base de données."
 
@@ -554,61 +553,62 @@ msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
 msgstr ""
 "{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
 
-#: src/collectable/views.py:120
+#: src/collectable/views.py:121
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
-#: src/collectable/views.py:121
+#: src/collectable/views.py:122
 #, python-format
 msgid "Search results for '%(q)s'"
 msgstr "Résultats de la recherche '%(q)s'"
 
-#: src/collectable/views.py:122
+#: src/collectable/views.py:123
 msgid "Most liked collectables"
 msgstr "Objets les plus aimés"
 
-#: src/collectable/views.py:123
+#: src/collectable/views.py:124
 msgid "Most wanted collectables"
 msgstr "Objets les plus recherchés"
 
-#: src/collectable/views.py:124
+#: src/collectable/views.py:125
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-#: src/collectable/views.py:128
+#: src/collectable/views.py:129
 msgid "No collectable found."
 msgstr "Aucun objet trouvé."
 
-#: src/collectable/views.py:129
+#: src/collectable/views.py:130
 msgid "No liked collectable"
 msgstr "Aucun objet aimé"
 
-#: src/collectable/views.py:130
+#: src/collectable/views.py:131
 msgid "No wanted collectable"
 msgstr "Aucun objet recherché"
 
-#: src/collectable/views.py:131
+#: src/collectable/views.py:132
 msgid "No owned collectable"
 msgstr "Aucun objet possédé"
 
-#: src/collectable/views.py:146
+#: src/collectable/views.py:147
 msgid "Collectable created successfully."
 msgstr "Objet créé avec succès."
 
-#: src/collectable/views.py:149 src/collectable/views.py:183
-#: src/collectable/views.py:275
+#: src/collectable/views.py:150 src/collectable/views.py:219
+#: src/collectable/views.py:310
 msgid "Invalid fields, please correct them."
 msgstr "Champs invalides, veuillez les corriger."
 
-#: src/collectable/views.py:176 src/collectable/views.py:267
+#: src/collectable/views.py:212 src/collectable/views.py:285
+#: src/collectable/views.py:302
 msgid "Unauthorized"
 msgstr "Interdit"
 
-#: src/collectable/views.py:181
+#: src/collectable/views.py:217
 msgid "Collectable updated successfully."
 msgstr "Objet mis à jour avec succès."
 
-#: src/collectable/views.py:249
+#: src/collectable/views.py:267
 msgid ""
 "This collectable has been hidden as it was reported as a duplicate. You are "
 "being redirected to the original."
@@ -616,11 +616,23 @@ msgstr ""
 "Cet objet a été masqué car étant signalé comme doublon. Vous avez été "
 "redirigé vers l'original."
 
-#: src/collectable/views.py:258
+#: src/collectable/views.py:276
 msgid "This collectable has not been reported as duplicate."
 msgstr "Cet objet n'a pas été signalé comme doublon."
 
-#: src/collectable/views.py:285
+#: src/collectable/views.py:292
+msgid "You have not reported this duplicate."
+msgstr "Vous n'avez pas signalé ce doublon."
+
+#: src/collectable/views.py:293
+msgid "Not Found"
+msgstr "Introuvable"
+
+#: src/collectable/views.py:295
+msgid "Your duplicate report has been cancelled."
+msgstr "Votre signalement de doublon a été annulé."
+
+#: src/collectable/views.py:320
 msgid "Duplicate reported! Thank you!"
 msgstr "Doublon signalé! Merci!"
 
