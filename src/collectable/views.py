@@ -104,7 +104,7 @@ class CollectableListView(ListView):
         # Store the current list in session, for easy navigation in details view.
         # We store only the IDs, as strings, to be JSON serializable.
         self.request.session["collectable_list"] = [
-            str(c.id) for c in qs.values_list("id", flat=True)
+            str(id) for id in qs.values_list("id", flat=True)
         ]
         self.request.session.modified = True
 
@@ -155,6 +155,41 @@ def create(request):
     return render(request, "collectable/create.html", context)
 
 
+def adjacent_in_list(request, collectable):
+    """
+    Previous and next collectable in list, for easy navigation.
+    We use the last viewed list stored in session, if any.
+    Otherwise, we use the whole collectables list, sorted by creation date.
+    """
+    if "collectable_list" in request.session:
+        collectable_list = request.session["collectable_list"]
+        try:
+            index = collectable_list.index(str(collectable.id))
+            previous_in_list = (
+                Collectable.objects.get(id=collectable_list[index - 1])
+                if index > 0
+                else None
+            )
+            next_in_list = (
+                Collectable.objects.get(id=collectable_list[index + 1])
+                if index < len(collectable_list) - 1
+                else None
+            )
+            return previous_in_list, next_in_list
+        except ValueError:
+            pass
+    # Not found in list, fallback to full list.
+    try:
+        previous_in_list = collectable.get_previous_by_created_at()
+    except Collectable.DoesNotExist:
+        previous_in_list = None
+    try:
+        next_in_list = collectable.get_next_by_created_at()
+    except Collectable.DoesNotExist:
+        next_in_list = None
+    return previous_in_list, next_in_list
+
+
 @require_http_methods(["GET", "POST"])
 def details(request, id):
     # Note: hidden collectable will be 404.
@@ -192,25 +227,7 @@ def details(request, id):
 
     duplicate_form = DuplicateReportForm()
 
-    # Previous and next collectable in list, for easy navigation.
-    # We use the last viewed list stored in session, if any.
-    # Otherwise, we use the whole collectables list, sorted by creation date.
-    if "collectable_list" in request.session:
-        collectable_list = request.session["collectable_list"]
-        index = collectable_list.index(str(collectable.id))
-        if index > 0:
-            previous_in_list = Collectable.objects.get(id=collectable_list[index - 1])
-        if index < len(collectable_list) - 1:
-            next_in_list = Collectable.objects.get(id=collectable_list[index + 1])
-    else:
-        try:
-            previous_in_list = collectable.get_previous_by_created_at()
-        except Collectable.DoesNotExist:
-            previous_in_list = None
-        try:
-            next_in_list = collectable.get_next_by_created_at()
-        except Collectable.DoesNotExist:
-            next_in_list = None
+    previous_in_list, next_in_list = adjacent_in_list(request, collectable)
 
     context = {
         "collectable": collectable,
