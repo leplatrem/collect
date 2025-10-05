@@ -256,6 +256,14 @@ a.more::before {
   transform: translateY(-2px);
 }
 
+main {
+    padding-top: 0;
+}
+
+main h1:first-of-type {
+  margin-top: 0;
+}
+
 section#attributes,
 section#possession {
   width: 50%;

@@ -17,6 +17,20 @@
 {% endblock head %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
+    {% if previous_in_list %}
+        <div class="nav-previous">
+            <a href="{{ previous_in_list.get_absolute_url }}"
+               hx-trigger="click, keyup[keyCode==219] from:window"
+               hx-get="{{ previous_in_list.get_absolute_url }}"
+               hx-target="main"
+               hx-select="main"
+               hx-push-url="true"
+               hx-swap="outerHTML show:window:top"
+               title="{{ previous_in_list }}">{% translate "Previous" %}</a>
+            <span>
+            {% translate "Press <kbd>[</kbd> to navigate to previous" %}</span>
+        </div>
+    {% endif %}
     <section id="attributes">
         <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
              height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
@@ -50,6 +64,19 @@
         {% endif %}
         {% user_possession_form collectable %}
     </section>
+    {% if next_in_list %}
+        <div class="nav-next">
+            <a href="{{ next_in_list.get_absolute_url }}"
+               hx-trigger="click, keyup[keyCode==221] from:window"
+               hx-get="{{ next_in_list.get_absolute_url }}"
+               hx-target="main"
+               hx-select="main"
+               hx-push-url="true"
+               hx-swap="outerHTML show:window:top"
+               title="{{ next_in_list }}">{% translate "Next" %}</a>
+            <span>{% translate "Press <kbd>]</kbd> to navigate to next" %}</span>
+        </div>
+    {% endif %}
     {% if user.is_authenticated %}
         <section id="report-duplicate">
             <h2>{% translate "Report duplicate" %}</h2>
@@ -127,22 +154,6 @@
             </div>
         </section>
     {% endif %}
-{% endblock %}
-{% block nav %}
-    {% with previous=collectable.get_previous_by_created_at.get_absolute_url next=collectable.get_next_by_created_at.get_absolute_url %}
-        <section id="navigation">
-            <a href="{{ previous }}"
-               hx-trigger="click, keyup[keyCode==219] from:window"
-               hx-get="{{ previous }}"
-               hx-target="main"
-               hx-select="main">{% translate "Previous" %}</a>
-            <a href="{{ next }}"
-               hx-trigger="click, keyup[keyCode==221] from:window"
-               hx-get="{{ next }}"
-               hx-target="main"
-               hx-select="main">{% translate "Next" %}</a>
-        </section>
-    {% endwith %}
 {% endblock %}
 {% block foot %}
     {{ form_edit.media.js }}

@@ -81,6 +81,14 @@ class CollectableListView(ListView):
             .with_possession_counts()
             .prefetch_tags_and_possessions(self.request.user)
         )
+        sort_by = {
+            "latest": "-created_at",
+            "search": "-created_at",
+            "most_liked": "-nlikes",
+            "most_wanted": "-nwants",
+            "most_owned": "-nowns",
+        }[self.kind]
+        qs = qs.order_by(sort_by, "-created_at")
 
         if self.kind == "most_liked":
             qs = qs.filter(nlikes__gt=0)
@@ -93,14 +101,14 @@ class CollectableListView(ListView):
                 self.search_keywords.split(" ")[: settings.MAX_SEARCH_KEYWORDS]
             )
 
-        sort_by = {
-            "latest": "-created_at",
-            "search": "-created_at",
-            "most_liked": "-nlikes",
-            "most_wanted": "-nwants",
-            "most_owned": "-nowns",
-        }[self.kind]
-        return qs.order_by(sort_by, "-created_at")
+        # Store the current list in session, for easy navigation in details view.
+        # We store only the IDs, as strings, to be JSON serializable.
+        self.request.session["collectable_list"] = [
+            str(c.id) for c in qs.values_list("id", flat=True)
+        ]
+        self.request.session.modified = True
+
+        return qs
 
     @property
     def search_keywords(self) -> str:
@@ -184,6 +192,20 @@ def details(request, id):
 
     duplicate_form = DuplicateReportForm()
 
+    # Previous and next collectable in list, for easy navigation.
+    # We use the last viewed list stored in session, if any.
+    # Otherwise, we use the whole collectables list, sorted by creation date.
+    if "collectable_list" in request.session:
+        collectable_list = request.session["collectable_list"]
+        index = collectable_list.index(str(collectable.id))
+        if index > 0:
+            previous_in_list = Collectable.objects.get(id=collectable_list[index - 1])
+        if index < len(collectable_list) - 1:
+            next_in_list = Collectable.objects.get(id=collectable_list[index + 1])
+    else:
+        previous_in_list = collectable.get_previous_by_created_at()
+        next_in_list = collectable.get_next_by_created_at()
+
     context = {
         "collectable": collectable,
         "form_edit": form,
@@ -191,6 +213,8 @@ def details(request, id):
         "related_tags": related_tags,
         "related_collectables": related_collectables,
         "duplicates": duplicates,
+        "next_in_list": next_in_list,
+        "previous_in_list": previous_in_list,
     }
 
     return render(request, "collectable/details.html", context)
