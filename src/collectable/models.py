@@ -419,12 +419,12 @@ class DuplicateReport(models.Model):
         ]
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         # Tag the duplicate as such.
         self.duplicate.tags.add("duplicate")
         # If the threshold is reached, merge the duplicate with the original.
         if len(self.confirmations()) >= settings.DUPLICATE_CONFIRMATION_THRESHOLD:
             self.duplicate.merge_into(self.original)
-        super().save(*args, **kwargs)
 
     def confirmations(self):
         return (
