@@ -75,15 +75,11 @@ class CollectableListView(ListView):
     paginate_by = settings.DEFAULT_PAGE_SIZE
 
     def get_queryset(self) -> QuerySet[Collectable]:
-        sort_by = {
-            "latest": "-created_at",
-            "search": "-created_at",
-            "most_liked": "-nlikes",
-            "most_wanted": "-nwants",
-            "most_owned": "-nowns",
-        }[self.kind]
-        qs = self.model.objects.with_counts_and_possessions(self.request.user).order_by(
-            sort_by, "-created_at"
+        qs = (
+            super()
+            .get_queryset()
+            .with_possession_counts()
+            .prefetch_tags_and_possessions(self.request.user)
         )
 
         if self.kind == "most_liked":
@@ -92,24 +88,29 @@ class CollectableListView(ListView):
             qs = qs.filter(nwants__gt=0)
         elif self.kind == "most_owned":
             qs = qs.filter(nowns__gt=0)
+        elif self.kind == "search":
+            qs = qs.search_keywords(
+                self.search_keywords.split(" ")[: settings.MAX_SEARCH_KEYWORDS]
+            )
 
-        # Search in description insentitive, and in tags.
-        for q in self.search_keywords().split(" "):
-            qs = qs.filter(tags__name__in=[q]) | qs.filter(description__icontains=q)
-        qs = qs.distinct()
+        sort_by = {
+            "latest": "-created_at",
+            "search": "-created_at",
+            "most_liked": "-nlikes",
+            "most_wanted": "-nwants",
+            "most_owned": "-nowns",
+        }[self.kind]
+        return qs.order_by(sort_by, "-created_at")
 
-        return qs
-
+    @property
     def search_keywords(self) -> str:
-        if self.kind == "search" and (q := self.request.GET.get("q")):
-            return q
-        return ""
+        return self.request.GET.get("q", "").strip()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = {
             "latest": _("Latest collectables"),
-            "search": _("Search results for '%(q)s'") % {"q": self.search_keywords()},
+            "search": _("Search results for '%(q)s'") % {"q": self.search_keywords},
             "most_liked": _("Most liked collectables"),
             "most_wanted": _("Most wanted collectables"),
             "most_owned": _("Most owned collectables"),

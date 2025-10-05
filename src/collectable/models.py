@@ -83,20 +83,52 @@ class CollectableQuerySet(models.QuerySet):
         This uses the related field from the Possession model to count the number of
         possessions that have likes, wants, and owns set to True.
         """
-        return self.visible().annotate(
+        return self.annotate(
             nlikes=Coalesce(
-                Count("possessions", filter=Q(**{"possession__likes": True})), 0
+                Count(
+                    "possessions",
+                    filter=Q(**{"possession__likes": True}),
+                    distinct=True,
+                ),
+                0,
             ),
             nwants=Coalesce(
-                Count("possessions", filter=Q(**{"possession__wants": True})), 0
+                Count(
+                    "possessions",
+                    filter=Q(**{"possession__wants": True}),
+                    distinct=True,
+                ),
+                0,
             ),
             nowns=Coalesce(
-                Count("possessions", filter=Q(**{"possession__owns": True})), 0
+                Count(
+                    "possessions", filter=Q(**{"possession__owns": True}), distinct=True
+                ),
+                0,
             ),
         )
 
     def prefetch_tags_and_possessions(self, user):
         return self.with_tags().for_user(user)
+
+    def search_keywords(self, keywords):
+        """
+        Filter the queryset by searching for keywords in the description and tags.
+        """
+        if not keywords:
+            return self
+
+        query = Q()
+        for keyword in keywords:
+            word_filter = (
+                Q(description__icontains=keyword)
+                | Q(id__icontains=keyword)
+                | Q(photo__icontains=keyword)
+                | Q(tags__name__iexact=keyword)
+            )
+            query |= word_filter  # any word match (OR)
+
+        return self.filter(query).distinct()
 
 
 class CollectableManager(models.Manager):

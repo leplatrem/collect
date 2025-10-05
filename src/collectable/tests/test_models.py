@@ -158,6 +158,22 @@ def test_duplicate_report_confirm(duplicate_report):
 
 
 @pytest.mark.django_db
+def test_collectable_search_keywords():
+    c1 = CollectableFactory(description="Bonjour le monde")
+    c1.tags.add("say-hello")
+    c2 = CollectableFactory(description="Hello there")
+    c3 = CollectableFactory(description="Goodbye world")
+    c3.tags.add("hello")
+
+    results = Collectable.objects.all().search_keywords(["hello"])
+
+    assert results.count() == 2
+    assert c1 not in results
+    assert c2 in results
+    assert c3 in results
+
+
+@pytest.mark.django_db
 def test_duplicate_report_loops():
     c0 = CollectableFactory()
     with pytest.raises(ValidationError) as exc:
