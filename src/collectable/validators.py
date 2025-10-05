@@ -29,7 +29,10 @@ class MimetypeValidator(object):
 @deconstructible
 class SquareImageValidator(object):
     def __call__(self, image):
-        if image.width != image.height:
+        if (
+            abs(image.width - image.height)
+            > settings.COLLECTABLE_SQUARE_IMAGE_TOLERANCE_PX
+        ):
             raise ValidationError(
                 _("%s is not a square image") % image, code="square-image"
             )
