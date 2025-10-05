@@ -55,7 +55,7 @@
     <h2>{% translate "Collections" %}</h2>
     <ul class="as-columns">
         {% for tag in tag_list %}
-            <li>
+            <li class="tag size-group-{{ tag.size_group }}">
                 <a href="{% url "collectable:collection" tag.slug %}">{{ tag.name }}</a> ({{ tag.ncollectable }})
             </li>
         {% empty %}

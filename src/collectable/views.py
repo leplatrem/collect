@@ -22,6 +22,14 @@ def index(request):
         .order_by("-ncollectable")
         .filter(ncollectable__gt=0)
     )
+    # Add a size group for styling.
+    max_count = max((t.ncollectable for t in tag_list), default=0)
+    group_count = 10
+    group_size = max_count // group_count if max_count >= group_count else 1
+    for t in tag_list:
+        t.size_group = min(t.ncollectable // group_size + 1, group_count)
+
+    # Get all collectables, with counts and possessions for the current user.
     qs = Collectable.objects.with_counts_and_possessions(request.user)
 
     context = {

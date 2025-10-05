@@ -422,3 +422,34 @@ section#related {
     transform: translateY(-6px);
   }
 }
+
+.tag.size-group-1 {
+  font-size: 1rem;
+}
+.tag.size-group-2 {
+  font-size: 1.2rem;
+}
+.tag.size-group-3 {
+  font-size: 1.4rem;
+}
+.tag.size-group-4 {
+  font-size: 1.6rem;
+}
+.tag.size-group-5 {
+  font-size: 1.8rem;
+}
+.tag.size-group-6 {
+  font-size: 1.9rem;
+}
+.tag.size-group-7 {
+  font-size: 1.95rem;
+}
+.tag.size-group-8 {
+  font-size: 1.975rem;
+}
+.tag.size-group-9 {
+  font-size: 1.99rem;
+}
+.tag.size-group-10 {
+  font-size: 2rem;
+}
