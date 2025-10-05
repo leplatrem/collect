@@ -65,6 +65,7 @@
                 <p>
                     <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
                 </p>
-            {% endif %}
-        </section>
-    {% endblock %}
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}
