@@ -23,10 +23,10 @@ def index(request):
     tag_list = (
         Tag.objects.annotate(ncollectable=Count("collectable"))
         .order_by("-ncollectable")
-        .filter(ncollectable__gt=0)
+        .filter(ncollectable__gt=1)
     )
-    # Add a size group for styling.
-    max_count = max((t.ncollectable for t in tag_list), default=0)
+    # Add a size group for styling. Skip the biggest one.
+    max_count = tag_list[1].ncollectable if len(tag_list) > 1 else 1
     group_count = 10
     group_size = max_count // group_count if max_count >= group_count else 1
     for t in tag_list:
