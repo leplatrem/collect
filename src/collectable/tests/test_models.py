@@ -102,8 +102,8 @@ def test_computed_tags_signal(collectable):
 
 def test_hidden_collectable_is_not_in_default_manager(db, user):
     CollectableFactory(hidden=True)
-    assert Collectable.objects.count() == 1
-    assert Collectable.objects.with_counts_and_possessions(user).count() == 0
+    assert Collectable.objects.count() == 0
+    assert Collectable.all_objects.count() == 1
 
 
 def test_duplicate_report_confirm(duplicate_report):

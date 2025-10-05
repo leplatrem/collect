@@ -95,6 +95,9 @@ class CollectableQuerySet(models.QuerySet):
             ),
         )
 
+    def prefetch_tags_and_possessions(self, user):
+        return self.with_tags().for_user(user)
+
 
 class CollectableManager(models.Manager):
     """
@@ -103,17 +106,18 @@ class CollectableManager(models.Manager):
     to models definitions.
     """
 
+    def __init__(self, *args, with_hidden=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.with_hidden = with_hidden
+
     def get_queryset(self):
-        return CollectableQuerySet(self.model, using=self._db)
+        qs = CollectableQuerySet(self.model, using=self._db)
+        if not self.with_hidden:
+            qs = qs.visible()
+        return qs
 
     def with_counts_and_possessions(self, user):
-        return (
-            self.get_queryset()
-            .visible()
-            .with_tags()
-            .for_user(user)
-            .with_possession_counts()
-        )
+        return self.get_queryset().with_possession_counts().with_tags().for_user(user)
 
 
 class Collectable(models.Model):
@@ -164,6 +168,7 @@ class Collectable(models.Model):
     hidden = models.BooleanField(_("Hidden"), default=False)
 
     objects = CollectableManager()
+    all_objects = CollectableManager(with_hidden=True)
 
     @receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
     def on_tag_changed(sender, instance, created, **kwargs):

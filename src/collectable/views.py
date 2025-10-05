@@ -17,6 +17,8 @@ from collectable.models import Collectable, DuplicateReport, Possession
 
 
 def index(request):
+    # List of all tags with at least one collectable, ordered by
+    # number of collectables.
     tag_list = (
         Tag.objects.annotate(ncollectable=Count("collectable"))
         .order_by("-ncollectable")
@@ -29,21 +31,39 @@ def index(request):
     for t in tag_list:
         t.size_group = min(t.ncollectable // group_size + 1, group_count)
 
-    # Get all collectables, with counts and possessions for the current user.
-    qs = Collectable.objects.with_counts_and_possessions(request.user)
+    # Get all collectables, with tags, possessions counts, and possessions
+    # for the current user.
+    # Since we use `prefetch_related()` for possessions and tags, we first have
+    # to query the IDs of the collectables we want to show.
+    # https://docs.djangoproject.com/en/stable/ref/models/querysets/#when-querysets-are-evaluated
+    base_qs = Collectable.objects.only("id").with_possession_counts()
+    querysets = {
+        "latest": base_qs.order_by("-created_at")[: settings.HOME_LIST_COUNT],
+        "most_liked": base_qs.order_by("-nlikes").filter(nlikes__gt=0)[
+            : settings.HOME_LIST_COUNT
+        ],
+        "most_wanted": base_qs.order_by("-nwants").filter(nwants__gt=0)[
+            : settings.HOME_LIST_COUNT
+        ],
+        "most_owned": base_qs.order_by("-nowns").filter(nowns__gt=0)[
+            : settings.HOME_LIST_COUNT
+        ],
+    }
 
     context = {
-        "total_collectables": len(qs),
-        "latest": qs.order_by("-created_at")[: settings.HOME_LIST_COUNT],
-        "most_liked": qs.order_by("-nlikes").filter(nlikes__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
-        "most_wanted": qs.order_by("-nwants").filter(nwants__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
-        "most_owned": qs.order_by("-nowns").filter(nowns__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
+        "total_collectables": Collectable.objects.count(),
+        "latest": Collectable.objects.filter(pk__in=querysets["latest"])
+        .with_possession_counts()
+        .prefetch_tags_and_possessions(request.user),
+        "most_liked": Collectable.objects.filter(pk__in=querysets["most_liked"])
+        .with_possession_counts()
+        .prefetch_tags_and_possessions(request.user),
+        "most_wanted": Collectable.objects.filter(pk__in=querysets["most_wanted"])
+        .with_possession_counts()
+        .prefetch_tags_and_possessions(request.user),
+        "most_owned": Collectable.objects.filter(pk__in=querysets["most_owned"])
+        .with_possession_counts()
+        .prefetch_tags_and_possessions(request.user),
         "tag_list": tag_list,
     }
     return render(request, "collectable/index.html", context)
@@ -184,7 +204,7 @@ def duplicate(request, id):
     If GET, show the original collectable it is a duplicate of.
     """
     # Note: hidden collectable won't be 404.
-    collectable = get_object_or_404(Collectable, id=id)
+    collectable = get_object_or_404(Collectable.all_objects.all(), id=id)
 
     if request.method == "GET":
         # Check that this collectable is indeed reported as duplicate.
