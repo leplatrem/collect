@@ -115,13 +115,15 @@ def test_duplicate_report_confirm(duplicate_report):
         collectable=duplicate_report.duplicate,
         owns=True,
         likes=True,
+        wants=False,
     )
     duplicate_report.original.tags.add("tag2", "tag4", "tag5")
     duplicate_report.original.description = "Hola"
     duplicate_report.original.save()
 
     assert len(duplicate_report.confirmations()) == 0
-    assert "duplicate" in duplicate_report.duplicate.tags.names()
+    dup = Collectable.objects.get(id=duplicate_report.duplicate.id)
+    assert "duplicate" in dup.tags.names()
 
     # Create a report from another user.
     DuplicateReportFactory(
@@ -144,7 +146,12 @@ def test_duplicate_report_confirm(duplicate_report):
     # Now the duplicate should be hidden.
     assert duplicate_report.duplicate.hidden
     # And original merged.
-    assert duplicate_report.original.tags.count() == 5
+    assert set(duplicate_report.original.tags.names()) == {
+        "tag1",
+        "tag2",
+        "tag4",
+        "tag5",
+    }
     assert "Hola\n---\nCoucou" in duplicate_report.original.description
     # The reporter should now own and like the original.
     possessed = Collectable.objects.with_counts_and_possessions(

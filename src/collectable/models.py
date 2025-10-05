@@ -314,6 +314,7 @@ class Collectable(models.Model):
             self.save(update_fields=["hidden"])
         # Merge tags
         original.tags.add(*self.tags.all())
+        original.tags.remove("duplicate")  # Remove the duplicate tag if present
         # Merge descriptions
         original.description = original.description + "\n---\n" + self.description
         original.save(update_fields=["description"])
