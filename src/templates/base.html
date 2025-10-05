@@ -24,7 +24,8 @@
                 <a href="{% url 'collectable:profile' %}">{{ user }}</a>
                 <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
             {% endif %}
-            <form hx-get="{% url 'collectable:search' %}"
+            <form id="search"
+                  hx-get="{% url 'collectable:search' %}"
                   class="inline"
                   hx-target="main"
                   hx-select="main"
@@ -45,7 +46,7 @@
                 <a href="{% url 'auth:login' %}">{% translate "Log In" %}</a>
             {% endif %}
         </header>
-        <main>
+        <main class="{{ view_name_classlist }}">
             <ul id="messages">
                 {% for message in messages %}
                     <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{ message }}</li>

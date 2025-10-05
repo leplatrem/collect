@@ -35,7 +35,7 @@ class PossessionForm(ModelForm):
 class DuplicateReportForm(ModelForm):
     original_input = CharField(
         label=_("Original"),
-        widget=TextInput(attrs={"placeholder": _("ID or URL of the object")}),
+        widget=TextInput(attrs={"placeholder": _("ID or URL of the original")}),
     )
 
     class Meta:

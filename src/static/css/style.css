@@ -66,10 +66,6 @@ body {
   padding: 0;
 }
 
-header a {
-  margin-right: 15px;
-}
-
 a,
 a:visited {
   color: var(--link-color);
@@ -83,6 +79,18 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-around;
+}
+
+header a {
+  margin-right: 15px;
+}
+
+header form#search {
+  flex-grow: 1;
+}
+
+.htmx-request {
+  opacity: 0.6;
 }
 
 footer {
@@ -171,6 +179,14 @@ button.link {
   display: none;
 }
 
+#report-duplicate form div {
+  display: inline;
+}
+
+#report-duplicate form button {
+  margin-top: 0;
+}
+
 a.more {
   font-size: 1.25rem;
   font-weight: 600;
@@ -257,26 +273,79 @@ a.more::before {
 }
 
 main {
-    padding-top: 0;
+  padding-top: 0;
 }
 
-main h1:first-of-type {
+main.collectable.details {
+  display: grid;
+  grid-template-columns: 1fr 6fr 6fr 1fr;
+  column-gap: 1.5rem;
+  grid-template-areas:
+    "title title title title "
+    "prev  image attrs next"
+    ".  image repdup ."
+    ".     possession .  ."
+    ".     related related ."
+    ".     dup dup ."
+    ".    history history .";
+}
+
+main.collectable.details h1 {
+  grid-area: title;
   margin-top: 0;
 }
+main.collectable.details #photo {
+  grid-area: image;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px var(--card-shadow);
+  border: 1px solid var(--card-border);
+}
+main.collectable.details #attributes {
+  grid-area: attrs;
+}
+main.collectable.details #possession {
+  grid-area: possession;
+}
+main.collectable.details .navigation.previous {
+  grid-area: prev;
+}
+main.collectable.details .navigation.next {
+  grid-area: next;
+}
+main.collectable.details #report-duplicate {
+  grid-area: repdup;
+  align-self: end;
+}
+main.collectable.details #history {
+  grid-area: history;
+}
+main.collectable.details #duplicates {
+  grid-area: dup;
+}
+main.collectable.details #related {
+  grid-area: related;
+}
 
-section#attributes,
-section#possession {
-  width: 50%;
+main.collectable.duplicate #attributes {
+  margin-left: 3rem;
+}
+
+.navigation .hint {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  font-style: italic;
+  opacity: 0.7;
+  margin-top: 0.25rem;
 }
 
 section#attributes input[type="text"],
 section#attributes textarea {
   width: 95%;
-}
-
-section#history ul {
-  max-height: 10em;
-  overflow-y: auto;
 }
 
 section#related {
@@ -362,8 +431,8 @@ section#related {
 }
 
 #messages li.success {
-  border-left: 4px solid var(--link-color);
-  background-color: color-mix(in srgb, var(--link-color) 50%, var(--card-bg));
+  border-left: 4px solid rgb(0, 152, 0);
+  background-color: color-mix(in srgb, rgb(0, 152, 0) 20%, var(--card-bg));
 }
 
 #messages li.info {
@@ -373,7 +442,7 @@ section#related {
 
 #messages li.warning {
   border-left: 4px solid #d4a017;
-  background-color: color-mix(in srgb, #d4a017 10%, var(--card-bg));
+  background-color: color-mix(in srgb, #d4a017 20%, var(--card-bg));
 }
 
 #messages li.error {

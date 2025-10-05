@@ -143,7 +143,7 @@ def create(request):
             Possession.objects.create(
                 user=request.user, collectable=collectable, owns=True
             )
-            messages.info(request, _("Collectable created successfully."))
+            messages.success(request, _("Collectable created successfully."))
             return redirect(collectable)
         else:
             messages.warning(request, _("Invalid fields, please correct them."))
@@ -178,7 +178,7 @@ def details(request, id):
         backup_photo = collectable.photo
         if form.is_valid():
             collectable = form.save()
-            messages.info(request, _("Collectable updated successfully."))
+            messages.success(request, _("Collectable updated successfully."))
         else:
             messages.warning(request, _("Invalid fields, please correct them."))
             # Why `is_valid()` is altering `collectable.photo`??
@@ -203,8 +203,14 @@ def details(request, id):
         if index < len(collectable_list) - 1:
             next_in_list = Collectable.objects.get(id=collectable_list[index + 1])
     else:
-        previous_in_list = collectable.get_previous_by_created_at()
-        next_in_list = collectable.get_next_by_created_at()
+        try:
+            previous_in_list = collectable.get_previous_by_created_at()
+        except Collectable.DoesNotExist:
+            previous_in_list = None
+        try:
+            next_in_list = collectable.get_next_by_created_at()
+        except Collectable.DoesNotExist:
+            next_in_list = None
 
     context = {
         "collectable": collectable,
@@ -276,7 +282,7 @@ def duplicate(request, id):
 
         # Save the report!
         form.save()
-        messages.info(request, _("Duplicate reported! Thank you!"))
+        messages.success(request, _("Duplicate reported! Thank you!"))
         # On success, we fill the page with the duplicate details.
         headers["HX-Retarget"] = "main"
         headers["HX-Reselect"] = "main"

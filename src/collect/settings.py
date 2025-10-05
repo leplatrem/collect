@@ -88,6 +88,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "collect.context_processors.constants",
+                "collect.context_processors.view_name_classlist",
             ]
             + (["django.template.context_processors.debug"] if DEBUG else [])
             + [

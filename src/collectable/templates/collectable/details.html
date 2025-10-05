@@ -17,31 +17,18 @@
 {% endblock head %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
-    {% if previous_in_list %}
-        <div class="nav-previous">
-            <a href="{{ previous_in_list.get_absolute_url }}"
-               hx-trigger="click, keyup[keyCode==219] from:window"
-               hx-get="{{ previous_in_list.get_absolute_url }}"
-               hx-target="main"
-               hx-select="main"
-               hx-push-url="true"
-               hx-swap="outerHTML show:window:top"
-               title="{{ previous_in_list }}">{% translate "Previous" %}</a>
-            <span>
-            {% translate "Press <kbd>[</kbd> to navigate to previous" %}</span>
-        </div>
-    {% endif %}
+    <img id="photo"
+         alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
+         height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+         width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+         src="{{ collectable.photo.url }}" />
     <section id="attributes">
-        <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
-             height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-             width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-             src="{{ collectable.photo.url }}" />
         {% if user.is_authenticated %}
             <form hx-encoding='multipart/form-data'
                   hx-post="{% url 'collectable:details' collectable.id %}"
                   hx-select="#attributes"
-                  hx-select-oob="#messages,#history,#related"
                   hx-target="#attributes"
+                  hx-select-oob="#messages,#photo,#history,#related"
                   hx-trigger="submit, keyup[keyCode==13] from:input"
                   hx-swap="outerHTML">
                 {{ form_edit }}
@@ -64,22 +51,9 @@
         {% endif %}
         {% user_possession_form collectable %}
     </section>
-    {% if next_in_list %}
-        <div class="nav-next">
-            <a href="{{ next_in_list.get_absolute_url }}"
-               hx-trigger="click, keyup[keyCode==221] from:window"
-               hx-get="{{ next_in_list.get_absolute_url }}"
-               hx-target="main"
-               hx-select="main"
-               hx-push-url="true"
-               hx-swap="outerHTML show:window:top"
-               title="{{ next_in_list }}">{% translate "Next" %}</a>
-            <span>{% translate "Press <kbd>]</kbd> to navigate to next" %}</span>
-        </div>
-    {% endif %}
     {% if user.is_authenticated %}
         <section id="report-duplicate">
-            <h2>{% translate "Report duplicate" %}</h2>
+            <h2>{% translate "This collectable is a duplicate?" %}</h2>
             <p>{% translate "If you think this collectable is a duplicate of another one, please report it." %}</p>
             <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
                   hx-select="#report-duplicate form"
@@ -146,13 +120,40 @@
     {% if duplicates %}
         <section id="duplicates">
             <h2>{% translate "Duplicates" %}</h2>
-            <p>{% translate "This collectable has been reported as the original version of the following collectables:" %}</p>
+            <p>{% translate "The following collectables have been reported as duplicates of this one:" %}</p>
             <div class="collectable-grid">
                 {% for duplicate in duplicates %}
                     {% include "collectable/collectable_thumbnail.html" with collectable=duplicate %}
                 {% endfor %}
             </div>
         </section>
+    {% endif %}
+    {% if previous_in_list %}
+        <div class="navigation previous">
+            <a href="{{ previous_in_list.get_absolute_url }}"
+               hx-trigger="click, keyup[keyCode==219] from:window"
+               hx-get="{{ previous_in_list.get_absolute_url }}"
+               hx-target="main"
+               hx-select="main"
+               hx-push-url="true"
+               hx-swap="outerHTML show:window:top"
+               title="{{ previous_in_list }}">{% translate "Previous" %}</a>
+            <span class="hint">
+            {% translate "Press <kbd>[</kbd> to navigate to previous" %}</span>
+        </div>
+    {% endif %}
+    {% if next_in_list %}
+        <div class="navigation next">
+            <a href="{{ next_in_list.get_absolute_url }}"
+               hx-trigger="click, keyup[keyCode==221] from:window"
+               hx-get="{{ next_in_list.get_absolute_url }}"
+               hx-target="main"
+               hx-select="main"
+               hx-push-url="true"
+               hx-swap="outerHTML show:window:top"
+               title="{{ next_in_list }}">{% translate "Next" %}</a>
+            <span class="hint">{% translate "Press <kbd>]</kbd> to navigate to next" %}</span>
+        </div>
     {% endif %}
 {% endblock %}
 {% block foot %}
