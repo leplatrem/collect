@@ -295,11 +295,10 @@ def duplicate(request, id):
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
         # User is cancelling their report.
-        try:
-            report = DuplicateReport.objects.get(
-                reporter=request.user, duplicate=collectable
-            )
-        except DuplicateReport.DoesNotExist:
+        report = DuplicateReport.objects.filter(
+            reporter=request.user, duplicate=collectable
+        ).first()
+        if not report:
             messages.warning(request, _("You have not reported this duplicate."))
             return HttpResponse(_("Not Found"), status=404)
         report.delete()
