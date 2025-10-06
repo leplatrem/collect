@@ -183,10 +183,6 @@ button.link {
   display: inline;
 }
 
-#report-duplicate form button {
-  margin-top: 0;
-}
-
 a.more {
   font-size: 1.25rem;
   font-weight: 600;
@@ -276,62 +272,29 @@ main {
   padding-top: 0;
 }
 
-main.collectable.details {
+main.collectable.details,
+main.collectable.duplicate {
   display: grid;
   grid-template-columns: 1fr 6fr 6fr 1fr;
   column-gap: 1.5rem;
-  grid-template-areas:
-    "title title title title "
-    "prev  image attrs next"
-    ".  image repdup ."
-    ".     possession .  ."
-    ".     related related ."
-    ".     dup dup ."
-    ".    history history .";
 }
 
-main.collectable.details h1 {
+main.collectable.details h1,
+main.collectable.duplicate h1 {
   grid-area: title;
   margin-top: 0;
 }
-main.collectable.details #photo {
-  grid-area: image;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px var(--card-shadow);
-  border: 1px solid var(--card-border);
-}
-main.collectable.details #attributes {
+main.collectable.details #attributes,
+main.collectable.duplicate #attributes {
   grid-area: attrs;
 }
-main.collectable.details #possession {
-  grid-area: possession;
-}
-main.collectable.details .navigation.previous {
+main.collectable.details .navigation.previous,
+main.collectable.duplicate .navigation.previous {
   grid-area: prev;
 }
-main.collectable.details .navigation.next {
+main.collectable.details .navigation.next,
+main.collectable.duplicate .navigation.next {
   grid-area: next;
-}
-main.collectable.details #report-duplicate {
-  grid-area: repdup;
-  align-self: end;
-}
-main.collectable.details #history {
-  grid-area: history;
-}
-main.collectable.details #duplicates {
-  grid-area: dup;
-}
-main.collectable.details #related {
-  grid-area: related;
-}
-
-main.collectable.duplicate #attributes {
-  margin-left: 3rem;
 }
 
 .navigation .hint {
@@ -343,9 +306,65 @@ main.collectable.duplicate #attributes {
   margin-top: 0.25rem;
 }
 
-section#attributes input[type="text"],
-section#attributes textarea {
+main.collectable.details {
+  grid-template-areas:
+    "title title title title "
+    "prev  image attrs next"
+    ".  image repdup ."
+    ".     possession .  ."
+    ".     related related ."
+    ".     dup dup ."
+    ".    history history .";
+}
+
+main.collectable.details #photo {
+  grid-area: image;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px var(--card-shadow);
+  border: 1px solid var(--card-border);
+}
+main.collectable.details #possession {
+  grid-area: possession;
+}
+main.collectable.details #report-duplicate {
+  grid-area: repdup;
+  align-self: end;
+}
+main.collectable.details #report-duplicate form button {
+  margin-top: 0;
+}
+main.collectable.details #history {
+  grid-area: history;
+}
+main.collectable.details #duplicates {
+  grid-area: dup;
+}
+main.collectable.details #related {
+  grid-area: related;
+}
+main.collectable.details #attributes input[type="text"],
+main.collectable.details #attributes textarea {
   width: 95%;
+}
+
+main.collectable.duplicate {
+  grid-template-areas:
+    "title title title title "
+    "prev attrs confirm next";
+}
+main.collectable.duplicate h1 {
+  grid-area: title;
+  margin-top: 0;
+}
+main.collectable.duplicate #attributes {
+  justify-self: center;
+}
+main.collectable.duplicate #confirm {
+  justify-self: confirm;
 }
 
 section#related {

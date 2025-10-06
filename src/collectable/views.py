@@ -102,12 +102,7 @@ class CollectableListView(ListView):
                 self.search_keywords.split(" ")[: settings.MAX_SEARCH_KEYWORDS]
             )
 
-        # Store the current list in session, for easy navigation in details view.
-        # We store only the IDs, as strings, to be JSON serializable.
-        self.request.session["collectable_list"] = [
-            str(id) for id in qs.values_list("id", flat=True)
-        ]
-        self.request.session.modified = True
+        store_current_list_in_session(self.request, qs)
 
         return qs
 
@@ -156,6 +151,20 @@ def create(request):
     return render(request, "collectable/create.html", context)
 
 
+def store_current_list_in_session(request, qs: QuerySet[Collectable]):
+    """
+    Store the current list of collectable IDs in session, for easy navigation
+    between previous and next in details view.
+    We only store the first 1000 IDs to avoid bloating the session.
+    """
+    # Store the current list in session, for easy navigation in details view.
+    # We store only the IDs, as strings, to be JSON serializable.
+    request.session["collectable_list"] = [
+        str(id_) for id_ in qs.values_list("id", flat=True)[:1000]
+    ]
+    request.session.modified = True
+
+
 def adjacent_in_list(request, collectable):
     """
     Previous and next collectable in list, for easy navigation.
@@ -164,21 +173,23 @@ def adjacent_in_list(request, collectable):
     """
     if "collectable_list" in request.session:
         collectable_list = request.session["collectable_list"]
+        if len(collectable_list) < 2:
+            return None, None
         try:
             index = collectable_list.index(str(collectable.id))
-            previous_in_list = (
-                Collectable.objects.get(id=collectable_list[index - 1])
-                if index > 0
-                else None
-            )
-            next_in_list = (
-                Collectable.objects.get(id=collectable_list[index + 1])
-                if index < len(collectable_list) - 1
-                else None
-            )
-            return previous_in_list, next_in_list
         except ValueError:
-            pass
+            index = None
+        if index is not None:
+            previous_id = (
+                collectable_list[index - 1] if index > 0 else collectable_list[-1]
+            )
+            next_id = collectable_list[(index + 1) % len(collectable_list)]
+            try:
+                previous_in_list = Collectable.objects.get(id=previous_id)
+                next_in_list = Collectable.objects.get(id=next_id)
+                return previous_in_list, next_in_list
+            except Collectable.DoesNotExist:
+                pass
     # Not found in list, fallback to full list.
     try:
         previous_in_list = collectable.get_previous_by_created_at()
@@ -342,6 +353,11 @@ def duplicate(request, id):
     already_reported = request.user.is_authenticated and request.user.username in {
         r.reporter.username for r in reports
     }
+    missing_confirmations = settings.DUPLICATE_CONFIRMATION_THRESHOLD - (
+        len(reports) - 1
+    )
+
+    previous_in_list, next_in_list = adjacent_in_list(request, collectable)
 
     context = {
         "form": form,
@@ -349,8 +365,9 @@ def duplicate(request, id):
         "collectable": collectable,
         "original": original,
         "reports": reports,
-        "missing_confirmations": settings.DUPLICATE_CONFIRMATION_THRESHOLD
-        - (len(reports) - 1),
+        "missing_confirmations": missing_confirmations,
+        "next_in_list": next_in_list,
+        "previous_in_list": previous_in_list,
     }
     response = render(request, "collectable/details_duplicate.html", context)
     for k, v in headers.items():
@@ -415,6 +432,8 @@ def collection(request, slugs):
         .order_by("-ncollectable")
         .filter(ncollectable__gt=1)
     )
+
+    store_current_list_in_session(request, collectable_list)
 
     context = {
         "slugs": slugs,

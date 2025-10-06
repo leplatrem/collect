@@ -66,31 +66,33 @@
             </form>
         </section>
     {% endif %}
-    <section id="history">
-        <h2>{% translate "History" %}</h2>
-        <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
-        <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
-        <ul>
-            {% for record in collectable.history_with_deltas %}
-                <li>
-                    {{ record.history_date }}:
-                    {% blocktranslate with action=record.get_history_type_display user=record.history_user %}
+    {% if user.is_authenticated %}
+        <section id="history">
+            <h2>{% translate "History" %}</h2>
+            <p>{% blocktranslate with date=collectable.created_at %}Created at {{ date }}{% endblocktranslate %}</p>
+            <p>{% blocktranslate with date=collectable.modified_at %}Last modified at {{ date }}{% endblocktranslate %}</p>
+            <ul>
+                {% for record in collectable.history_with_deltas %}
+                    <li>
+                        {{ record.history_date }}:
+                        {% blocktranslate with action=record.get_history_type_display user=record.history_user %}
                         {{ action }} by {{ user }}
                     {% endblocktranslate %}
-                    {% if record.history_delta_changes %}
-                        <ul>
-                            {% for change in record.history_delta_changes %}
-                                <li>
-                                    <strong>{{ change.field }}:</strong>
-                                    {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </section>
+                        {% if record.history_delta_changes %}
+                            <ul>
+                                {% for change in record.history_delta_changes %}
+                                    <li>
+                                        <strong>{{ change.field }}:</strong>
+                                        {{ change.old }}&nbsp;→&nbsp;&nbsp;{{ change.new }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
     <section id="related">
         <h2>{% translate "Similar collectables" %}</h2>
         <p>
@@ -128,33 +130,7 @@
             </div>
         </section>
     {% endif %}
-    {% if previous_in_list %}
-        <div class="navigation previous">
-            <a href="{{ previous_in_list.get_absolute_url }}"
-               hx-trigger="click, keyup[keyCode==219] from:window"
-               hx-get="{{ previous_in_list.get_absolute_url }}"
-               hx-target="main"
-               hx-select="main"
-               hx-push-url="true"
-               hx-swap="outerHTML show:window:top"
-               title="{{ previous_in_list }}">{% translate "Previous" %}</a>
-            <span class="hint">
-            {% translate "Press <kbd>[</kbd> to navigate to previous" %}</span>
-        </div>
-    {% endif %}
-    {% if next_in_list %}
-        <div class="navigation next">
-            <a href="{{ next_in_list.get_absolute_url }}"
-               hx-trigger="click, keyup[keyCode==221] from:window"
-               hx-get="{{ next_in_list.get_absolute_url }}"
-               hx-target="main"
-               hx-select="main"
-               hx-push-url="true"
-               hx-swap="outerHTML show:window:top"
-               title="{{ next_in_list }}">{% translate "Next" %}</a>
-            <span class="hint">{% translate "Press <kbd>]</kbd> to navigate to next" %}</span>
-        </div>
-    {% endif %}
+    {% include "collectable/keyboard_navigation.html" %}
 {% endblock %}
 {% block foot %}
     {{ form_edit.media.js }}

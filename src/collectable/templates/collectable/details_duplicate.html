@@ -37,6 +37,8 @@
                     {% endfor %}
                 </ul>
             </p>
+        </section>
+        <section id="confirm">
             <p>
                 {% if user.is_authenticated %}
                     {% if already_reported %}
@@ -68,4 +70,5 @@
             </p>
         {% endif %}
     </section>
+    {% include "collectable/keyboard_navigation.html" %}
 {% endblock %}

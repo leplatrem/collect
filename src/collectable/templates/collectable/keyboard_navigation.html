@@ -1,0 +1,28 @@
+{% load i18n %}
+{% if previous_in_list %}
+    <div class="navigation previous">
+        <a href="{{ previous_in_list.get_absolute_url }}"
+           hx-trigger="click, keyup[keyCode==219] from:window"
+           hx-get="{{ previous_in_list.get_absolute_url }}"
+           hx-target="main"
+           hx-select="main"
+           hx-push-url="true"
+           hx-swap="outerHTML show:window:top"
+           title="{{ previous_in_list }}">{% translate "Previous" %}</a>
+        <span class="hint">
+        {% translate "Press <kbd>[</kbd> to navigate to previous" %}</span>
+    </div>
+{% endif %}
+{% if next_in_list %}
+    <div class="navigation next">
+        <a href="{{ next_in_list.get_absolute_url }}"
+           hx-trigger="click, keyup[keyCode==221] from:window"
+           hx-get="{{ next_in_list.get_absolute_url }}"
+           hx-target="main"
+           hx-select="main"
+           hx-push-url="true"
+           hx-swap="outerHTML show:window:top"
+           title="{{ next_in_list }}">{% translate "Next" %}</a>
+        <span class="hint">{% translate "Press <kbd>]</kbd> to navigate to next" %}</span>
+    </div>
+{% endif %}
