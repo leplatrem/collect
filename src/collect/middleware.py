@@ -44,3 +44,29 @@ class HealthCheckMiddleware:
             logger.exception(exc)
             return HttpResponseServerError("db: cannot connect to database.")
         return JsonResponse({"status": "ok"})
+
+class AnonymousOnlyCacheMiddleware:
+    """
+    Middleware that ensures Django's per-site cache only applies
+    to anonymous users (not authenticated ones).
+
+    Works when placed between:
+        - UpdateCacheMiddleware (writes)
+        - FetchFromCacheMiddleware (reads)
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # If user is authenticated, skip cache entirely
+        if hasattr(request, "user") and request.user.is_authenticated:
+            # Disable the cache update process
+            request._cache_update_cache = False
+            return self.get_response(request)
+
+        # Let FetchFromCacheMiddleware serve cached responses
+        response = self.get_response(request)
+
+        # Let UpdateCacheMiddleware cache the response if it’s cacheable
+        return response

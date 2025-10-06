@@ -60,7 +60,11 @@ if DEBUG_TOOLBAR_ENABLED:
 
 MIDDLEWARE = [
     "collect.middleware.HealthCheckMiddleware",
+    'django.middleware.cache.UpdateCacheMiddleware',  # writes cache
+    'collect.middleware.AnonymousOnlyCacheMiddleware',  # serve cache to anonymous
+    'django.middleware.cache.FetchFromCacheMiddleware',  # reads cache
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -112,6 +116,16 @@ DATABASES = {
         default="sqlite:///" + str(BASE_DIR / "db.sqlite3"),
         cast=db_url,
     )
+}
+
+# Cache
+# https://docs.djangoproject.com/en/5.1/topics/cache/
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+        "TIMEOUT": config("COLLECT_CACHE_TIMEOUT_SECONDS", default=600, cast=int),  # default 10 minutes
+    }
 }
 
 
