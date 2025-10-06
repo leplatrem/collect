@@ -13,6 +13,7 @@
   overflow: hidden;
   background: #fff;
   position: relative;
+  cursor: move;
 }
 
 .square-cropper-widget .crop-area canvas {

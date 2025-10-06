@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("htmx:load", () => {
   const CANVAS_SIZE_PIXELS = 400;
   const BACKGROUND_COLOR = "#fff";
 
