@@ -397,39 +397,45 @@ def possession(request, id):
 
 
 def collection(request, slugs):
-    slugs = slugs.split(",")
+    slugs = [s for s in slugs.split(",") if s]  # drop empties
+
+    collectable_list = (
+        Collectable.objects.with_all_tags(slugs)
+        .with_counts_and_possessions(request.user)
+        .order_by("-created_at")
+    )
+
+    total = collectable_list.count()
+
+    # Count how many are owned by the current user.
+    total_owned = (
+        Possession.objects.filter(
+            user=request.user, owns=True, collectable__in=collectable_list
+        )
+        .values("collectable_id")
+        .distinct()
+        .count()
+    )
+
+    # Tags user asked for (with count of collectables per tag)
     tag_list = list(
-        Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
+        Tag.objects.filter(slug__in=slugs).annotate(
+            ncollectable=Count("collectable", distinct=True)
+        )
     )
-
-    collectable_list = Collectable.objects.with_counts_and_possessions(
-        request.user
-    ).order_by("-created_at")
-
-    for slug in slugs:
-        collectable_list = collectable_list.filter(tags__slug=slug)
-
-    # Count how many are owned by the current user, taking advantage of prefetched
-    # data from above.
-    total_owned = sum(
-        1
-        for c in collectable_list
-        if getattr(c, "possession_set_list", []) and c.possession_set_list[0].owns
-    )
-
-    known_tag_slugs = [t.slug for t in tag_list]
+    # Keep unknown slugs visible as "virtual" tags without saving
+    known_tag_slugs = {t.slug for t in tag_list}
     for slug in slugs:
         if slug not in known_tag_slugs:
-            tag_list.append(Tag(name=slug, slug=slug))  # Don't save.
+            tag_list.append(Tag(name=slug, slug=slug))  # unsaved placeholder
 
+    # Related tags among the currently matched collectables
     reltag_list = (
-        Tag.objects.filter(
-            collectable__id__in=collectable_list.values_list("id", flat=True)
-        )
+        Tag.objects.filter(collectable__in=collectable_list)
         .exclude(slug__in=slugs)
-        .annotate(ncollectable=Count("collectable"))
-        .order_by("-ncollectable")
+        .annotate(ncollectable=Count("collectable", distinct=True))
         .filter(ncollectable__gt=1)
+        .order_by("-ncollectable")
     )
 
     store_current_list_in_session(request, collectable_list)
@@ -437,11 +443,13 @@ def collection(request, slugs):
     context = {
         "slugs": slugs,
         "collectable_list": collectable_list,
-        "page_obj": paginate(request, qs=collectable_list),
+        "page_obj": paginate(
+            request, qs=collectable_list
+        ),  # pagination still uses the qs
         "tag_list": tag_list,
         "reltag_list": reltag_list,
         "total_owned": total_owned,
-        "percent_owned": 100 * total_owned / max(len(collectable_list), 1),
+        "percent_owned": (100 * total_owned / total) if total else 0,
     }
     return render(request, "collectable/collection.html", context)
 

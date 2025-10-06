@@ -130,6 +130,23 @@ class CollectableQuerySet(models.QuerySet):
 
         return self.filter(query).distinct()
 
+    def with_all_tags(self, slugs):
+        """
+        Filter the queryset to include only collectables that have all the given tags.
+        """
+        return (
+            self.filter(tags__slug__in=slugs)
+            .annotate(
+                tag_match_count=Count(
+                    "tags__slug",
+                    filter=Q(tags__slug__in=slugs),
+                    distinct=True,
+                )
+            )
+            .filter(tag_match_count=len(slugs))
+            .distinct()
+        )
+
 
 class CollectableManager(models.Manager):
     """
