@@ -232,6 +232,9 @@ ALLOWED_HOSTS: list[str] = config(
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
+USE_X_FORWARDED_HOST = config(
+    "DJANGO_USE_X_FORWARDED_HOST", default=False if DEBUG else True, cast=bool
+)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = config(
