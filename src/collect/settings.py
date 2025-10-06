@@ -231,6 +231,9 @@ ALLOWED_HOSTS: list[str] = config(
     default="localhost",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = config(
     "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False, cast=bool
 )
