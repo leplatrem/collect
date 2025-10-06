@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 from taggit.models import Tag
 
 from collect.utils import paginate
@@ -255,123 +255,119 @@ def details(request, id):
     return render(request, "collectable/details.html", context)
 
 
-@require_http_methods(["GET", "POST", "DELETE"])
-def duplicate(request, id):
-    """
-    This collectable has been reported as a duplicate of another one.
+class DuplicateView(View):
+    template_name = "collectable/details_duplicate.html"
+    http_method_names = ["get", "post", "delete"]
 
-    If POST, user is reporting this collectable as a duplicate of another one.
-    If GET, show the original collectable it is a duplicate of.
-    """
-    # Note: hidden collectable won't be 404.
-    collectable = get_object_or_404(Collectable.all_objects.all(), id=id)
+    def get_object(self, id):
+        # Note: hidden collectable won't be 404.
+        return get_object_or_404(Collectable.all_objects, pk=id)
 
-    if request.method == "GET":
-        # Check that this collectable is indeed reported as duplicate.
-        if duplicate_report := collectable.reports_as_duplicate.first():
-            # If this collectable was hidden, then redirect to the original.
-            # If the original is hidden, then it will redirect in chain.
-            if collectable.hidden:
-                messages.info(
-                    request,
-                    _(
-                        "This collectable has been hidden as it was reported as a duplicate. "
-                        "You are being redirected to the original."
-                    ),
-                )
-                return redirect(
-                    "collectable:duplicate", id=duplicate_report.original.id
-                )
-        else:
+    def get(self, request, id):
+        collectable = self.get_object(id)
+
+        duplicate_report = collectable.reports_as_duplicate.first()
+        if not duplicate_report:
             messages.info(
                 request, _("This collectable has not been reported as duplicate.")
             )
             return redirect("collectable:details", id=collectable.id)
 
-    headers = {}
+        # If the duplicate (this) was hidden, redirect to the original (which may cascade).
+        if collectable.hidden:
+            messages.info(
+                request,
+                _(
+                    "This collectable has been hidden as it was reported as a duplicate. "
+                    "You are being redirected to the original."
+                ),
+            )
+            return redirect("collectable:duplicate", id=duplicate_report.original_id)
 
-    # Handle duplicate report (or confirmation).
-    if request.method == "DELETE":
-        if not request.user.is_authenticated:
-            return HttpResponse(_("Unauthorized"), status=401)
-        # User is cancelling their report.
-        report = DuplicateReport.objects.filter(
-            reporter=request.user, duplicate=collectable
-        ).first()
-        if not report:
-            messages.warning(request, _("You have not reported this duplicate."))
-            return HttpResponse(_("Not Found"), status=404)
-        report.delete()
-        messages.success(request, _("Your duplicate report has been cancelled."))
-        response = HttpResponse(status=204)  # No content
-        response["HX-Redirect"] = reverse("collectable:details", args=[collectable.id])
-        return response
+        return self._render_details(request, collectable, duplicate_report.original_id)
 
-    if request.method == "POST":
+    def post(self, request, id):
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
 
-        # Original is posted in form.
+        collectable = self.get_object(id)
+
         form = DuplicateReportForm(request.POST)
         form.instance.duplicate = collectable
         form.instance.reporter = request.user
 
         if not form.is_valid():
             messages.warning(request, _("Invalid fields, please correct them."))
-            # Show invalid form.
             return render(
-                request,
-                "collectable/details_duplicate.html",
-                {"collectable": collectable, "form": form},
+                request, self.template_name, {"collectable": collectable, "form": form}
             )
 
-        # Save the report!
         form.save()
         messages.success(request, _("Duplicate reported! Thank you!"))
-        # On success, we fill the page with the duplicate details.
-        headers["HX-Retarget"] = "main"
-        headers["HX-Reselect"] = "main"
 
-    # Show the first original. Form was valid, and saved. There is
-    # at least the one we just created.
-    duplicate_report = collectable.reports_as_duplicate.first()
-    assert duplicate_report is not None
-    # We show the thumbnail with the possession form.
-    original = Collectable.objects.with_counts_and_possessions(request.user).get(
-        id=duplicate_report.original.id
-    )
+        # Re-render details with HTMX retarget/reselect.
+        response = self._render_details(request, collectable, form.instance.original_id)
+        response["HX-Retarget"] = "main"
+        response["HX-Reselect"] = "main"
+        return response
 
-    # The confirmation form will have the original pre-selected.
-    form = DuplicateReportForm(initial={"original_input": original.id})
-    form.fields["original_input"].widget = django_widgets.HiddenInput()
+    def delete(self, request, id):
+        if not request.user.is_authenticated:
+            return HttpResponse(_("Unauthorized"), status=401)
 
-    # Show details of who reported and when.
-    reports = DuplicateReport.objects.filter(
-        original=original, duplicate=collectable
-    ).select_related("reporter")
-    already_reported = request.user.is_authenticated and request.user.username in {
-        r.reporter.username for r in reports
-    }
-    missing_confirmations = settings.DUPLICATE_CONFIRMATION_THRESHOLD - (
-        len(reports) - 1
-    )
+        collectable = self.get_object(id)
+        report = DuplicateReport.objects.filter(
+            reporter=request.user, duplicate=collectable
+        ).first()
+        if not report:
+            messages.warning(request, _("You have not reported this duplicate."))
+            return HttpResponse(_("Not Found"), status=404)
 
-    previous_in_list, next_in_list = adjacent_in_list(request, collectable)
+        report.delete()
+        messages.success(request, _("Your duplicate report has been cancelled."))
+        response = HttpResponse(status=204)
+        response["HX-Redirect"] = reverse("collectable:details", args=[collectable.id])
+        return response
 
-    context = {
-        "form": form,
-        "already_reported": already_reported,
-        "collectable": collectable,
-        "original": original,
-        "reports": reports,
-        "missing_confirmations": missing_confirmations,
-        "next_in_list": next_in_list,
-        "previous_in_list": previous_in_list,
-    }
-    response = render(request, "collectable/details_duplicate.html", context)
-    for k, v in headers.items():
-        response.headers[k] = v
-    return response
+    # ---- helpers ---------------------------------------------------------
+
+    def _render_details(self, request, collectable, original_id):
+        # We show the thumbnail with the possession form, including counts.
+        original = Collectable.objects.with_counts_and_possessions(request.user).get(
+            id=original_id
+        )
+
+        # Preselect the original; keep the widget hidden.
+        form = DuplicateReportForm(initial={"original_input": original.id})
+        form.fields["original_input"].widget = django_widgets.HiddenInput()
+
+        reports_qs = DuplicateReport.objects.filter(
+            original=original, duplicate=collectable
+        ).select_related("reporter")
+
+        already_reported = (
+            request.user.is_authenticated
+            and reports_qs.filter(reporter=request.user).exists()
+        )
+
+        # Discount one to avoid counting the reporter themselves toward confirmations.
+        missing_confirmations = settings.DUPLICATE_CONFIRMATION_THRESHOLD - max(
+            0, reports_qs.count() - 1
+        )
+
+        previous_in_list, next_in_list = adjacent_in_list(request, collectable)
+
+        context = {
+            "form": form,
+            "already_reported": already_reported,
+            "collectable": collectable,
+            "original": original,
+            "reports": reports_qs,
+            "missing_confirmations": missing_confirmations,
+            "next_in_list": next_in_list,
+            "previous_in_list": previous_in_list,
+        }
+        return render(request, self.template_name, context)
 
 
 @require_http_methods(["POST"])
