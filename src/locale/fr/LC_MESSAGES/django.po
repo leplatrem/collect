@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-06 10:16+0200\n"
+"POT-Creation-Date: 2025-10-08 22:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,82 +124,89 @@ msgstr "%(total)s objets dans la base de données."
 msgid "%s collectables verified."
 msgstr "%s collectables vérifiés."
 
-#: src/collectable/models.py:43
+#: src/collectable/models.py:44
 msgid "Tag"
 msgstr "Étiquette"
 
-#: src/collectable/models.py:44 src/collectable/models.py:178
-#: src/collectable/models.py:186
+#: src/collectable/models.py:45 src/collectable/models.py:192
+#: src/collectable/models.py:200
 #: src/collectable/templates/collectable/details.html:40
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: src/collectable/models.py:161
+#: src/collectable/models.py:175
 msgid "Identifier"
 msgstr "Identifiant"
 
-#: src/collectable/models.py:164
+#: src/collectable/models.py:178
 msgid "Created at"
 msgstr "Créé le"
 
-#: src/collectable/models.py:166
+#: src/collectable/models.py:180
 msgid "Modified at"
 msgstr "Modifié le"
 
-#: src/collectable/models.py:167
+#: src/collectable/models.py:181
 #: src/collectable/templates/collectable/details.html:38
 msgid "Description"
 msgstr "Description"
 
-#: src/collectable/models.py:169
+#: src/collectable/models.py:183
 msgid "Photo"
 msgstr "Photo"
 
-#: src/collectable/models.py:171
+#: src/collectable/models.py:185
 msgid "Please provide a square JPEG image (.jpg, .jpeg)"
 msgstr "Veuillez fournir une image JPEG carrée (.jpg, .jpeg)"
 
-#: src/collectable/models.py:181
+#: src/collectable/models.py:195
 #: src/collectable/templates/collectable/details.html:71
 msgid "History"
 msgstr "Historique"
 
-#: src/collectable/models.py:200
+#: src/collectable/models.py:214
 msgid "Hidden"
 msgstr "Masqué"
 
-#: src/collectable/models.py:353
+#: src/collectable/models.py:367
 msgid "Collectable"
 msgstr "Objet"
 
-#: src/collectable/models.py:354
+#: src/collectable/models.py:368
 msgid "Collectables"
 msgstr "Objets"
 
-#: src/collectable/models.py:365
+#: src/collectable/models.py:379
 msgid "Likes"
 msgstr "Aime"
 
-#: src/collectable/models.py:366
+#: src/collectable/models.py:380
 msgid "Wants"
 msgstr "Recherche"
 
-#: src/collectable/models.py:367
+#: src/collectable/models.py:381
 msgid "Owns"
 msgstr "Possède"
 
-#: src/collectable/models.py:370
+#: src/collectable/models.py:384
 msgid "Possession"
 msgstr "Possession"
 
-#: src/collectable/models.py:371
+#: src/collectable/models.py:385
 #: src/collectable/templates/collectable/details.html:48
 msgid "Possessions"
 msgstr "Possessions"
 
-#: src/collectable/models.py:407
+#: src/collectable/models.py:421
 msgid "Reported at"
 msgstr "Signalé le"
+
+#: src/collectable/templates/collectable/collectable_list.html:8
+#, python-format
+msgid "%(counter)s collectable."
+msgid_plural "%(counter)s collectables."
+msgstr[0] "%(counter)s objet."
+msgstr[1] "%(counter)s objets."
 
 #: src/collectable/templates/collectable/collectable_thumbnail.html:6
 #: src/collectable/templates/collectable/details_duplicate.html:22
@@ -379,30 +386,14 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 #: src/collectable/templates/collectable/details_duplicate.html:63
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "                    %(missing)s more confirmation before merging the two "
-#| "collectables.\n"
-#| "                "
-#| msgid_plural ""
-#| "\n"
-#| "%(missing)s more confirmations before merging the two collectables."
-msgid ""
-"\n"
-"                    %(missing)s more confirmation before merging the two "
-"collectables.\n"
-"                "
+#, python-format
+msgid "%(missing)s more confirmation before merging the two collectables."
 msgid_plural ""
 "%(missing)s more confirmations before merging the two collectables."
-msgstr[0] ""
-"\n"
-"%(missing)s confirmation avant la fusion des deux objets."
-msgstr[1] ""
-"\n"
-"%(missing)s confirmations avant la fusion des deux objets."
+msgstr[0] "%(missing)s confirmation avant la fusion des deux objets."
+msgstr[1] "%(missing)s confirmations avant la fusion des deux objets."
 
-#: src/collectable/templates/collectable/details_duplicate.html:68
+#: src/collectable/templates/collectable/details_duplicate.html:66
 msgid "Ignore"
 msgstr "Ignorer"
 
@@ -434,7 +425,6 @@ msgid "Latest"
 msgstr "Derniers"
 
 #: src/collectable/templates/collectable/index.html:16
-#: src/collectable/views.py:123
 msgid "No collectable in database."
 msgstr "Aucun objet dans la base de données."
 
@@ -553,62 +543,51 @@ msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
 msgstr ""
 "{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
 
-#: src/collectable/views.py:116
+#: src/collectable/views.py:123
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
-#: src/collectable/views.py:117
+#: src/collectable/views.py:125
 #, python-format
 msgid "Search results for '%(q)s'"
-msgstr "Résultats de la recherche '%(q)s'"
+msgstr "Résultats de la recherche pour '%(q)s'"
 
-#: src/collectable/views.py:118
+#: src/collectable/views.py:127
+#, python-format
+msgid "Basic search results for '%(q)s'"
+msgstr "Résultats de la recherche textuelle pour '%(q)s'"
+
+#: src/collectable/views.py:132
 msgid "Most liked collectables"
 msgstr "Objets les plus aimés"
 
-#: src/collectable/views.py:119
+#: src/collectable/views.py:133
 msgid "Most wanted collectables"
 msgstr "Objets les plus recherchés"
 
-#: src/collectable/views.py:120
+#: src/collectable/views.py:134
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-#: src/collectable/views.py:124
-msgid "No collectable found."
-msgstr "Aucun objet trouvé."
-
-#: src/collectable/views.py:125
-msgid "No liked collectable"
-msgstr "Aucun objet aimé"
-
-#: src/collectable/views.py:126
-msgid "No wanted collectable"
-msgstr "Aucun objet recherché"
-
-#: src/collectable/views.py:127
-msgid "No owned collectable"
-msgstr "Aucun objet possédé"
-
-#: src/collectable/views.py:142
+#: src/collectable/views.py:149
 msgid "Collectable created successfully."
 msgstr "Objet créé avec succès."
 
-#: src/collectable/views.py:145 src/collectable/views.py:230
-#: src/collectable/views.py:321
+#: src/collectable/views.py:152 src/collectable/views.py:237
+#: src/collectable/views.py:327
 msgid "Invalid fields, please correct them."
 msgstr "Champs invalides, veuillez les corriger."
 
-#: src/collectable/views.py:223 src/collectable/views.py:296
-#: src/collectable/views.py:313
+#: src/collectable/views.py:230 src/collectable/views.py:303
+#: src/collectable/views.py:319
 msgid "Unauthorized"
 msgstr "Interdit"
 
-#: src/collectable/views.py:228
+#: src/collectable/views.py:235
 msgid "Collectable updated successfully."
 msgstr "Objet mis à jour avec succès."
 
-#: src/collectable/views.py:278
+#: src/collectable/views.py:285
 msgid ""
 "This collectable has been hidden as it was reported as a duplicate. You are "
 "being redirected to the original."
@@ -616,29 +595,33 @@ msgstr ""
 "Cet objet a été masqué car étant signalé comme doublon. Vous avez été "
 "redirigé vers l'original."
 
-#: src/collectable/views.py:287
+#: src/collectable/views.py:294
 msgid "This collectable has not been reported as duplicate."
 msgstr "Cet objet n'a pas été signalé comme doublon."
 
-#: src/collectable/views.py:303
+#: src/collectable/views.py:309
 msgid "You have not reported this duplicate."
 msgstr "Vous n'avez pas signalé ce doublon."
 
-#: src/collectable/views.py:304
+#: src/collectable/views.py:310
 msgid "Not Found"
 msgstr "Introuvable"
 
-#: src/collectable/views.py:306
+#: src/collectable/views.py:312
 msgid "Your duplicate report has been cancelled."
 msgstr "Votre signalement de doublon a été annulé."
 
-#: src/collectable/views.py:331
+#: src/collectable/views.py:337
 msgid "Duplicate reported! Thank you!"
 msgstr "Doublon signalé! Merci!"
 
 #: src/cropper/fields.py:31
 msgid "Invalid crop dimensions."
 msgstr "Dimensions de rognage invalides."
+
+#: src/cropper/templates/cropper/widget.html:15
+msgid "Zoom:"
+msgstr ""
 
 #: src/templates/base.html:22
 msgid "Home"
@@ -719,12 +702,3 @@ msgstr "S'inscrire"
 #: src/templates/registration/signup.html:4
 msgid "Sign Up"
 msgstr "S'inscrire"
-
-#~ msgid "Saved ✅"
-#~ msgstr "Sauvegardé ✅"
-
-#~ msgid "No collectable found at the given URL."
-#~ msgstr "Aucun objet trouvé à cette URL."
-
-#~ msgid "No collectable found with this ID."
-#~ msgstr "Aucun objet trouvé avec cet ID."

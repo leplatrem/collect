@@ -20,6 +20,8 @@ dependencies = [
     "psycopg2-binary>=2.9.10,<3",
     "django-storages>=1.14.6,<2",
     "google-cloud-storage>=3.1.0,<4",
+    "boolean-py>=5.0",
+    "ply>=3.11",
 ]
 
 [dependency-groups]

@@ -60,9 +60,7 @@
                     {% endif %}
                 {% endif %}
                 <p>
-                    {% blocktranslate count missing=missing_confirmations %}
-                    {{ missing }} more confirmation before merging the two collectables.
-                {% plural %}{{ missing }} more confirmations before merging the two collectables.{% endblocktranslate %}
+                    {% blocktranslate count missing=missing_confirmations %}{{ missing }} more confirmation before merging the two collectables.{% plural %}{{ missing }} more confirmations before merging the two collectables.{% endblocktranslate %}
                 </p>
                 <p>
                     <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
