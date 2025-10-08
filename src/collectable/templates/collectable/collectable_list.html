@@ -5,7 +5,7 @@
 {% block content %}
     <h1>{{ title }}</h1>
     <p>
-        {% blocktranslate count counter=collectable_list.count %}{{ counter }} collectable.{% plural %}{{counter}} collectables.{% endblocktranslate %}
+        {% blocktranslate count counter=page_obj.paginator.count %}{{ counter }} collectable.{% plural %}{{counter}} collectables.{% endblocktranslate %}
     </p>
     <section id="collectable-list" class="collectable-grid">
         {% for collectable in page_obj %}
