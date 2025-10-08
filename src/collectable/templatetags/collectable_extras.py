@@ -35,3 +35,11 @@ def fullurl(context, path=""):
     if not path.startswith("/"):
         path = "/" + path
     return request.build_absolute_uri(path)
+
+
+@register.filter
+def date_only(value):
+    """Return only the date part of a datetime."""
+    if not value:
+        return ""
+    return value.date() if hasattr(value, "date") else value
