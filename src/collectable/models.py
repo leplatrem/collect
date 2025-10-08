@@ -19,6 +19,7 @@ from taggit.managers import TaggableManager
 from taggit.models import Tag
 
 from collect.utils import tags_joiner
+from collectable.search import QBuilder
 from collectable.validators import (
     MaxFileSizeValidator,
     MimetypeValidator,
@@ -111,24 +112,37 @@ class CollectableQuerySet(models.QuerySet):
     def prefetch_tags_and_possessions(self, user):
         return self.with_tags().for_user(user)
 
-    def search_keywords(self, keywords):
+    def advanced_search(self, query_string: str) -> "CollectableQuerySet":
         """
         Filter the queryset by searching for keywords in the description and tags.
+        See `search_dsl.py` for the query language details.
         """
-        if not keywords:
-            return self
+        if not query_string:
+            return self  # nothing to filter
 
+        qb = QBuilder()
+        include_q, exclude_q = qb.compile(query_string)
+        qs = self
+        if qb.needs_annotations:
+            qs = qb.apply_annotations(qs)
+        qs = qs.filter(include_q).exclude(exclude_q).distinct()
+        return qs
+
+    def basic_search(self, query_string: str) -> "CollectableQuerySet":
+        """
+        Basic search that matches any of the words in the description, id, photo name,
+        or tags.
+        """
         query = Q()
-        for keyword in keywords:
-            word_filter = (
+        for keyword in (query_string or "").split()[: settings.MAX_SEARCH_KEYWORDS]:
+            keyword = keyword.strip()
+            query |= (
                 Q(description__icontains=keyword)
                 | Q(id__icontains=keyword)
                 | Q(photo__icontains=keyword)
-                | Q(tags__name__iexact=keyword)
+                | Q(tags__name__icontains=keyword)
             )
-            query |= word_filter  # any word match (OR)
-
-        return self.filter(query).distinct()
+        return self.filter(query).distinct()  # any word match (OR)
 
 
 class CollectableManager(models.Manager):

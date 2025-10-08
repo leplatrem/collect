@@ -150,6 +150,23 @@ def test_duplicate_delete(logged_in_client, collectable, another_collectable, us
     assert response.status_code == 204
 
 
+@pytest.mark.django_db(transaction=True)
+def test_collectable_advanced_search(client, collectable, another_collectable):
+    another_collectable.hidden = True
+    another_collectable.save()
+    resp = client.get(reverse("collectable:search"), {"q": "NOT #nonexistent"})
+    assert resp.status_code == 200
+    assert resp.context["collectable_list"].count() == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_collectable_basic_search_on_error(client, collectable, another_collectable):
+    resp = client.get(reverse("collectable:search"), {"q": "AN( "})
+    assert resp.status_code == 200
+    assert resp.context["advanced_search"] is False
+    assert resp.context["collectable_list"].count() == 0
+
+
 @pytest.mark.django_db
 def test_duplicate_delete_with_multiple(
     logged_in_client, collectable, another_collectable, user

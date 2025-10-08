@@ -67,6 +67,7 @@ def test_history_with_tags_deltas(collectable):
         [{"field": "tags", "old": "", "new": "#tag1, #tag2"}],
         [{"field": "tags", "old": "#tag1", "new": ""}],
         [{"field": "tags", "old": "", "new": "#tag1"}],
+        [],
     ]
 
 
@@ -162,22 +163,6 @@ def test_duplicate_report_confirm(duplicate_report):
     assert possessed[0].nlikes == 1
     assert possessed[0].nowns == 1
     assert possessed[0].nwants == 0
-
-
-@pytest.mark.django_db
-def test_collectable_search_keywords():
-    c1 = CollectableFactory(description="Bonjour le monde")
-    c1.tags.add("say-hello")
-    c2 = CollectableFactory(description="Hello there")
-    c3 = CollectableFactory(description="Goodbye world")
-    c3.tags.add("hello")
-
-    results = Collectable.objects.all().search_keywords(["hello"])
-
-    assert results.count() == 2
-    assert c1 not in results
-    assert c2 in results
-    assert c3 in results
 
 
 @pytest.mark.django_db

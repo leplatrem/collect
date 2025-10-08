@@ -4,6 +4,9 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h1>{{ title }}</h1>
+    <p>
+        {% blocktranslate count counter=collectable_list.count %}{{ counter }} collectable.{% plural %}{{counter}} collectables.{% endblocktranslate %}
+    </p>
     <section id="collectable-list" class="collectable-grid">
         {% for collectable in page_obj %}
             {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
@@ -15,8 +18,6 @@
                       hx-trigger="revealed"></span>
             {% endif %}
             {% include "collectable/collectable_thumbnail.html" %}
-        {% empty %}
-            {{ empty_msg }}
         {% endfor %}
     </section>
 {% endblock %}

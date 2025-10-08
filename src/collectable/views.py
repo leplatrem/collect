@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -74,6 +76,7 @@ class CollectableListView(ListView):
     model = Collectable
     kind = "latest"
     paginate_by = settings.DEFAULT_PAGE_SIZE
+    extra_context: dict[str, Any] = {}
 
     def get_queryset(self) -> QuerySet[Collectable]:
         qs = (
@@ -98,9 +101,14 @@ class CollectableListView(ListView):
         elif self.kind == "most_owned":
             qs = qs.filter(nowns__gt=0)
         elif self.kind == "search":
-            qs = qs.search_keywords(
-                self.search_keywords.split(" ")[: settings.MAX_SEARCH_KEYWORDS]
-            )
+            qs = qs.all()  # visible by default
+            try:
+                qs = qs.advanced_search(self.search_keywords)
+                self.extra_context["advanced_search"] = True
+            except Exception as exc:
+                print(f"search_keywords: invalid query '{self.search_keywords}': {exc}")
+                qs = qs.basic_search(self.search_keywords)
+                self.extra_context["advanced_search"] = False
 
         store_current_list_in_session(self.request, qs)
 
@@ -112,19 +120,20 @@ class CollectableListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context.update(self.extra_context)
         context["title"] = {
             "latest": _("Latest collectables"),
-            "search": _("Search results for '%(q)s'") % {"q": self.search_keywords},
+            "search": (
+                _("Search results for '%(q)s'")
+                if self.extra_context.get("advanced_search")
+                else _("Basic search results for '%(q)s'")
+            )
+            % {
+                "q": self.search_keywords,
+            },
             "most_liked": _("Most liked collectables"),
             "most_wanted": _("Most wanted collectables"),
             "most_owned": _("Most owned collectables"),
-        }[self.kind]
-        context["empty_msg"] = {
-            "latest": _("No collectable in database."),
-            "search": _("No collectable found."),
-            "most_liked": _("No liked collectable"),
-            "most_wanted": _("No wanted collectable"),
-            "most_owned": _("No owned collectable"),
         }[self.kind]
         return context
 

@@ -1,5 +1,6 @@
 import io
 
+import factory
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from factory import Faker, SubFactory
@@ -31,9 +32,21 @@ class CollectableFactory(DjangoModelFactory):
         buffer = io.BytesIO()
         img.save(buffer, format="JPEG")
         buffer.seek(0)
-        file = SimpleUploadedFile("test.jpg", buffer.read(), content_type="image/jpeg")
+        file = SimpleUploadedFile(
+            kwargs.pop("filename", "sticker-filename.jpg"),
+            buffer.read(),
+            content_type="image/jpeg",
+        )
         kwargs["photo"] = file
         return super()._create(model_class, *args, **kwargs)
+
+    @factory.post_generation
+    def tags(self, create, extracted, **kwargs):
+        if not create:
+            # Object not saved yet — skip
+            return
+        if extracted:
+            self.tags.add(*extracted)
 
 
 class PossessionFactory(DjangoModelFactory):
