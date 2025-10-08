@@ -29,7 +29,7 @@ urlpatterns = [
     path("search/", views.CollectableListView.as_view(kind="search"), name="search"),
     path("create/", views.create, name="create"),
     path("<uuid:id>/", views.details, name="details"),
-    path("<uuid:id>/duplicate/", views.duplicate, name="duplicate"),
+    path("<uuid:id>/duplicate/", views.DuplicateView.as_view(), name="duplicate"),
     path("<uuid:id>/possession/", views.possession, name="possession"),
     re_path(
         r"^collection/(?P<slugs>[0-9a-zA-Z_\-]+(,[0-9a-zA-Z_\-]+)*)/$",
