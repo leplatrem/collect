@@ -114,7 +114,7 @@
                         {% translate "No other collectables found." %}
                     {% endif %}
                     {% if related_count > RELATED_COLLECTABLES_LIST_COUNT %}
-                        <a href="{% url "collectable:collection" collectable.tags.slugs|join:"," %}"
+                        <a href="{% url "collectable:collection" related_tags|join:"," %}"
                            class="more">{% translate "More..." %}</a>
                     {% endif %}
                 </div>

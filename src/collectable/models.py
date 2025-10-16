@@ -243,15 +243,25 @@ class Collectable(models.Model):
         )
 
     def related_tags(self, min_count=2):
-        return self.tags_with_count().filter(ncollectable__gte=min_count)
+        return (
+            self.tags_with_count()
+            .filter(ncollectable__gte=min_count)
+            .order_by("ncollectable")  # rarest first
+        )
 
     def related_collectables(self, user):
-        related_tags = self.related_tags()
+        related_tag_ids = list(self.related_tags().values_list("id", flat=True))
+
         return (
             Collectable.objects.with_counts_and_possessions(user)
             .exclude(id=self.id)
-            .filter(tags__in=related_tags)
-            .distinct()
+            .filter(tags__in=related_tag_ids)
+            .annotate(
+                num_matching_tags=Count(
+                    "tags", filter=Q(tags__in=related_tag_ids), distinct=True
+                )
+            )
+            .filter(num_matching_tags=len(related_tag_ids))  # has all related tags
         )
 
     def get_absolute_url(self):
