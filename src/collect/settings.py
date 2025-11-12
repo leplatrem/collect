@@ -297,3 +297,5 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 )
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
+
+DEFAULT_TAGS: str = config("COLLECT_DEFAULT_TAGS", default="#{year}")

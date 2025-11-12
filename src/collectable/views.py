@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 
 from django.conf import settings
@@ -154,7 +155,10 @@ def create(request):
         else:
             messages.warning(request, _("Invalid fields, please correct them."))
     else:
-        form = CollectableForm()
+        default_tags = settings.DEFAULT_TAGS.replace(
+            "{year}", datetime.datetime.now().strftime("%Y")
+        )
+        form = CollectableForm(initial={"tags": default_tags})
     context = {
         "form": form,
     }
