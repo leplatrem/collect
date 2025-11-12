@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext_lazy as _
-from PIL import ExifTags, Image
+from PIL import ExifTags, Image, ImageOps
 
 from collectable.models import Collectable, Possession
 
@@ -67,6 +67,8 @@ class Command(BaseCommand):
             taglist = (options["tags"] or []) + folder_tags
 
             im = Image.open(image_path)
+            im = ImageOps.exif_transpose(im)
+
             width, height = im.size
             if width != height:
                 self.stdout.write(
