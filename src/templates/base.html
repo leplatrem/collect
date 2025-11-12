@@ -71,5 +71,12 @@
         </footer>
         {% block foot %}
         {% endblock foot %}
+        <script>
+          document.body.addEventListener('animationend', (e) => {
+            if (e.animationName === 'fadeOut') {
+              e.target.remove();
+            }
+          });
+        </script>
     </body>
 </html>
