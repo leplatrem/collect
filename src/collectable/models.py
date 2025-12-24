@@ -433,7 +433,7 @@ class DuplicateReport(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=~models.Q(original=models.F("duplicate")),
+                condition=~models.Q(original=models.F("duplicate")),
                 name="prevent_self_duplicate",
             ),
             models.UniqueConstraint(
