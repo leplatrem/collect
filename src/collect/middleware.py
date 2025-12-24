@@ -37,9 +37,9 @@ class HealthCheckMiddleware:
                 cursor = connections[name].cursor()
                 cursor.execute("SELECT 1;")
                 row = cursor.fetchone()
-                assert (
-                    row is not None and row[0] == 1
-                ), f"Invalid response from database ({row})"
+                assert row is not None and row[0] == 1, (
+                    f"Invalid response from database ({row})"
+                )
         except Exception as exc:
             logger.exception(exc)
             return HttpResponseServerError("db: cannot connect to database.")
