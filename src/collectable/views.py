@@ -1,4 +1,4 @@
-import datetime
+import logging
 from typing import Any
 
 from django.conf import settings
@@ -10,6 +10,7 @@ from django.forms import widgets as django_widgets
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, View
@@ -159,7 +160,7 @@ def create(request):
             messages.warning(request, _("Invalid fields, please correct them."))
     else:
         default_tags = settings.DEFAULT_TAGS.replace(
-            "{year}", datetime.datetime.now().strftime("%Y")
+            "{year}", timezone.now().strftime("%Y")
         )
         form = CollectableForm(initial={"tags": default_tags})
     context = {
