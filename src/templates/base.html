@@ -25,9 +25,9 @@
                 {% if perms.collectable.add_collectable %}
                     <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
                 {% endif %}
-            {% endif %}
-            {% if user.is_authenticated and perms.collectable.add_duplicatereport %}
-                <a href="{% url 'collectable:collection' 'duplicate' %}">{% translate "Review duplicates" %}</a>
+                {% if perms.collectable.add_duplicatereport %}
+                    <a href="{% url 'collectable:collection' 'duplicate' %}">{% translate "Review duplicates" %}</a>
+                {% endif %}
             {% endif %}
             <form id="search"
                   hx-get="{% url 'collectable:search' %}"
