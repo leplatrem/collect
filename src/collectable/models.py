@@ -189,7 +189,7 @@ class Collectable(models.Model):
         upload_to="collectables/%Y/",
         help_text=_("Please provide a square JPEG image (.jpg, .jpeg)"),
         validators=[
-            MimetypeValidator(["image/jpg", "image/jpeg"]),
+            MimetypeValidator(["image/jpeg"]),
             SquareImageValidator(),
             MaxFileSizeValidator(),
         ],
