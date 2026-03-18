@@ -431,6 +431,9 @@ def collection(request, slugs):
     for slug in slugs:
         collectable_list = collectable_list.filter(tags__slug=slug)
 
+    # Evaluate the queryset once so we can reuse the results.
+    collectable_list = list(collectable_list)
+
     # Count how many are owned by the current user, taking advantage of prefetched
     # data from above.
     total_owned = sum(
