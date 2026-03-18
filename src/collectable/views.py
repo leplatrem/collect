@@ -19,6 +19,8 @@ from collect.utils import paginate
 from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
 from collectable.models import Collectable, DuplicateReport, Possession
 
+logger = logging.getLogger(__name__)
+
 
 def index(request):
     # List of all tags with at least one collectable, ordered by
@@ -106,8 +108,8 @@ class CollectableListView(ListView):
             try:
                 qs = qs.advanced_search(self.search_keywords)
                 self.extra_context["advanced_search"] = True
-            except Exception as exc:
-                print(f"search_keywords: invalid query '{self.search_keywords}': {exc}")
+            except (ValueError, SyntaxError) as exc:
+                logger.warning("Invalid search query '%s': %s", self.search_keywords, exc)
                 qs = qs.basic_search(self.search_keywords)
                 self.extra_context["advanced_search"] = False
 

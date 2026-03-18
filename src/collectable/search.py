@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 
+import logging
+
 import ply.lex as lex
 import ply.yacc as yacc
 from boolean import BooleanAlgebra
 from boolean.boolean import AND, NOT, OR, Symbol
 from django.conf import settings
 from django.db.models import Count, Q
+
+logger = logging.getLogger(__name__)
 
 
 """
@@ -269,10 +273,10 @@ class QBuilder:
         algebra = BooleanAlgebra()
         expr = algebra.parse(boolean_str)
 
-        if settings.DEBUG or True:
-            print(f"search_keywords: '{query_string}' → '{boolean_str}'")
+        if settings.DEBUG:
+            logger.debug(f"search_keywords: '{query_string}' → '{boolean_str}'")
             for k, v in literal_map.items():
-                print(f"  {k}: field={v.field} value={v.value}")
+                logger.debug(f"  {k}: field={v.field} value={v.value}")
 
         def as_term(node):
             # node is a boolean.Symbol
