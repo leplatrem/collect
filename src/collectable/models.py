@@ -415,7 +415,9 @@ class Possession(models.Model):
     class Meta:
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
-        unique_together = ("user", "collectable")
+        constraints = [
+            models.UniqueConstraint(fields=["user", "collectable"], name="unique_possession"),
+        ]
 
 
 def get_unknown_user():
