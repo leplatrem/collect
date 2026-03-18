@@ -45,16 +45,16 @@
                 {% if user.is_authenticated and perms.collectable.add_duplicatereport and perms.collectable.delete_duplicatereport %}
                     {% if already_reported %}
                         <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
-                              hx-select="body"
-                              hx-target="body">
+                              hx-select="main"
+                              hx-target="main">
                             {% csrf_token %}
                             {{ form }}
                             <button type="submit">{% translate "Cancel" %}</button>
                         </form>
                     {% else %}
                         <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
-                              hx-select="body"
-                              hx-target="body">
+                              hx-select="main"
+                              hx-target="main">
                             {% csrf_token %}
                             {{ form }}
                             <button type="submit">{% translate "Confirm" %}</button>
