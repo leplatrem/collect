@@ -1,5 +1,6 @@
 import re
 import uuid
+from collections import deque
 
 import taggit.models
 from django.conf import settings
@@ -504,7 +505,7 @@ class DuplicateReport(models.Model):
         Multiple reports of the same edge do NOT count as a loop.
         """
         visited = set()
-        queue = [self.duplicate.id]
+        queue = deque([self.duplicate.id])
 
         # Build a graph of all edges as (original -> duplicate)
         edges = DuplicateReport.objects.exclude(
@@ -519,7 +520,7 @@ class DuplicateReport(models.Model):
         graph.setdefault(self.original.id, set()).add(self.duplicate.id)
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             if current == self.original.id and current != self.duplicate.id:
                 return True  # cycle detected
 
