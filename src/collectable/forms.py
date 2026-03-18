@@ -1,6 +1,6 @@
 import urllib
 
-from django.forms import CharField, ModelForm, Textarea, TextInput, ValidationError
+from django.forms import BooleanField, CharField, ModelForm, Textarea, TextInput, ValidationError
 from django.urls import Resolver404, resolve
 from django.utils.translation import gettext_lazy as _
 
@@ -10,6 +10,14 @@ from cropper.fields import CropImageField
 
 class CollectableForm(ModelForm):
     photo = CropImageField()
+    rights_confirmed = BooleanField(
+        required=True,
+        label=_("Rights confirmation"),
+        help_text=_(
+            "I confirm that I am the author of this photo, or that it is in the public "
+            "domain, and that I have the right to submit it under the selected license."
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -17,10 +25,13 @@ class CollectableForm(ModelForm):
         self.fields["description"].widget.attrs.update(
             {"placeholder": _("Description, author, history, links to source, ...")}
         )
+        # On edit, rights were already confirmed at creation time.
+        if self.instance and self.instance.pk:
+            del self.fields["rights_confirmed"]
 
     class Meta:
         model = Collectable
-        fields = ["photo", "description", "tags"]
+        fields = ["photo", "description", "tags", "license"]
         widgets = {
             "description": Textarea(attrs={"rows": "5"}),
         }

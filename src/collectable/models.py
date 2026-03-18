@@ -171,6 +171,11 @@ class Collectable(models.Model):
     Main model representing a collectable item.
     """
 
+    class License(models.TextChoices):
+        CC0 = "CC0-1.0", _("CC0 1.0 – No Rights Reserved")
+        CC_BY = "CC-BY-4.0", _("CC BY 4.0 – Attribution")
+        CC_BY_SA = "CC-BY-SA-4.0", _("CC BY-SA 4.0 – Attribution-ShareAlike")
+
     id = models.UUIDField(
         _("Identifier"), primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -212,6 +217,18 @@ class Collectable(models.Model):
         options={"quality": settings.COLLECTABLE_THUMBNAIL_QUALITY},
     )
     hidden = models.BooleanField(_("Hidden"), default=False)
+    license = models.CharField(
+        _("License"),
+        max_length=20,
+        choices=License.choices,
+        default=License.CC0,
+        help_text=_(
+            "The license under which this image is submitted. "
+            "By selecting a license, you confirm that you are the author of the photo "
+            "or that the image is in the public domain, and that you have the right "
+            "to submit it under the chosen license."
+        ),
+    )
 
     objects = CollectableManager()
     all_objects = CollectableManager(with_hidden=True)
