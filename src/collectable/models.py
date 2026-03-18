@@ -10,7 +10,7 @@ from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
@@ -282,7 +282,7 @@ class Collectable(models.Model):
         )
 
     def get_absolute_url(self):
-        return reverse_lazy("collectable:details", kwargs={"id": self.id})
+        return reverse("collectable:details", kwargs={"id": self.id})
 
     def possession_of(self, user):
         """
