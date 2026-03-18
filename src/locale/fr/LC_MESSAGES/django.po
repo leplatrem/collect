@@ -134,7 +134,7 @@ msgstr "%(total)s objets dans la base de données."
 msgid "%s collectables verified."
 msgstr "%s collectables vérifiés."
 
-#: src/collectable/models.py:44
+#: src/collectable/models.py:45
 msgid "Tag"
 msgstr "Étiquette"
 
@@ -574,9 +574,11 @@ msgid "%s is not a square image"
 msgstr "\"%s\" n'est pas une image carrée"
 
 #: src/collectable/validators.py:46
-msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
+#, fuzzy, python-format
+#| msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
+msgid "%(file)s exceeds the maximum file size of %(max_size)s bytes."
 msgstr ""
-"{{ file }} dépasse la taille maximale de fichier de {{ max_size }} bytes."
+"%(file)s dépasse la taille maximale de fichier de %(max_size)s bytes."
 
 #: src/collectable/views.py:127
 msgid "Latest collectables"
