@@ -234,18 +234,6 @@ class Collectable(models.Model):
     objects = CollectableManager()
     all_objects = CollectableManager(with_hidden=True)
 
-    @receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
-    def on_tag_changed(sender, instance, created, **kwargs):
-        """Workaround for the issue with history not able to track tags changes correctly.
-        See https://github.com/jazzband/django-taggit/issues/918
-        """
-        item = instance.content_object
-        if not isinstance(item, Collectable):  # pragma: no cover
-            # This signal can be triggered by other models, we only care about Collectable
-            return
-        item._computed_tags = tags_joiner(item.tags.all())
-        item.save(update_fields=["_computed_tags"])
-
     def tags_with_count(self):
         """
         Return the tags associated with this collectable, annotated with the count of
@@ -394,6 +382,19 @@ class Collectable(models.Model):
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
+
+
+@receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
+def on_tag_changed(sender, instance, created, **kwargs):
+    """Workaround for the issue with history not able to track tags changes correctly.
+    See https://github.com/jazzband/django-taggit/issues/918
+    """
+    item = instance.content_object
+    if not isinstance(item, Collectable):  # pragma: no cover
+        # This signal can be triggered by other models, we only care about Collectable
+        return
+    item._computed_tags = tags_joiner(item.tags.all())
+    item.save(update_fields=["_computed_tags"])
 
 
 class Possession(models.Model):
