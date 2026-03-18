@@ -6,7 +6,7 @@ import taggit.models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
@@ -339,27 +339,30 @@ class Collectable(models.Model):
 
     def merge_into(self, original):
         """Merge this collectable into the original one."""
-        if not self.hidden:
-            self.hidden = True
-            self.save(update_fields=["hidden"])
-        # Merge tags
-        original.tags.add(*self.tags.all())
-        original.tags.remove("duplicate")  # Remove the duplicate tag if present
-        # Merge descriptions
-        original.description = original.description + "\n---\n" + self.description
-        original.save(update_fields=["description"])
-        # Reassign possessions
-        for possession in self.possession_set.all():
-            poss, _ = Possession.objects.get_or_create(
-                user=possession.user, collectable=original
+        with transaction.atomic():
+            if not self.hidden:
+                self.hidden = True
+                self.save(update_fields=["hidden"])
+            # Merge tags
+            original.tags.add(*self.tags.all())
+            original.tags.remove("duplicate")  # Remove the duplicate tag if present
+            # Merge descriptions
+            original.description = "\n---\n".join(
+                filter(None, [original.description, self.description])
             )
-            if possession.likes:
-                poss.likes = True
-            if possession.wants:
-                poss.wants = True
-            if possession.owns:
-                poss.owns = True
-            poss.save()
+            original.save(update_fields=["description"])
+            # Reassign possessions
+            for possession in self.possession_set.all():
+                poss, _ = Possession.objects.get_or_create(
+                    user=possession.user, collectable=original
+                )
+                if possession.likes:
+                    poss.likes = True
+                if possession.wants:
+                    poss.wants = True
+                if possession.owns:
+                    poss.owns = True
+                poss.save()
 
     def is_duplicate(self) -> bool:
         """
