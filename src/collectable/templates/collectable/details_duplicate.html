@@ -42,7 +42,7 @@
         </section>
         <section id="confirm">
             <p>
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and user.has_perm("collectable.add_duplicatereport") and user.has_perm("collectable.delete_duplicatereport") %}
                     {% if already_reported %}
                         <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
                               hx-select="body"
