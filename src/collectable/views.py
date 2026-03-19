@@ -4,7 +4,7 @@ from typing import Any
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.forms import widgets as django_widgets
 from django.http import HttpResponse
@@ -27,7 +27,9 @@ def index(request):
     # List of all tags with at least one collectable, ordered by
     # number of collectables.
     tag_list = (
-        Tag.objects.annotate(ncollectable=Count("collectable"))
+        Tag.objects.annotate(
+            ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
+        )
         .order_by("-ncollectable")
         .filter(ncollectable__gt=1)
     )
