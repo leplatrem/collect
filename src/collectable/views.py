@@ -82,7 +82,11 @@ class CollectableListView(ListView):
     model = Collectable
     kind = "latest"
     paginate_by = settings.DEFAULT_PAGE_SIZE
-    extra_context: dict[str, Any] = {}
+    extra_context: dict[str, Any] = None  # type: ignore[assignment]
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.extra_context = {}
 
     def get_queryset(self) -> QuerySet[Collectable]:
         qs = (
