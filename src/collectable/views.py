@@ -238,15 +238,17 @@ def details(request, id):
             return HttpResponse(_("Unauthorized"), status=401)
         if not request.user.has_perm("collectable.change_collectable"):
             return HttpResponse(_("Forbidden"), status=403)
-        form = CollectableForm(request.POST, request.FILES, instance=collectable)
-        backup_photo = collectable.photo
+        # Use a fresh instance so validation doesn't mutate the in-memory `collectable`
+        bound_instance = Collectable.objects.get(pk=collectable.pk)
+        form = CollectableForm(request.POST, request.FILES, instance=bound_instance)
         if form.is_valid():
-            collectable = form.save()
+            form.save()
+            collectable = Collectable.objects.with_counts_and_possessions(
+                request.user
+            ).get(pk=collectable.pk)
             messages.success(request, _("Collectable updated successfully."))
         else:
             messages.warning(request, _("Invalid fields, please correct them."))
-            # Why `is_valid()` is altering `collectable.photo`??
-            collectable.photo = backup_photo
     else:
         form = CollectableForm(instance=collectable)
 
