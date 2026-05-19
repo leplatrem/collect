@@ -1,6 +1,13 @@
 import urllib
 
-from django.forms import BooleanField, CharField, ModelForm, Textarea, TextInput, ValidationError
+from django.forms import (
+    BooleanField,
+    CharField,
+    ModelForm,
+    Textarea,
+    TextInput,
+    ValidationError,
+)
 from django.urls import Resolver404, resolve
 from django.utils.translation import gettext_lazy as _
 

@@ -4,20 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('collectable', '0008_duplicatereport'),
+        ("collectable", "0008_duplicatereport"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='collectable',
-            name='license',
-            field=models.CharField(choices=[('CC0-1.0', 'CC0 1.0 – No Rights Reserved'), ('CC-BY-4.0', 'CC BY 4.0 – Attribution'), ('CC-BY-SA-4.0', 'CC BY-SA 4.0 – Attribution-ShareAlike')], default='CC0-1.0', help_text='The license under which this image is submitted. By selecting a license, you confirm that you are the author of the photo or that the image is in the public domain, and that you have the right to submit it under the chosen license.', max_length=20, verbose_name='License'),
+            model_name="collectable",
+            name="license",
+            field=models.CharField(
+                choices=[
+                    ("CC0-1.0", "CC0 1.0 – No Rights Reserved"),
+                    ("CC-BY-4.0", "CC BY 4.0 – Attribution"),
+                    ("CC-BY-SA-4.0", "CC BY-SA 4.0 – Attribution-ShareAlike"),
+                ],
+                default="CC0-1.0",
+                help_text="The license under which this image is submitted. By selecting a license, you confirm that you are the author of the photo or that the image is in the public domain, and that you have the right to submit it under the chosen license.",
+                max_length=20,
+                verbose_name="License",
+            ),
         ),
         migrations.AddField(
-            model_name='historicalcollectable',
-            name='license',
-            field=models.CharField(choices=[('CC0-1.0', 'CC0 1.0 – No Rights Reserved'), ('CC-BY-4.0', 'CC BY 4.0 – Attribution'), ('CC-BY-SA-4.0', 'CC BY-SA 4.0 – Attribution-ShareAlike')], default='CC0-1.0', help_text='The license under which this image is submitted. By selecting a license, you confirm that you are the author of the photo or that the image is in the public domain, and that you have the right to submit it under the chosen license.', max_length=20, verbose_name='License'),
+            model_name="historicalcollectable",
+            name="license",
+            field=models.CharField(
+                choices=[
+                    ("CC0-1.0", "CC0 1.0 – No Rights Reserved"),
+                    ("CC-BY-4.0", "CC BY 4.0 – Attribution"),
+                    ("CC-BY-SA-4.0", "CC BY-SA 4.0 – Attribution-ShareAlike"),
+                ],
+                default="CC0-1.0",
+                help_text="The license under which this image is submitted. By selecting a license, you confirm that you are the author of the photo or that the image is in the public domain, and that you have the right to submit it under the chosen license.",
+                max_length=20,
+                verbose_name="License",
+            ),
         ),
     ]
