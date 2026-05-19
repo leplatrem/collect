@@ -268,6 +268,7 @@ class Collectable(models.Model):
                 )
             )
             .filter(num_matching_tags=len(related_tag_ids))  # has all related tags
+            .distinct()
         )
 
     def get_absolute_url(self):
