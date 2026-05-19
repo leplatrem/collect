@@ -29,7 +29,7 @@
                   hx-select="#attributes"
                   hx-target="#attributes"
                   hx-select-oob="#messages,#photo,#history,#related"
-                  hx-trigger="submit, keyup[keyCode==13] from:input, keyup[ctrlKey&&keyCode==13] from:textarea"
+                  hx-trigger="submit, keyup[key=='Enter'] from:input, keyup[ctrlKey&&key=='Enter'] from:textarea"
                   hx-swap="outerHTML">
                 {{ form_edit }}
                 <button type="submit">{% translate "Save" %}</button>
