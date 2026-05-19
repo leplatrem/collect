@@ -3,7 +3,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count
 from django.db.models.query import QuerySet
 from django.forms import widgets as django_widgets
@@ -142,6 +142,7 @@ class CollectableListView(ListView):
 
 @require_http_methods(["GET", "POST"])
 @login_required
+@permission_required("collectable.add_collectable", raise_exception=True)
 def create(request):
     if request.method == "POST":
         form = CollectableForm(request.POST, request.FILES)
@@ -235,6 +236,8 @@ def details(request, id):
     if request.method == "POST":
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
+        if not request.user.has_perm("collectable.change_collectable"):
+            return HttpResponse(_("Forbidden"), status=403)
         form = CollectableForm(request.POST, request.FILES, instance=collectable)
         backup_photo = collectable.photo
         if form.is_valid():
@@ -303,6 +306,8 @@ class DuplicateView(View):
     def post(self, request, id):
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
+        if not request.user.has_perm("collectable.add_duplicatereport"):
+            return HttpResponse(_("Forbidden"), status=403)
 
         collectable = self.get_object(id)
 
@@ -328,6 +333,8 @@ class DuplicateView(View):
     def delete(self, request, id):
         if not request.user.is_authenticated:
             return HttpResponse(_("Unauthorized"), status=401)
+        if not request.user.has_perm("collectable.delete_duplicatereport"):
+            return HttpResponse(_("Forbidden"), status=403)
 
         collectable = self.get_object(id)
         report = DuplicateReport.objects.filter(

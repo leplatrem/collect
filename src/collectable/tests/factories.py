@@ -1,7 +1,9 @@
 import io
 
 import factory
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from factory import Faker, SubFactory
 from factory.django import DjangoModelFactory
@@ -17,6 +19,15 @@ class UserFactory(DjangoModelFactory):
 
     username = Faker("user_name")
     email = Faker("email")
+
+    @factory.post_generation
+    def collector(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted is False:
+            return
+        group, _ = Group.objects.get_or_create(name=settings.COLLECTORS_GROUP_NAME)
+        self.groups.add(group)
 
 
 class CollectableFactory(DjangoModelFactory):

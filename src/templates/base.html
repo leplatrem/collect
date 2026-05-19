@@ -22,9 +22,11 @@
             <a href="{% url 'home' %}">{% translate "Home" %}</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'collectable:profile' %}">{{ user }}</a>
-                <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
+                {% if perms.collectable.add_collectable %}
+                    <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
+                {% endif %}
             {% endif %}
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and perms.collectable.add_duplicatereport %}
                 <a href="{% url 'collectable:collection' 'duplicate' %}">{% translate "Review duplicates" %}</a>
             {% endif %}
             <form id="search"

@@ -23,7 +23,7 @@
          width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
          src="{{ collectable.photo.url }}" />
     <section id="attributes">
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and perms.collectable.change_collectable %}
             <form hx-encoding='multipart/form-data'
                   hx-post="{% url 'collectable:details' collectable.id %}"
                   hx-select="#attributes"
@@ -54,7 +54,7 @@
         {% endif %}
         {% user_possession_form collectable %}
     </section>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and perms.collectable.add_duplicatereport %}
         <section id="report-duplicate">
             <h2>{% translate "This collectable is a duplicate?" %}</h2>
             <p>{% translate "If you think this collectable is a duplicate of another one, please report it." %}</p>
