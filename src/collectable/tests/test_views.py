@@ -47,6 +47,7 @@ def test_create_view_authenticated_post(db, logged_in_client, collectable):
     data = {
         "description": "Created via test",
         "tags": "tag1,tag2",
+        "license": "CC-BY-SA-4.0",
         "photo": collectable.photo,
         "photo_x": 0,
         "photo_y": 0,
@@ -65,6 +66,7 @@ def test_details_view_authenticated_post(db, logged_in_client, collectable):
     data = {
         "description": "Edited via test",
         "tags": "tag1,tag2",
+        "license": "CC-BY-SA-4.0",
         "photo": collectable.photo,
         "photo_x": 0,
         "photo_y": 0,
