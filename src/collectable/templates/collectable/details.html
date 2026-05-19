@@ -43,6 +43,9 @@
                 {% endfor %}
             </p>
         {% endif %}
+        <p class="license">
+            {% translate "License" %}: <strong>{{ collectable.get_license_display }}</strong>
+        </p>
     </section>
     <section id="possession">
         <h2>{% translate "Possessions" %}</h2>
