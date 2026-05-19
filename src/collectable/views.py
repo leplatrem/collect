@@ -111,7 +111,6 @@ class CollectableListView(ListView):
         elif self.kind == "most_owned":
             qs = qs.filter(nowns__gt=0)
         elif self.kind == "search":
-            qs = qs.all()  # visible by default
             try:
                 qs = qs.advanced_search(self.search_keywords)
                 self.extra_context["advanced_search"] = True
