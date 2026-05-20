@@ -250,3 +250,33 @@ def test_duplicate_post_valid_form(logged_in_client, collectable, another_collec
     assert "reports" in response.context
     assert response.headers["HX-Retarget"] == "main"
     assert response.headers["HX-Reselect"] == "main"
+
+
+@pytest.mark.django_db
+def test_index_view_tag_list_excludes_hidden_collectables(client):
+    visible1 = CollectableFactory()
+    visible2 = CollectableFactory()
+    visible1.tags.add("shared")
+    visible2.tags.add("shared")
+
+    hidden1 = CollectableFactory(hidden=True)
+    hidden2 = CollectableFactory(hidden=True)
+    hidden1.tags.add("ghost")
+    hidden2.tags.add("ghost")
+
+    response = client.get(reverse("collectable:index"))
+
+    tag_names = {t.name for t in response.context["tag_list"]}
+    assert "shared" in tag_names
+    assert "ghost" not in tag_names
+
+
+@pytest.mark.django_db
+def test_list_view_extra_context_not_shared_across_requests(client, collectable):
+    # Trigger a search request that sets `advanced_search` in extra_context.
+    client.get(reverse("collectable:search"), {"q": "anything"})
+
+    # A subsequent unrelated list request must not inherit `advanced_search`.
+    response = client.get(reverse("collectable:latest"))
+
+    assert "advanced_search" not in response.context

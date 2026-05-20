@@ -1,16 +1,17 @@
 import re
 import uuid
+from collections import deque
 
 import taggit.models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail
@@ -189,7 +190,7 @@ class Collectable(models.Model):
         upload_to="collectables/%Y/",
         help_text=_("Please provide a square JPEG image (.jpg, .jpeg)"),
         validators=[
-            MimetypeValidator(["image/jpg", "image/jpeg"]),
+            MimetypeValidator(["image/jpeg"]),
             SquareImageValidator(),
             MaxFileSizeValidator(),
         ],
@@ -233,18 +234,6 @@ class Collectable(models.Model):
     objects = CollectableManager()
     all_objects = CollectableManager(with_hidden=True)
 
-    @receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
-    def on_tag_changed(sender, instance, created, **kwargs):
-        """Workaround for the issue with history not able to track tags changes correctly.
-        See https://github.com/jazzband/django-taggit/issues/918
-        """
-        item = instance.content_object
-        if not isinstance(item, Collectable):  # pragma: no cover
-            # This signal can be triggered by other models, we only care about Collectable
-            return
-        item._computed_tags = tags_joiner(item.tags.all())
-        item.save(update_fields=["_computed_tags"])
-
     def tags_with_count(self):
         """
         Return the tags associated with this collectable, annotated with the count of
@@ -279,10 +268,11 @@ class Collectable(models.Model):
                 )
             )
             .filter(num_matching_tags=len(related_tag_ids))  # has all related tags
+            .distinct()
         )
 
     def get_absolute_url(self):
-        return reverse_lazy("collectable:details", kwargs={"id": self.id})
+        return reverse("collectable:details", kwargs={"id": self.id})
 
     def possession_of(self, user):
         """
@@ -350,27 +340,30 @@ class Collectable(models.Model):
 
     def merge_into(self, original):
         """Merge this collectable into the original one."""
-        if not self.hidden:
-            self.hidden = True
-            self.save(update_fields=["hidden"])
-        # Merge tags
-        original.tags.add(*self.tags.all())
-        original.tags.remove("duplicate")  # Remove the duplicate tag if present
-        # Merge descriptions
-        original.description = original.description + "\n---\n" + self.description
-        original.save(update_fields=["description"])
-        # Reassign possessions
-        for possession in self.possession_set.all():
-            poss, _ = Possession.objects.get_or_create(
-                user=possession.user, collectable=original
+        with transaction.atomic():
+            if not self.hidden:
+                self.hidden = True
+                self.save(update_fields=["hidden"])
+            # Merge tags
+            original.tags.add(*self.tags.all())
+            original.tags.remove("duplicate")  # Remove the duplicate tag if present
+            # Merge descriptions
+            original.description = "\n---\n".join(
+                filter(None, [original.description, self.description])
             )
-            if possession.likes:
-                poss.likes = True
-            if possession.wants:
-                poss.wants = True
-            if possession.owns:
-                poss.owns = True
-            poss.save()
+            original.save(update_fields=["description"])
+            # Reassign possessions
+            for possession in self.possession_set.all():
+                poss, _ = Possession.objects.get_or_create(
+                    user=possession.user, collectable=original
+                )
+                if possession.likes:
+                    poss.likes = True
+                if possession.wants:
+                    poss.wants = True
+                if possession.owns:
+                    poss.owns = True
+                poss.save()
 
     def is_duplicate(self) -> bool:
         """
@@ -395,6 +388,19 @@ class Collectable(models.Model):
         verbose_name_plural = _("Collectables")
 
 
+@receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
+def on_tag_changed(sender, instance, created, **kwargs):
+    """Workaround for the issue with history not able to track tags changes correctly.
+    See https://github.com/jazzband/django-taggit/issues/918
+    """
+    item = instance.content_object
+    if not isinstance(item, Collectable):  # pragma: no cover
+        # This signal can be triggered by other models, we only care about Collectable
+        return
+    item._computed_tags = tags_joiner(item.tags.all())
+    item.save(update_fields=["_computed_tags"])
+
+
 class Possession(models.Model):
     """
     Link between a user and a collectable item, representing the user's
@@ -410,7 +416,11 @@ class Possession(models.Model):
     class Meta:
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
-        unique_together = ("user", "collectable")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "collectable"], name="unique_possession"
+            ),
+        ]
 
 
 def get_unknown_user():
@@ -460,6 +470,7 @@ class DuplicateReport(models.Model):
         ]
 
     def save(self, *args, **kwargs):
+        self.full_clean()
         super().save(*args, **kwargs)
         # Tag the duplicate as such.
         self.duplicate.tags.add("duplicate")
@@ -504,7 +515,7 @@ class DuplicateReport(models.Model):
         Multiple reports of the same edge do NOT count as a loop.
         """
         visited = set()
-        queue = [self.duplicate.id]
+        queue = deque([self.duplicate.id])
 
         # Build a graph of all edges as (original -> duplicate)
         edges = DuplicateReport.objects.exclude(
@@ -519,7 +530,7 @@ class DuplicateReport(models.Model):
         graph.setdefault(self.original.id, set()).add(self.duplicate.id)
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             if current == self.original.id and current != self.duplicate.id:
                 return True  # cycle detected
 

@@ -198,3 +198,22 @@ def test_duplicate_not_deleted_on_user_delete(duplicate_report):
 
     duplicate_report.refresh_from_db()
     assert duplicate_report.reporter.username == "unknown"
+
+
+@pytest.mark.django_db
+def test_merge_into_with_empty_original_description():
+    original = CollectableFactory(description="")
+    duplicate = CollectableFactory(description="duplicate description")
+
+    duplicate.merge_into(original)
+
+    original.refresh_from_db()
+    # No leading "\n---\n" when the original description is empty.
+    assert original.description == "duplicate description"
+
+
+@pytest.mark.django_db
+def test_duplicate_report_save_validates():
+    c = CollectableFactory()
+    with pytest.raises(ValidationError):
+        DuplicateReport(reporter=UserFactory(), duplicate=c, original=c).save()
