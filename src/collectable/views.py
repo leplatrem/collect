@@ -20,6 +20,7 @@ from collect.utils import paginate
 from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
 from collectable.models import Collectable, DuplicateReport, Possession
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -115,11 +116,13 @@ class CollectableListView(ListView):
                 qs = qs.advanced_search(self.search_keywords)
                 self.extra_context["advanced_search"] = True
             except (ValueError, SyntaxError) as exc:
-                logger.warning("Invalid search query '%s': %s", self.search_keywords, exc)
+                logger.warning(
+                    "Invalid search query '%s': %s", self.search_keywords, exc
+                )
                 qs = qs.basic_search(self.search_keywords)
                 self.extra_context["advanced_search"] = False
 
-        store_current_list_in_session(self.request, qs)
+        store_current_list_in_session(self.request, qs.values_list("id", flat=True))
 
         return qs
 
@@ -174,17 +177,14 @@ def create(request):
     return render(request, "collectable/create.html", context)
 
 
-def store_current_list_in_session(request, qs: QuerySet[Collectable]):
+def store_current_list_in_session(request, ids):
     """
     Store the current list of collectable IDs in session, for easy navigation
     between previous and next in details view.
     We only store the first 1000 IDs to avoid bloating the session.
     """
-    # Store the current list in session, for easy navigation in details view.
-    # We store only the IDs, as strings, to be JSON serializable.
-    request.session["collectable_list"] = [
-        str(id_) for id_ in qs.values_list("id", flat=True)[:1000]
-    ]
+    # Store as strings to be JSON serializable.
+    request.session["collectable_list"] = [str(id_) for id_ in ids[:1000]]
     request.session.modified = True
 
 
@@ -438,6 +438,7 @@ def collection(request, slugs):
 
     # Evaluate the queryset once so we can reuse the results.
     collectable_list = list(collectable_list)
+    collectable_ids = [c.id for c in collectable_list]
 
     # Count how many are owned by the current user, taking advantage of prefetched
     # data from above.
@@ -453,16 +454,14 @@ def collection(request, slugs):
             tag_list.append(Tag(name=slug, slug=slug))  # Don't save.
 
     reltag_list = (
-        Tag.objects.filter(
-            collectable__id__in=collectable_list.values_list("id", flat=True)
-        )
+        Tag.objects.filter(collectable__id__in=collectable_ids)
         .exclude(slug__in=slugs)
         .annotate(ncollectable=Count("collectable"))
         .order_by("-ncollectable")
         .filter(ncollectable__gt=1)
     )
 
-    store_current_list_in_session(request, collectable_list)
+    store_current_list_in_session(request, collectable_ids)
 
     context = {
         "slugs": slugs,

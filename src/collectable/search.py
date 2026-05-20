@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-
 import logging
+from dataclasses import dataclass
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -8,6 +7,7 @@ from boolean import BooleanAlgebra
 from boolean.boolean import AND, NOT, OR, Symbol
 from django.conf import settings
 from django.db.models import Count, Q
+
 
 logger = logging.getLogger(__name__)
 

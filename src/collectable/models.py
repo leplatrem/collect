@@ -417,7 +417,9 @@ class Possession(models.Model):
         verbose_name = _("Possession")
         verbose_name_plural = _("Possessions")
         constraints = [
-            models.UniqueConstraint(fields=["user", "collectable"], name="unique_possession"),
+            models.UniqueConstraint(
+                fields=["user", "collectable"], name="unique_possession"
+            ),
         ]
 
 
