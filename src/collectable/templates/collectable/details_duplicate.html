@@ -26,18 +26,16 @@
             <p>{% translate "has been reported as a duplicate of" %}</p>
             <p>{% include "collectable/collectable_thumbnail.html" with collectable=original %}</p>
             {% if user.is_authenticated %}
-                <p>
-                    {% translate "by" %}
-                    <ul>
-                        {% for report in reports %}
-                            <li>
-                                {% blocktranslate with who=report.reporter when=report.created_at|date_only %}
-                                {{ who }} on {{ when }}
-                            {% endblocktranslate %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </p>
+                {% translate "by" %}
+                <ul>
+                    {% for report in reports %}
+                        <li>
+                            {% blocktranslate with who=report.reporter when=report.created_at|date_only %}
+                            {{ who }} on {{ when }}
+                        {% endblocktranslate %}
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
         </section>
         <section id="confirm">
