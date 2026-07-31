@@ -19,10 +19,7 @@
         {% else %}
             <p>{% translate "This collectable" %}</p>
             {# Same as collectable_thumbnail.html but without the link #}
-            <img alt="{% if collectable.description %}{{ collectable.description }}{% else %}{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}"
-                 height="{% widthratio COLLECTABLE_THUMBNAIL_SIZE 2 1 %}"
-                 width="{% widthratio COLLECTABLE_THUMBNAIL_SIZE 2 1 %}"
-                 src="{{ collectable.thumbnail.url }}" />
+            <img alt="{% if collectable.description %}{{ collectable.description }}{% else %}{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}" height="{% widthratio COLLECTABLE_THUMBNAIL_SIZE 2 1 %}" width="{% widthratio COLLECTABLE_THUMBNAIL_SIZE 2 1 %}" src="{{ collectable.thumbnail.url }}" />
             <p>{% translate "has been reported as a duplicate of" %}</p>
             <p>{% include "collectable/collectable_thumbnail.html" with collectable=original %}</p>
             {% if user.is_authenticated %}
@@ -37,35 +34,35 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-        </section>
-        <section id="confirm">
-            <p>
-                {% if user.is_authenticated and perms.collectable.add_duplicatereport and perms.collectable.delete_duplicatereport %}
-                    {% if already_reported %}
-                        <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
-                              hx-select="main"
-                              hx-target="main">
-                            {% csrf_token %}
-                            {{ form }}
-                            <button type="submit">{% translate "Cancel" %}</button>
-                        </form>
-                    {% else %}
-                        <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
-                              hx-select="main"
-                              hx-target="main">
-                            {% csrf_token %}
-                            {{ form }}
-                            <button type="submit">{% translate "Confirm" %}</button>
-                        </form>
+            </section>
+            <section id="confirm">
+                <p>
+                    {% if user.is_authenticated and perms.collectable.add_duplicatereport and perms.collectable.delete_duplicatereport %}
+                        {% if already_reported %}
+                            <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
+                                  hx-select="main"
+                                  hx-target="main">
+                                {% csrf_token %}
+                                {{ form }}
+                                <button type="submit">{% translate "Cancel" %}</button>
+                            </form>
+                        {% else %}
+                            <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
+                                  hx-select="main"
+                                  hx-target="main">
+                                {% csrf_token %}
+                                {{ form }}
+                                <button type="submit">{% translate "Confirm" %}</button>
+                            </form>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-                <p>
-                    {% blocktranslate count missing=missing_confirmations %}{{ missing }} more confirmation before merging the two collectables.{% plural %}{{ missing }} more confirmations before merging the two collectables.{% endblocktranslate %}
+                    <p>
+                        {% blocktranslate count missing=missing_confirmations %}{{ missing }} more confirmation before merging the two collectables.{% plural %}{{ missing }} more confirmations before merging the two collectables.{% endblocktranslate %}
+                    </p>
+                    <p>
+                        <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
+                    </p>
                 </p>
-                <p>
-                    <a href="{% url 'collectable:details' collectable.id %}?_skip_duplicate">{% translate "Ignore" %}</a>
-                </p>
-            </p>
         {% endif %}
     </section>
     {% include "collectable/keyboard_navigation.html" %}

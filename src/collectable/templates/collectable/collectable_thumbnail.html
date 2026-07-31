@@ -3,10 +3,7 @@
 <div class="collectable thumbnail">
     <a href="{% url "collectable:details" collectable.id %}"
        title="{% if collectable.description %}{{ collectable.description }}{% endif %}">
-        <img alt="{% if collectable.description %}{{ collectable.description }}{% else %}{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}"
-             height="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
-             width="{{ COLLECTABLE_THUMBNAIL_SIZE }}"
-             src="{{ collectable.thumbnail.url }}" />
+        <img alt="{% if collectable.description %}{{ collectable.description }}{% else %}{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}" height="{{ COLLECTABLE_THUMBNAIL_SIZE }}" width="{{ COLLECTABLE_THUMBNAIL_SIZE }}" src="{{ collectable.thumbnail.url }}" />
     </a>
     <div class="taglist">
         {% for tag in collectable.tags_list %}

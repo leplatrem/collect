@@ -38,15 +38,23 @@ class CollectableFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        # Add a fake image
-        img = Image.new("RGB", (100, 100), color="white")
+        # Add a fake image, JPEG by default, PNG (with transparency) on request.
+        img_format = kwargs.pop("img_format", "JPEG")
+        if img_format == "PNG":
+            img = Image.new("RGBA", (100, 100), color=(255, 0, 0, 0))
+            default_filename = "sticker-filename.png"
+            content_type = "image/png"
+        else:
+            img = Image.new("RGB", (100, 100), color="white")
+            default_filename = "sticker-filename.jpg"
+            content_type = "image/jpeg"
         buffer = io.BytesIO()
-        img.save(buffer, format="JPEG")
+        img.save(buffer, format=img_format)
         buffer.seek(0)
         file = SimpleUploadedFile(
-            kwargs.pop("filename", "sticker-filename.jpg"),
+            kwargs.pop("filename", default_filename),
             buffer.read(),
-            content_type="image/jpeg",
+            content_type=content_type,
         )
         kwargs["photo"] = file
         return super()._create(model_class, *args, **kwargs)

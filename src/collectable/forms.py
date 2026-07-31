@@ -28,7 +28,7 @@ class CollectableForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["photo"].widget.attrs.update({"accept": "image/jpeg"})
+        self.fields["photo"].widget.attrs.update({"accept": "image/jpeg,image/png"})
         self.fields["description"].widget.attrs.update(
             {"placeholder": _("Description, author, history, links to source, ...")}
         )
