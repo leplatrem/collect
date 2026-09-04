@@ -1,8 +1,12 @@
 # Additions to your existing test_views.py file
 
+import io
+
 import pytest
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from PIL import Image
 
 from collectable.models import Collectable, DuplicateReport, Possession
 from collectable.tests.factories import (
@@ -59,6 +63,38 @@ def test_create_view_authenticated_post(db, logged_in_client, collectable):
     id = response.url.split("/")[-2]
     collectable = Collectable.objects.get(id=id)
     assert collectable.description == "Created via test"
+
+
+def test_create_view_accepts_png_upload(db, logged_in_client):
+    # Build a transparent PNG upload.
+    img = Image.new("RGBA", (400, 400), color=(255, 0, 0, 0))
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    png = SimpleUploadedFile("sticker.png", buffer.read(), content_type="image/png")
+
+    url = reverse("collectable:create")
+    data = {
+        "description": "PNG upload",
+        "tags": "tag1",
+        "license": "CC-BY-SA-4.0",
+        "photo": png,
+        "photo_x": 0,
+        "photo_y": 0,
+        "photo_w": 400,
+        "photo_h": 400,
+        "rights_confirmed": True,
+    }
+    response = logged_in_client.post(url, data)
+    assert response.status_code == 302
+    id = response.url.split("/")[-2]
+    collectable = Collectable.objects.get(id=id)
+    # Original is preserved as PNG.
+    assert collectable.photo.name.endswith(".png")
+    # JPEG thumbnail is generated without error (transparency flattened onto white).
+    thumb = Image.open(collectable.thumbnail.file)
+    assert thumb.format == "JPEG"
+    assert thumb.convert("RGB").getpixel((0, 0)) == (255, 255, 255)
 
 
 def test_details_view_authenticated_post(db, logged_in_client, collectable):

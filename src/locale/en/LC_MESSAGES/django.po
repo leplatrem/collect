@@ -103,7 +103,7 @@ msgid "Photo"
 msgstr ""
 
 #: collectable/models.py:85
-msgid "Please provide a square JPEG image (.jpg, .jpeg)"
+msgid "Please provide a square JPEG or PNG image (.jpg, .jpeg, .png)"
 msgstr ""
 
 #: collectable/models.py:93 collectable/templates/collectable/details.html:55

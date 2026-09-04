@@ -20,6 +20,7 @@ from taggit.managers import TaggableManager
 from taggit.models import Tag
 
 from collect.utils import tags_joiner
+from collectable.processors import FlattenOnWhite
 from collectable.search import QBuilder
 from collectable.validators import (
     MaxFileSizeValidator,
@@ -188,9 +189,9 @@ class Collectable(models.Model):
     photo = models.ImageField(
         _("Photo"),
         upload_to="collectables/%Y/",
-        help_text=_("Please provide a square JPEG image (.jpg, .jpeg)"),
+        help_text=_("Please provide a square JPEG or PNG image (.jpg, .jpeg, .png)"),
         validators=[
-            MimetypeValidator(["image/jpeg"]),
+            MimetypeValidator(["image/jpeg", "image/png"]),
             SquareImageValidator(),
             MaxFileSizeValidator(),
         ],
@@ -212,7 +213,8 @@ class Collectable(models.Model):
             Thumbnail(
                 settings.COLLECTABLE_THUMBNAIL_SIZE,
                 settings.COLLECTABLE_THUMBNAIL_SIZE,
-            )
+            ),
+            FlattenOnWhite(),
         ],
         format="JPEG",
         options={"quality": settings.COLLECTABLE_THUMBNAIL_QUALITY},

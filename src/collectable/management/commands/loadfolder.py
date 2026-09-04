@@ -58,7 +58,7 @@ class Command(BaseCommand):
         count_created = 0
         count_updated = 0
         for image_path in images:
-            if image_path.suffix.lower() not in [".jpg", ".jpeg"]:
+            if image_path.suffix.lower() not in [".jpg", ".jpeg", ".png"]:
                 continue  # skip non-image files
             # Consider subfolders as tags.
             parent_folder = image_path.parent
