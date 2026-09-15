@@ -31,24 +31,58 @@
                   hx-select-oob="#messages,#photo,#history,#related"
                   hx-trigger="submit, keyup[key=='Enter'] from:input, keyup[ctrlKey&&key=='Enter'] from:textarea"
                   hx-swap="outerHTML">
-                {{ form_edit }}
+                {% csrf_token %}
+                {{ form_edit.non_field_errors }}
+                {% for field in form_edit %}
+                    <div class="form-field">
+                        {{ field.errors }}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="helptext">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
                 <button type="submit">{% translate "Save" %}</button>
             </form>
         {% else %}
-            <p>{% translate "Description" %}: {{ collectable.description }}</p>
-            <p>
-                {% translate "Tags" %}:
-                {% for tag in collectable.tags.all %}
-                    <a href="{% url "collectable:collection" tag.slug %}">#{{ tag.name }}</a>
-                {% endfor %}
-            </p>
+            <div class="collectable-info">
+                {% if collectable.description %}
+                    <div class="collectable-description">
+                        <h2>{% translate "Description" %}</h2>
+                        <div class="description-text">{{ collectable.description|linebreaks }}</div>
+                    </div>
+                {% endif %}
+                {% if collectable.tags.exists %}
+                    <div class="collectable-tags">
+                        <h2>{% translate "Tags" %}</h2>
+                        <ul class="tag-list">
+                            {% for tag in collectable.tags.all %}
+                                <li>
+                                    <a href="{% url 'collectable:collection' tag.slug %}">#{{ tag.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <dl class="collectable-metadata">
+                    <div>
+                        <dt>{% translate "License" %}</dt>
+                        <dd>
+                            {{ collectable.get_license_display }}
+                        </dd>
+                    </div>
+                    {% if collectable.copies_count is not None %}
+                        <div>
+                            <dt>{% translate "Copies count" %}</dt>
+                            <dd>
+                                {{ collectable.copies_count }}
+                            </dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </div>
         {% endif %}
-        <p class="license">
-            {% translate "License" %}: <strong>{{ collectable.get_license_display }}</strong>
-        </p>
-        <p class="copies-count">
-            {% translate "Copies count" %}: <strong>{{ collectable.copies_count }}</strong>
-        </p>
     </section>
     <section id="possession">
         <h2>{% translate "Possessions" %}</h2>
@@ -67,7 +101,17 @@
                   hx-select-oob="#messages"
                   hx-swap="outerHTML">
                 {% csrf_token %}
-                {{ duplicate_form }}
+                {{ duplicate_form.non_field_errors }}
+                {% for field in duplicate_form %}
+                    <div class="form-field">
+                        {{ field.errors }}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="helptext">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
                 <button type="submit">{% translate "Report" %}</button>
             </form>
         </section>

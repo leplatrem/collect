@@ -106,18 +106,6 @@ form.inline {
   display: inline-block;
 }
 
-input[type="text"],
-input[type="search"],
-input[type="password"],
-textarea,
-select {
-  padding: 0.5rem;
-  border: 1px solid var(--input-border);
-  border-radius: 6px;
-  background: var(--input-bg);
-  color: inherit;
-}
-
 form button:not(.link) {
   padding: 0.6rem 1.2rem;
   margin: 1rem 0;
@@ -177,10 +165,6 @@ button.link {
 
 .invisible {
   display: none;
-}
-
-#report-duplicate form div {
-  display: inline;
 }
 
 a.more {
@@ -346,10 +330,6 @@ main.collectable.details #duplicates {
 main.collectable.details #related {
   grid-area: related;
 }
-main.collectable.details #attributes input[type="text"],
-main.collectable.details #attributes textarea {
-  width: 95%;
-}
 
 main.collectable.duplicate {
   grid-template-areas:
@@ -365,6 +345,267 @@ main.collectable.duplicate #attributes {
 }
 main.collectable.duplicate #confirm {
   justify-self: confirm;
+}
+
+#report-duplicate form div {
+  display: inline;
+}
+
+/* =========================================================
+   Forms
+   ========================================================= */
+
+.form-field {
+  margin-bottom: 1.25rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.form-field input[type="text"],
+.form-field input[type="search"],
+.form-field input[type="password"],
+.form-field input[type="email"],
+.form-field input[type="number"],
+.form-field input[type="file"],
+.form-field textarea,
+.form-field select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: inherit;
+  font: inherit;
+}
+
+.form-field textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.form-field input[type="file"] {
+  padding: 0.45rem;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: 2px solid var(--link-color);
+  outline-offset: 1px;
+}
+
+.form-field .helptext {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Field errors */
+.form-field .errorlist {
+  margin: 0 0 0.4rem;
+  padding: 0;
+  list-style: none;
+  color: var(--error-color);
+}
+
+/* Checkbox fields */
+.form-field input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0 0.5rem 0 0;
+  vertical-align: middle;
+  accent-color: var(--button-bg);
+}
+
+.form-field input[type="checkbox"] + label {
+  display: inline;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Form buttons */
+form:not(.inline) button:not(.link) {
+  padding: 0.6rem 1.2rem;
+  margin: 0.25rem 0 1rem;
+
+  background-color: var(--button-bg);
+  color: var(--button-color);
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: inherit;
+
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+form:not(.inline) button:not(.link):hover {
+  background-color: var(--button-color-hover);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+form:not(.inline) button:not(.link):active {
+  transform: scale(0.97);
+}
+
+form:not(.inline) button[type="submit"]:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-color);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+
+/* =========================================================
+   Create / Edit forms
+   ========================================================= */
+
+main.collectable.create #attributes,
+main.collectable.details #attributes {
+  width: 100%;
+  max-width: 800px;
+}
+
+main.collectable.create #attributes form,
+main.collectable.details #attributes form {
+  width: 100%;
+}
+
+/* =========================================================
+   Header search
+   ========================================================= */
+
+header form#search {
+  display: flex;
+  flex: 1 1 20rem;
+  max-width: 32rem;
+  margin: 0 1rem;
+}
+
+header form#search input[type="search"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+
+  background: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+
+  font: inherit;
+  line-height: 1.4;
+
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+header form#search input[type="search"]::placeholder {
+  color: var(--text-color);
+  opacity: 0.55;
+}
+
+header form#search input[type="search"]:focus {
+  border-color: var(--link-color);
+  box-shadow: 0 0 0 2px color-mix(
+    in srgb,
+    var(--link-color) 20%,
+    transparent
+  );
+}
+
+/* Remove the browser's default search decorations where supported. */
+header form#search input[type="search"]::-webkit-search-cancel-button,
+header form#search input[type="search"]::-webkit-search-decoration {
+  appearance: none;
+}
+
+/* =========================================================
+   Details page
+   ========================================================= */
+
+main.collectable.details #attributes {
+  grid-area: attrs;
+}
+
+main.collectable.details #attributes input[type="text"],
+main.collectable.details #attributes input[type="file"],
+main.collectable.details #attributes textarea,
+main.collectable.details #attributes select {
+  width: 100%;
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 700px) {
+  main.collectable.details,
+  main.collectable.duplicate {
+    display: block;
+  }
+
+  main.collectable.details #photo {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+
+  main.collectable.create #attributes,
+  main.collectable.details #attributes {
+    max-width: none;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  form:not(.inline) button:not(.link) {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   Very small screens
+   ========================================================= */
+
+@media (max-width: 480px) {
+  body > * {
+    padding: 0.75rem;
+  }
+
+  .form-field input[type="text"],
+  .form-field input[type="search"],
+  .form-field input[type="password"],
+  .form-field input[type="email"],
+  .form-field input[type="number"],
+  .form-field input[type="file"],
+  .form-field textarea,
+  .form-field select {
+    padding: 0.55rem;
+  }
 }
 
 section#related {
@@ -548,4 +789,124 @@ section#related {
 }
 .tag.size-group-10 {
   font-size: 2rem;
+}
+
+
+/* =========================================================
+   Read-only collectable information
+   ========================================================= */
+
+.collectable-info {
+  width: 100%;
+  max-width: 800px;
+}
+
+.collectable-info h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.collectable-description,
+.collectable-tags {
+  margin-bottom: 1.75rem;
+}
+
+
+/* Description */
+
+.description-text {
+  padding: 1rem 1.1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px var(--card-shadow);
+}
+
+.description-text p {
+  margin: 0 0 0.75rem;
+}
+
+.description-text p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* Tags */
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list a {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  background: var(--tag-bg);
+  color: var(--tag-color);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.tag-list a:hover {
+  background: var(--tag-bg-hover);
+  transform: translateY(-1px);
+}
+
+
+/* Metadata */
+
+.collectable-metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.collectable-metadata > div {
+  padding: 0.9rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+}
+
+.collectable-metadata dt {
+  margin-bottom: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+}
+
+.collectable-metadata dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .collectable-info {
+    max-width: none;
+  }
+
+  .collectable-metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .description-text {
+    padding: 0.85rem;
+  }
 }
