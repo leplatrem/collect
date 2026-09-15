@@ -43,9 +43,22 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name="possession",
-            unique_together=set(),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AlterUniqueTogether(
+                    name="possession",
+                    unique_together=set(),
+                ),
+            ],
+            database_operations=[
+                migrations.RunSQL(
+                    sql="""
+                        DROP INDEX IF EXISTS
+                        "idx_75330_collectable_possession_user_id_collectable_id_9d18e8a";
+                    """,
+                    reverse_sql=migrations.RunSQL.noop,
+                ),
+            ],
         ),
         migrations.AlterField(
             model_name="collectable",
