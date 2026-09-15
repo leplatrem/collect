@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-18 23:43+0000\n"
+"POT-Creation-Date: 2026-09-16 01:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,243 +18,198 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/accounts/forms.py:9
 msgid "Invitation secret"
 msgstr "Secret d'invitation"
 
-#: src/accounts/forms.py:15
+msgid "If you have an invitation secret, enter it here to get full access."
+msgstr ""
+
 #, python-format
 msgid "Invalid secret: %(value)s"
 msgstr "Secret invalide : %(value)s"
 
-#: src/collect/settings.py:164
 msgid "English"
 msgstr "Anglais"
 
-#: src/collect/settings.py:165
 msgid "French"
 msgstr "Français"
 
-#: src/collectable/forms.py:15
 msgid "Rights confirmation"
 msgstr "Confirmation des droits"
 
-#: src/collectable/forms.py:17
 msgid ""
 "I confirm that I am the author of this photo, or that it is in the public "
 "domain, and that I have the right to submit it under the selected license."
-msgstr "Je confirme que je suis l'auteur de cette photo, ou qu'elle est dans le domaine public, et que j'ai le droit de la soumettre sous la licence sélectionnée."
+msgstr ""
+"Je confirme que je suis l'auteur de cette photo, ou qu'elle est dans le "
+"domaine public, et que j'ai le droit de la soumettre sous la licence "
+"sélectionnée."
 
-#: src/collectable/forms.py:26
 msgid "Description, author, history, links to source, ..."
 msgstr "Description, auteur, histoire, liens vers la source, ..."
 
-#: src/collectable/forms.py:48
 msgid "Original"
 msgstr "Original"
 
-#: src/collectable/forms.py:49
 msgid "ID or URL of the original"
 msgstr "ID ou URL de l'original"
 
-#: src/collectable/forms.py:72
 msgid "This field is required."
 msgstr "Ce champ est obligatoire"
 
-#: src/collectable/forms.py:83
 msgid "Enter a valid URL"
 msgstr "Saisir une URL valide"
 
-#: src/collectable/forms.py:87
 msgid "Enter a collectable URL"
 msgstr "Saisir l'URL d'un objet"
 
-#: src/collectable/forms.py:93
 msgid "The URL does not point to a collectable details page."
 msgstr "Cette URL ne pointe pas vers la page détail d'un objet"
 
-#: src/collectable/forms.py:98
 msgid "Enter a valid URL or ID."
 msgstr "Saisir une URL valide"
 
-#: src/collectable/management/commands/loadfolder.py:25
 msgid "Username for creator of imported collectables"
 msgstr "Nom d'utilisateur pour le créateur des objets importés"
 
-#: src/collectable/management/commands/loadfolder.py:32
 msgid "Text to prepend to description"
 msgstr "Texte à ajouter à la fin des descriptions"
 
-#: src/collectable/management/commands/loadfolder.py:38
 msgid "Text to append to description"
 msgstr "Texte à ajouter au début descriptions"
 
-#: src/collectable/management/commands/loadfolder.py:42
 msgid "Username for owner of imported collectables"
 msgstr "Nom d'utilisateur pour le propriétaire des objets importés"
 
-#: src/collectable/management/commands/loadfolder.py:76
 #, python-format
 msgid "\"%s\" is not a square image, skipping."
 msgstr "\"%s\" n'est pas une image carrée, ignore image."
 
-#: src/collectable/management/commands/loadfolder.py:95
 #, python-format
 msgid "\"%s\" has no DateTime EXIF metadata, using filename as ID seed."
 msgstr ""
 "\"%s\" n'a pas de métadonnées EXIF, nom de fichier utilisé comme source."
 
-#: src/collectable/management/commands/loadfolder.py:167
 #, python-format
 msgid "Successfully created %s"
 msgstr "%s créé avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:172
 #, python-format
 msgid "Successfully updated %s"
 msgstr "%s mis à jour avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:187
 #, python-format
 msgid "Successfully assigned owner of %s"
 msgstr "Propriétaire de %s assigné avec succès"
 
-#: src/collectable/management/commands/loadfolder.py:193
 #, python-format
 msgid "%(num_created)s collectables created, %(num_updated)s updated."
 msgstr "%(num_created)s collectables crées, %(num_updated)s mis à jour."
 
-#: src/collectable/management/commands/loadfolder.py:200
 #, python-format
 msgid "%(total)s collectables in database."
 msgstr "%(total)s objets dans la base de données."
 
-#: src/collectable/management/commands/verifyuploads.py:39
 #, python-format
 msgid "%s collectables verified."
 msgstr "%s collectables vérifiés."
 
-#: src/collectable/models.py:45
 msgid "Tag"
 msgstr "Étiquette"
 
-#: src/collectable/models.py:45 src/collectable/models.py:197
-#: src/collectable/models.py:205
-#: src/collectable/templates/collectable/details.html:40
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: src/collectable/models.py:175
 msgid "CC0 1.0 – No Rights Reserved"
 msgstr ""
 
-#: src/collectable/models.py:176
 msgid "CC BY 4.0 – Attribution"
 msgstr ""
 
-#: src/collectable/models.py:177
 msgid "CC BY-SA 4.0 – Attribution-ShareAlike"
 msgstr ""
 
-#: src/collectable/models.py:180
 msgid "Identifier"
 msgstr "Identifiant"
 
-#: src/collectable/models.py:183
 msgid "Created at"
 msgstr "Créé le"
 
-#: src/collectable/models.py:185
 msgid "Modified at"
 msgstr "Modifié le"
 
-#: src/collectable/models.py:186
-#: src/collectable/templates/collectable/details.html:38
 msgid "Description"
 msgstr "Description"
 
-#: src/collectable/models.py:188
 msgid "Photo"
 msgstr "Photo"
 
-#: src/collectable/models.py:190
 msgid "Please provide a square JPEG or PNG image (.jpg, .jpeg, .png)"
 msgstr "Veuillez fournir une image JPEG ou PNG carrée (.jpg, .jpeg, .png)"
 
-#: src/collectable/models.py:200
-#: src/collectable/templates/collectable/details.html:74
 msgid "History"
 msgstr "Historique"
 
-#: src/collectable/models.py:219
 msgid "Hidden"
 msgstr "Masqué"
 
-#: src/collectable/models.py:221
-#: src/collectable/templates/collectable/details.html:47
 msgid "License"
 msgstr "Licence"
 
-#: src/collectable/models.py:226
 msgid ""
 "The license under which this image is submitted. By selecting a license, you "
 "confirm that you are the author of the photo or that the image is in the "
 "public domain, and that you have the right to submit it under the chosen "
 "license."
-msgstr "La licence sous laquelle cette image est soumise. En sélectionnant une licence, vous confirmez que vous êtes l'auteur de la photo ou que l'image est dans le domaine public, et que vous avez le droit de la soumettre sous la licence choisie."
+msgstr ""
+"La licence sous laquelle cette image est soumise. En sélectionnant une "
+"licence, vous confirmez que vous êtes l'auteur de la photo ou que l'image "
+"est dans le domaine public, et que vous avez le droit de la soumettre sous "
+"la licence choisie."
 
-#: src/collectable/models.py:394
+msgid "Copies count"
+msgstr "Nombre de copies"
+
+msgid "The number of copies of this collectable."
+msgstr "Nombre de copies de ce objet."
+
 msgid "Collectable"
 msgstr "Objet"
 
-#: src/collectable/models.py:395
 msgid "Collectables"
 msgstr "Objets"
 
-#: src/collectable/models.py:406
 msgid "Likes"
 msgstr "Aime"
 
-#: src/collectable/models.py:407
 msgid "Wants"
 msgstr "Recherche"
 
-#: src/collectable/models.py:408
 msgid "Owns"
 msgstr "Possède"
 
-#: src/collectable/models.py:411
 msgid "Possession"
 msgstr "Possession"
 
-#: src/collectable/models.py:412
-#: src/collectable/templates/collectable/details.html:51
 msgid "Possessions"
 msgstr "Possessions"
 
-#: src/collectable/models.py:448
 msgid "Reported at"
 msgstr "Signalé le"
 
-#: src/collectable/templates/collectable/collectable_list.html:8
 #, python-format
 msgid "%(counter)s collectable."
 msgid_plural "%(counter)s collectables."
 msgstr[0] "%(counter)s objet."
 msgstr[1] "%(counter)s objets."
 
-#: src/collectable/templates/collectable/collectable_thumbnail.html:6
-#: src/collectable/templates/collectable/details_duplicate.html:22
 #, python-format
 msgid "Thumbnail of %(obj)s"
 msgstr "Vignette de %(obj)s"
 
-#: src/collectable/templates/collectable/collection.html:5
-#: src/collectable/templates/collectable/collection.html:9
 msgid "Collection"
 msgstr "Collection"
 
-#: src/collectable/templates/collectable/collection.html:16
 #, python-format
 msgid ""
 "\n"
@@ -273,79 +228,60 @@ msgstr[1] ""
 "  %(counter)s Résultats\n"
 "  "
 
-#: src/collectable/templates/collectable/collection.html:25
 #, python-format
 msgid "You own %(n)s items in this collection (%(p)s%%)"
 msgstr "Vous possedez %(n)s objets dans cette collection (%(p)s%%)"
 
-#: src/collectable/templates/collectable/collection.html:30
 msgid "Related collections"
 msgstr "Collections associées"
 
-#: src/collectable/templates/collectable/collection.html:37
 msgid "None"
 msgstr "Aucune"
 
-#: src/collectable/templates/collectable/collection.html:53
 #, python-format
 msgid "No collectable with tags %(slugs)s"
 msgstr "Aucun objet avec les étiquettes %(slugs)s"
 
-#: src/collectable/templates/collectable/create.html:9
-#: src/collectable/templates/collectable/create.html:14
 msgid "Create"
 msgstr "Ajouter"
 
-#: src/collectable/templates/collectable/details.html:5
-#: src/collectable/templates/collectable/details_duplicate.html:5
 #, python-format
 msgid "Details of %(id)s"
 msgstr "Détails de %(id)s"
 
-#: src/collectable/templates/collectable/details.html:19
 msgid "Details"
 msgstr "Détails"
 
-#: src/collectable/templates/collectable/details.html:21
 #, python-format
 msgid "Photo of %(obj)s"
 msgstr "Photo de %(obj)s"
 
-#: src/collectable/templates/collectable/details.html:35
 msgid "Save"
 msgstr "Sauvegarder"
 
-#: src/collectable/templates/collectable/details.html:53
 msgid "Mark if you like, own or want this collectable."
 msgstr "Marquez si vous aimez, possédez ou désirez cet objet."
 
-#: src/collectable/templates/collectable/details.html:59
 msgid "This collectable is a duplicate?"
 msgstr "Cet objet est un doublon?"
 
-#: src/collectable/templates/collectable/details.html:60
 msgid ""
 "If you think this collectable is a duplicate of another one, please report "
 "it."
 msgstr ""
 "Si vous pensez que cet objet est le doublon d'un autre, veuillez le signaler."
 
-#: src/collectable/templates/collectable/details.html:68
-#: src/collectable/templates/collectable/details_duplicate.html:16
 msgid "Report"
 msgstr "Envoyer"
 
-#: src/collectable/templates/collectable/details.html:75
 #, python-format
 msgid "Created at %(date)s"
 msgstr "Créé le %(date)s"
 
-#: src/collectable/templates/collectable/details.html:77
 #, python-format
 msgid "Last modified at %(date)s"
 msgstr "Dernière modification le %(date)s"
 
-#: src/collectable/templates/collectable/details.html:83
 #, python-format
 msgid ""
 "\n"
@@ -356,71 +292,53 @@ msgstr ""
 "  %(action)s par %(user)s\n"
 "  "
 
-#: src/collectable/templates/collectable/details.html:102
 msgid "Similar collectables"
 msgstr "Objets similaires"
 
-#: src/collectable/templates/collectable/details.html:104
 msgid "With the same tags"
 msgstr "Avec les mêmes étiquettes"
 
-#: src/collectable/templates/collectable/details.html:117
 msgid "No other collectables found."
 msgstr "Aucun autre objet trouvé."
 
-#: src/collectable/templates/collectable/details.html:121
-#: src/collectable/templates/collectable/index.html:19
-#: src/collectable/templates/collectable/index.html:30
-#: src/collectable/templates/collectable/index.html:41
-#: src/collectable/templates/collectable/index.html:52
 msgid "More..."
 msgstr "Plus..."
 
-#: src/collectable/templates/collectable/details.html:129
 msgid "Duplicates"
 msgstr "Doublons"
 
-#: src/collectable/templates/collectable/details.html:130
 msgid ""
 "The following collectables have been reported as duplicates of this one:"
 msgstr "Les objets suivants ont été signalés comme des doublons de cet objet:"
 
-#: src/collectable/templates/collectable/details_duplicate.html:8
 msgid "Duplicate"
 msgstr "Doublon"
 
-#: src/collectable/templates/collectable/details_duplicate.html:20
 msgid "This collectable"
 msgstr "Cet objet"
 
-#: src/collectable/templates/collectable/details_duplicate.html:26
 msgid "has been reported as a duplicate of"
 msgstr "a été signalé comme le doublon de"
 
-#: src/collectable/templates/collectable/details_duplicate.html:30
 msgid "by"
 msgstr "par"
 
-#: src/collectable/templates/collectable/details_duplicate.html:34
 #, python-format
 msgid ""
 "\n"
-"                                %(who)s on %(when)s\n"
-"                            "
+"                            %(who)s on %(when)s\n"
+"                        "
 msgstr ""
 "\n"
-"  %(who)s le %(when)s\n"
-"  "
+"                                   %(who)s le %(when)s\n"
+"                               "
 
-#: src/collectable/templates/collectable/details_duplicate.html:52
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/collectable/templates/collectable/details_duplicate.html:60
 msgid "Confirm"
 msgstr "Confirmer"
 
-#: src/collectable/templates/collectable/details_duplicate.html:65
 #, python-format
 msgid "%(missing)s more confirmation before merging the two collectables."
 msgid_plural ""
@@ -428,15 +346,12 @@ msgid_plural ""
 msgstr[0] "%(missing)s confirmation avant la fusion des deux objets."
 msgstr[1] "%(missing)s confirmations avant la fusion des deux objets."
 
-#: src/collectable/templates/collectable/details_duplicate.html:68
 msgid "Ignore"
 msgstr "Ignorer"
 
-#: src/collectable/templates/collectable/index.html:5
 msgid "Explore"
 msgstr "Explorer"
 
-#: src/collectable/templates/collectable/index.html:6
 #, python-format
 msgid ""
 "\n"
@@ -455,180 +370,134 @@ msgstr[1] ""
 "  %(counter)s objets\n"
 "  "
 
-#: src/collectable/templates/collectable/index.html:11
 msgid "Latest"
 msgstr "Derniers"
 
-#: src/collectable/templates/collectable/index.html:16
 msgid "No collectable in database."
 msgstr "Aucun objet dans la base de données."
 
-#: src/collectable/templates/collectable/index.html:22
 msgid "Most wanted"
 msgstr "Les plus recherchés"
 
-#: src/collectable/templates/collectable/index.html:27
-#: src/collectable/templates/collectable/profile.html:44
 msgid "No collectable wanted."
 msgstr "Aucun objet recherché."
 
-#: src/collectable/templates/collectable/index.html:33
 msgid "Most liked"
 msgstr "Les plus aimés"
 
-#: src/collectable/templates/collectable/index.html:38
-#: src/collectable/templates/collectable/profile.html:31
 msgid "No collectable liked."
 msgstr "Aucun objet aimé."
 
-#: src/collectable/templates/collectable/index.html:44
 msgid "Most owned"
 msgstr "Les plus possédés"
 
-#: src/collectable/templates/collectable/index.html:49
-#: src/collectable/templates/collectable/profile.html:18
 msgid "No collectable owned."
 msgstr "Aucun objet possédé."
 
-#: src/collectable/templates/collectable/index.html:55
 msgid "Collections"
 msgstr "Collections"
 
-#: src/collectable/templates/collectable/index.html:62
 msgid "No collection found."
 msgstr "Aucune collection."
 
-#: src/collectable/templates/collectable/keyboard_navigation.html:11
-#: src/templates/paginator.html:7
 msgid "Previous"
 msgstr "Précédent"
 
-#: src/collectable/templates/collectable/keyboard_navigation.html:13
 msgid "Press <kbd>[</kbd> to navigate to previous"
 msgstr "Appuyez sur <kbd>[</kbd> pour aller au précédent"
 
-#: src/collectable/templates/collectable/keyboard_navigation.html:25
-#: src/templates/paginator.html:12
 msgid "Next"
 msgstr "Suivant"
 
-#: src/collectable/templates/collectable/keyboard_navigation.html:26
 msgid "Press <kbd>]</kbd> to navigate to next"
 msgstr "Appuyez sur <kbd>]</kbd> pour aller au suivant"
 
-#: src/collectable/templates/collectable/possession_form.html:13
 #, python-format
 msgid "%(counter)s like"
 msgid_plural "%(counter)s likes"
 msgstr[0] "%(counter)s aimé"
 msgstr[1] "%(counter)s aimés"
 
-#: src/collectable/templates/collectable/possession_form.html:16
 #, python-format
 msgid "%(counter)s want"
 msgid_plural "%(counter)s wants"
 msgstr[0] "%(counter)s recherché"
 msgstr[1] "%(counter)s recherchés"
 
-#: src/collectable/templates/collectable/possession_form.html:19
 #, python-format
 msgid "%(counter)s owner"
 msgid_plural "%(counter)s owners"
 msgstr[0] "%(counter)s propriétaire"
 msgstr[1] "%(counter)s propriétaires"
 
-#: src/collectable/templates/collectable/profile.html:4
-#: src/collectable/templates/collectable/profile.html:7
 msgid "Profile"
 msgstr "Profil"
 
-#: src/collectable/templates/collectable/profile.html:8
 msgid "Owned"
 msgstr "Possédé"
 
-#: src/collectable/templates/collectable/profile.html:11
-#: src/collectable/templates/collectable/profile.html:24
-#: src/collectable/templates/collectable/profile.html:37
 #, python-format
 msgid "%(counter)s item."
 msgid_plural "%(counter)s items."
 msgstr[0] "%(counter)s objets."
 msgstr[1] "%(counter)s objets."
 
-#: src/collectable/templates/collectable/profile.html:21
 msgid "Liked"
 msgstr "Aimé"
 
-#: src/collectable/templates/collectable/profile.html:34
 msgid "Wanted"
 msgstr "Recherché"
 
-#: src/collectable/validators.py:20
 #, python-format
 msgid "%s is not an acceptable file type."
 msgstr "%s n'a pas le bon format de fichier."
 
-#: src/collectable/validators.py:37
 #, python-format
 msgid "%s is not a square image"
 msgstr "\"%s\" n'est pas une image carrée"
 
-#: src/collectable/validators.py:46
-#, fuzzy, python-format
-#| msgid "{{ file }} exceeds the maximum file size of {{ max_size }} bytes."
+#, python-format
 msgid "%(file)s exceeds the maximum file size of %(max_size)s bytes."
-msgstr ""
-"%(file)s dépasse la taille maximale de fichier de %(max_size)s bytes."
+msgstr "%(file)s dépasse la taille maximale de fichier de %(max_size)s bytes."
 
-#: src/collectable/views.py:127
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
-#: src/collectable/views.py:129
 #, python-format
 msgid "Search results for '%(q)s'"
 msgstr "Résultats de la recherche pour '%(q)s'"
 
-#: src/collectable/views.py:131
 #, python-format
 msgid "Basic search results for '%(q)s'"
 msgstr "Résultats de la recherche textuelle pour '%(q)s'"
 
-#: src/collectable/views.py:136
 msgid "Most liked collectables"
 msgstr "Objets les plus aimés"
 
-#: src/collectable/views.py:137
 msgid "Most wanted collectables"
 msgstr "Objets les plus recherchés"
 
-#: src/collectable/views.py:138
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-#: src/collectable/views.py:153
 msgid "Collectable created successfully."
 msgstr "Objet créé avec succès."
 
-#: src/collectable/views.py:156 src/collectable/views.py:244
-#: src/collectable/views.py:314
 msgid "Invalid fields, please correct them."
 msgstr "Champs invalides, veuillez les corriger."
 
-#: src/collectable/views.py:237 src/collectable/views.py:305
-#: src/collectable/views.py:330
 msgid "Unauthorized"
 msgstr "Interdit"
 
-#: src/collectable/views.py:242
+msgid "Forbidden"
+msgstr "Interdit"
+
 msgid "Collectable updated successfully."
 msgstr "Objet mis à jour avec succès."
 
-#: src/collectable/views.py:286
 msgid "This collectable has not been reported as duplicate."
 msgstr "Cet objet n'a pas été signalé comme doublon."
 
-#: src/collectable/views.py:295
 msgid ""
 "This collectable has been hidden as it was reported as a duplicate. You are "
 "being redirected to the original."
@@ -636,59 +505,45 @@ msgstr ""
 "Cet objet a été masqué car étant signalé comme doublon. Vous avez été "
 "redirigé vers l'original."
 
-#: src/collectable/views.py:320
 msgid "Duplicate reported! Thank you!"
 msgstr "Doublon signalé! Merci!"
 
-#: src/collectable/views.py:337
 msgid "You have not reported this duplicate."
 msgstr "Vous n'avez pas signalé ce doublon."
 
-#: src/collectable/views.py:338
 msgid "Not Found"
 msgstr "Introuvable"
 
-#: src/collectable/views.py:341
 msgid "Your duplicate report has been cancelled."
 msgstr "Votre signalement de doublon a été annulé."
 
-#: src/cropper/fields.py:31
 msgid "Invalid crop dimensions."
 msgstr "Dimensions de rognage invalides."
 
-#: src/cropper/templates/cropper/widget.html:15
 msgid "Zoom:"
 msgstr ""
 
-#: src/templates/base.html:22
 msgid "Home"
 msgstr "Accueil"
 
-#: src/templates/base.html:25
 msgid "Create collectable"
 msgstr "Ajouter un objet"
 
-#: src/templates/base.html:28
 msgid "Review duplicates"
 msgstr "Vérifier doublons"
 
-#: src/templates/base.html:40
 msgid "Search collectables..."
 msgstr "Recherche des objects..."
 
-#: src/templates/base.html:44
 msgid "Password Change"
 msgstr "Changer mot de passe"
 
-#: src/templates/base.html:47
 msgid "Log Out"
 msgstr "Se déconnecter"
 
-#: src/templates/base.html:50 src/templates/registration/login.html:11
 msgid "Log In"
 msgstr "Se connecter"
 
-#: src/templates/base.html:66
 msgid ""
 "\n"
 "                🚀 This project is <strong>free</strong> and <strong>open "
@@ -704,38 +559,27 @@ msgstr ""
 "collect\" target=\"_blank\" rel=\"noopener\">GitHub</a>!\n"
 "                "
 
-#: src/templates/paginator.html:5
 msgid "First page"
 msgstr "Première page"
 
-#: src/templates/paginator.html:9
 #, python-format
 msgid "Page %(number)s of %(total)s"
 msgstr "Page %(number)s sur %(total)s"
 
-#: src/templates/paginator.html:14
 msgid "Last page"
 msgstr "Dernière page"
 
-#: src/templates/registration/login.html:4
-#: src/templates/registration/login.html:7
 msgid "Login"
 msgstr "Connexion"
 
-#: src/templates/registration/login.html:14
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
-#: src/templates/registration/login.html:16
 msgid "New here?"
 msgstr "Nouveau ici ?"
 
-#: src/templates/registration/login.html:18
-#: src/templates/registration/signup.html:7
-#: src/templates/registration/signup.html:11
 msgid "Sign up"
 msgstr "S'inscrire"
 
-#: src/templates/registration/signup.html:4
 msgid "Sign Up"
 msgstr "S'inscrire"

@@ -232,6 +232,13 @@ class Collectable(models.Model):
             "to submit it under the chosen license."
         ),
     )
+    copies_count = models.PositiveIntegerField(
+        _("Copies count"),
+        default=None,
+        null=True,
+        blank=True,
+        help_text=_("The number of copies of this collectable."),
+    )
 
     objects = CollectableManager()
     all_objects = CollectableManager(with_hidden=True)

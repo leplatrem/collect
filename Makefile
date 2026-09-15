@@ -54,6 +54,7 @@ migrate:  ## Run pending migrations if needed
 demo: $(INSTALL_STAMP_PYTHON) $(ENV_FILE) migrate   ## Create demo data
 	$(UV) run manage.py smart_create_user --admin admin s3cr3t
 	$(UV) run manage.py smart_create_user testuser testpass
+	$(UV) run manage.py smart_create_user --collector collector collectorpass
 	$(UV) run manage.py loadfolder admin demo
 	@echo "You can now run 'make start'"
 
