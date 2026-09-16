@@ -34,21 +34,7 @@
                   hx-swap="outerHTML">
                 {% csrf_token %}
                 {{ form_edit.non_field_errors }}
-                {% for field in form_edit %}
-                    <div class="form-field">
-                        {{ field.errors }}
-                        <label for="{{ field.id_for_label }}">
-                            {{ field.label }}
-                            {% if not field.field.required %}
-                                <span class="optional">{% translate "optional" %}</span>
-                            {% endif %}
-                        </label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="helptext">{{ field.help_text }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% include "includes/form_fields.html" with form=form_edit %}
                 <button type="submit">{% translate "Save" %}</button>
             </form>
         {% else %}
@@ -116,16 +102,7 @@
                   hx-swap="outerHTML">
                 {% csrf_token %}
                 {{ duplicate_form.non_field_errors }}
-                {% for field in duplicate_form %}
-                    <div class="form-field">
-                        {{ field.errors }}
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="helptext">{{ field.help_text }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% include "includes/form_fields.html" with form=duplicate_form %}
                 <button type="submit">{% translate "Report" %}</button>
             </form>
         </section>

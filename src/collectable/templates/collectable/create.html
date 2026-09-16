@@ -11,21 +11,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            {% for field in form %}
-                <div class="form-field">
-                    {{ field.errors }}
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                        {% if not field.field.required %}
-                            <span class="optional">{% translate "optional" %}</span>
-                        {% endif %}
-                    </label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <div class="helptext">{{ field.help_text }}</div>
-                    {% endif %}
-                </div>
-            {% endfor %}
+            {% include "includes/form_fields.html" with form=form %}
             <button type="submit">{% translate "Create" %}</button>
         </form>
     </section>
