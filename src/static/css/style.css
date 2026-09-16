@@ -294,7 +294,7 @@ main.collectable.details {
   grid-template-areas:
     "title title title title"
     "prev image attrs next"
-    ".    image attrs ."
+    ".    possession attrs ."
     ".    possession repdup ."
     ".    related related ."
     ".    dup dup ."
@@ -303,6 +303,9 @@ main.collectable.details {
 
 main.collectable.details #photo {
   grid-area: image;
+}
+
+main.collectable.details #photo img {
   width: 100%;
   height: auto;
   object-fit: cover;

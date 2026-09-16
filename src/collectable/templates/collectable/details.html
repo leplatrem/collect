@@ -17,11 +17,12 @@
 {% endblock head %}
 {% block content %}
     <h1>{% translate "Details" %}</h1>
-    <img id="photo"
-         alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
-         height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-         width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
-         src="{{ collectable.photo.url }}" />
+    <section id="photo">
+        <img alt="{% blocktranslate with obj=collectable %}Photo of {{ obj }}{% endblocktranslate %}"
+             height="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+             width="{{ COLLECTABLE_PHOTO_MAX_SIZE }}"
+             src="{{ collectable.photo.url }}" />
+    </section>
     <section id="attributes">
         {% if user.is_authenticated and perms.collectable.change_collectable %}
             <form hx-encoding='multipart/form-data'
@@ -77,6 +78,14 @@
                             <dt>{% translate "Copies count" %}</dt>
                             <dd>
                                 {{ collectable.copies_count }}
+                            </dd>
+                        </div>
+                    {% endif %}
+                    {% if collectable.source_file %}
+                        <div>
+                            <dt>{% translate "Source file" %}</dt>
+                            <dd>
+                                <a href="{{ collectable.source_file.url }}">{{ collectable.source_filename }}</a>
                             </dd>
                         </div>
                     {% endif %}

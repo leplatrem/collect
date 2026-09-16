@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 01:14+0200\n"
+"POT-Creation-Date: 2026-09-16 02:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,8 +45,8 @@ msgstr ""
 "domaine public, et que j'ai le droit de la soumettre sous la licence "
 "sélectionnée."
 
-msgid "Description, author, history, links to source, ..."
-msgstr "Description, auteur, histoire, liens vers la source, ..."
+msgid "Description, author, history, ..."
+msgstr "Description, auteur, histoire, ..."
 
 msgid "Original"
 msgstr "Original"
@@ -172,6 +172,12 @@ msgstr "Nombre de copies"
 
 msgid "The number of copies of this collectable."
 msgstr "Nombre de copies de ce objet."
+
+msgid "Source file"
+msgstr "Fichier source"
+
+msgid "Original editable file (e.g. .pdf, .png, .svg, ...)"
+msgstr "Fichier éditable original (ex. .pdf, .png, .svg, ...)"
 
 msgid "Collectable"
 msgstr "Objet"

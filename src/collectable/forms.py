@@ -32,7 +32,7 @@ class CollectableForm(ModelForm):
 
         self.fields["photo"].widget.attrs.update({"accept": "image/jpeg,image/png"})
         self.fields["description"].widget.attrs.update(
-            {"placeholder": _("Description, author, history, links to source, ...")}
+            {"placeholder": _("Description, author, history, ...")}
         )
         # On edit, rights were already confirmed at creation time.
         instance = kwargs.get("instance")
@@ -48,6 +48,7 @@ class CollectableForm(ModelForm):
             "tags",
             "license",
             "copies_count",
+            "source_file",
         ]
         widgets = {
             "description": Textarea(attrs={"rows": "5"}),

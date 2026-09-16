@@ -1,3 +1,4 @@
+import os
 import re
 import uuid
 from collections import deque
@@ -239,6 +240,14 @@ class Collectable(models.Model):
         blank=True,
         help_text=_("The number of copies of this collectable."),
     )
+    source_file = models.FileField(
+        _("Source file"),
+        upload_to="collectables/%Y/source/",
+        default=None,
+        null=True,
+        blank=True,
+        help_text=_("Original editable file (e.g. .pdf, .png, .svg, ...)"),
+    )
 
     objects = CollectableManager()
     all_objects = CollectableManager(with_hidden=True)
@@ -391,6 +400,14 @@ class Collectable(models.Model):
             id__in=duplicate_reports
         )
         return duplicates
+
+    def source_filename(self):
+        """
+        Return the filename of the source file, if any.
+        """
+        if self.source_file:
+            return os.path.basename(self.source_file.name)
+        return None
 
     class Meta:
         verbose_name = _("Collectable")
