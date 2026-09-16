@@ -10,7 +10,8 @@
     <section id="attributes">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form }}
+            {{ form.non_field_errors }}
+            {% include "includes/form_fields.html" with form=form %}
             <button type="submit">{% translate "Create" %}</button>
         </form>
     </section>

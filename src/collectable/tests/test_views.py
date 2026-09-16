@@ -57,6 +57,7 @@ def test_create_view_authenticated_post(db, logged_in_client, collectable):
         "photo_y": 0,
         "photo_w": 400,
         "photo_h": 400,
+        "rights_confirmed": True,
     }
     response = logged_in_client.post(url, data)
     assert response.status_code == 302

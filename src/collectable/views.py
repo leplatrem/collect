@@ -442,11 +442,13 @@ def collection(request, slugs):
 
     # Count how many are owned by the current user, taking advantage of prefetched
     # data from above.
+    total_collectables = len(collectable_list)
     total_owned = sum(
         1
         for c in collectable_list
         if getattr(c, "possession_set_list", []) and c.possession_set_list[0].owns
     )
+    percent_owned = total_owned / total_collectables * 100 if total_collectables else 0
 
     known_tag_slugs = [t.slug for t in tag_list]
     for slug in slugs:
@@ -470,7 +472,8 @@ def collection(request, slugs):
         "tag_list": tag_list,
         "reltag_list": reltag_list,
         "total_owned": total_owned,
-        "percent_owned": 100 * total_owned / max(len(collectable_list), 1),
+        "total_collectables": total_collectables,
+        "percent_owned": percent_owned,
     }
     return render(request, "collectable/collection.html", context)
 

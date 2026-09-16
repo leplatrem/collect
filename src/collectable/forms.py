@@ -19,6 +19,7 @@ class CollectableForm(ModelForm):
     photo = CropImageField()
     rights_confirmed = BooleanField(
         required=True,
+        initial=False,
         label=_("Rights confirmation"),
         help_text=_(
             "I confirm that I am the author of this photo, or that it is in the public "
@@ -28,17 +29,27 @@ class CollectableForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields["photo"].widget.attrs.update({"accept": "image/jpeg,image/png"})
         self.fields["description"].widget.attrs.update(
-            {"placeholder": _("Description, author, history, links to source, ...")}
+            {"placeholder": _("Description, author, history, ...")}
         )
         # On edit, rights were already confirmed at creation time.
-        if self.instance and self.instance.pk:
+        instance = kwargs.get("instance")
+        if instance is not None:
             del self.fields["rights_confirmed"]
 
     class Meta:
         model = Collectable
-        fields = ["photo", "description", "tags", "license"]
+        fields = [
+            "photo",
+            "rights_confirmed",
+            "description",
+            "tags",
+            "license",
+            "copies_count",
+            "source_file",
+        ]
         widgets = {
             "description": Textarea(attrs={"rows": "5"}),
         }

@@ -12,7 +12,7 @@ class SignUpForm(UserCreationForm):
         max_length=30,
         required=False,
         help_text=_(
-            "If you have an invitation secret, enter it here to get full access."
+            "If you have an invitation secret, enter it here to get full access with upload permission."
         ),
     )
 

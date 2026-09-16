@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load l10n %}
 {% load collectable_extras %}
 {% block title %}
     {% translate "Collection" %}
@@ -20,10 +21,24 @@
         {% endblocktranslate %}
     </h2>
     {% if user.is_authenticated %}
-        <section>
-            <p>
-                {% blocktranslate with n=total_owned p=percent_owned|floatformat:"0" %}You own {{n}} items in this collection ({{p}}%){% endblocktranslate %}
-            </p>
+        <section class="collection-progress">
+            {% comment %} djlint:off H021 {% endcomment %}
+            <div class="collection-progress-ring"
+                 style="--progress: {{ percent_owned|unlocalize }}%">
+                <div class="collection-progress-value">
+                    <strong>{{ total_owned }}</strong>
+                    <span>/ {{ total_collectables }}</span>
+                </div>
+            </div>
+            {% comment %} djlint:on {% endcomment %}
+            <div class="collection-progress-info">
+                <h2>{% translate "Your collection" %}</h2>
+                <p>
+                    {% blocktranslate with p=percent_owned|floatformat:"0" %}
+                        You've collected {{ p }}% of this collection.
+                    {% endblocktranslate %}
+                </p>
+            </div>
         </section>
     {% endif %}
     {% if reltag_list %}
