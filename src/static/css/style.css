@@ -168,12 +168,43 @@ button.link {
 }
 
 a.more {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 60%;
+
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--link-color);
+
+  font-size: 2rem;
   font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+
+  opacity: 0.6;
+  box-shadow: 0 4px 8px var(--card-shadow);
+
+  transition:
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
 }
 
 a.more::before {
   content: "» ";
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+a.more:hover {
+  opacity: 1;
+  box-shadow: 0 6px 12px var(--card-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .collectable-grid {
@@ -637,18 +668,14 @@ section#related {
   margin-bottom: 1em;
 }
 
-.counters {
-  display: flex;
-  gap: 0.5rem;
-}
-
 .possession-form label {
   display: none;
 }
 
 .possession-form p {
+  display: inline-block;
   margin: 0;
-  margin-left: 0.5rem;
+  width: 32%;
   text-align: center;
 }
 
