@@ -961,3 +961,104 @@ section#related {
     padding: 0.85rem;
   }
 }
+
+/* =========================================================
+   Collection progress
+   ========================================================= */
+
+.collection-progress {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px var(--card-shadow);
+}
+
+.collection-progress-ring {
+  --progress: 0%;
+
+  flex: 0 0 90px;
+  width: 90px;
+  height: 90px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--link-color) var(--progress),
+    var(--card-border) var(--progress)
+  );
+}
+
+.collection-progress-ring::before {
+  content: "";
+  grid-area: 1 / 1;
+
+  width: 70px;
+  height: 70px;
+
+  border-radius: 50%;
+  background: var(--card-bg);
+}
+
+.collection-progress-value {
+  grid-area: 1 / 1;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.collection-progress-value strong {
+  font-size: 1.25rem;
+}
+
+.collection-progress-value span {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.collection-progress-info {
+  min-width: 0;
+}
+
+.collection-progress-info h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.collection-progress-info p {
+  margin: 0;
+  opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+  .collection-progress {
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .collection-progress-ring {
+    flex-basis: 75px;
+    width: 75px;
+    height: 75px;
+  }
+
+  .collection-progress-ring::before {
+    width: 58px;
+    height: 58px;
+  }
+}
