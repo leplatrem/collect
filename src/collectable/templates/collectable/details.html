@@ -37,7 +37,12 @@
                 {% for field in form_edit %}
                     <div class="form-field">
                         {{ field.errors }}
-                        {{ field.label_tag }}
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if not field.field.required %}
+                                <span class="optional">{% translate "optional" %}</span>
+                            {% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}
                             <div class="helptext">{{ field.help_text }}</div>

@@ -408,6 +408,13 @@ main.collectable.duplicate #confirm {
   line-height: 1.4;
 }
 
+.form-field .optional {
+  margin-left: 0.35rem;
+  font-size: 0.8em;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
 /* Field errors */
 .form-field .errorlist {
   margin: 0 0 0.4rem;
