@@ -637,14 +637,18 @@ section#related {
   margin-bottom: 1em;
 }
 
+.counters {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .possession-form label {
   display: none;
 }
 
 .possession-form p {
-  display: inline-block;
   margin: 0;
-  width: 32%;
+  margin-left: 0.5rem;
   text-align: center;
 }
 

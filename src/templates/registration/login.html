@@ -7,7 +7,7 @@
     <h2>{% translate "Login" %}</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form }}
+        {% include "includes/form_fields.html" with form=form %}
         <button type="submit">{% translate "Log In" %}</button>
     </form>
     <p>
