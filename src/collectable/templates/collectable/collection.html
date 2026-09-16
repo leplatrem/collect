@@ -22,6 +22,7 @@
     </h2>
     {% if user.is_authenticated %}
         <section class="collection-progress">
+            {% comment %} djlint:off H021 {% endcomment %}
             <div class="collection-progress-ring"
                  style="--progress: {{ percent_owned|unlocalize }}%">
                 <div class="collection-progress-value">
@@ -29,6 +30,7 @@
                     <span>/ {{ total_collectables }}</span>
                 </div>
             </div>
+            {% comment %} djlint:on {% endcomment %}
             <div class="collection-progress-info">
                 <h2>{% translate "Your collection" %}</h2>
                 <p>
