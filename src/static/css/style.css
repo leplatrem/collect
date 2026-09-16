@@ -292,12 +292,12 @@ main.collectable.duplicate .navigation.next {
 
 main.collectable.details {
   grid-template-areas:
-    "title title title title "
-    "prev  image attrs next"
-    ".  image repdup ."
-    ".     possession .  ."
-    ".     related related ."
-    ".     dup dup ."
+    "title title title title"
+    "prev image attrs next"
+    ".    image attrs ."
+    ".    possession repdup ."
+    ".    related related ."
+    ".    dup dup ."
     ".    history history .";
 }
 
@@ -345,10 +345,6 @@ main.collectable.duplicate #attributes {
 }
 main.collectable.duplicate #confirm {
   justify-self: confirm;
-}
-
-#report-duplicate form div {
-  display: inline;
 }
 
 /* =========================================================
@@ -472,7 +468,6 @@ form:not(.inline) button[type="submit"]:disabled {
   transform: none;
 }
 
-
 /* =========================================================
    Create / Edit forms
    ========================================================= */
@@ -486,6 +481,36 @@ main.collectable.details #attributes {
 main.collectable.create #attributes form,
 main.collectable.details #attributes form {
   width: 100%;
+}
+
+#report-duplicate form {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+#report-duplicate form .form-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+#report-duplicate form button {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.9rem;
+}
+@media (max-width: 700px) {
+  #report-duplicate form {
+    display: block;
+  }
+
+  #report-duplicate form .form-field {
+    margin-bottom: 1rem;
+  }
+
+  #report-duplicate form button {
+    width: 100%;
+  }
 }
 
 /* =========================================================
@@ -526,11 +551,7 @@ header form#search input[type="search"]::placeholder {
 
 header form#search input[type="search"]:focus {
   border-color: var(--link-color);
-  box-shadow: 0 0 0 2px color-mix(
-    in srgb,
-    var(--link-color) 20%,
-    transparent
-  );
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--link-color) 20%, transparent);
 }
 
 /* Remove the browser's default search decorations where supported. */
@@ -543,17 +564,12 @@ header form#search input[type="search"]::-webkit-search-decoration {
    Details page
    ========================================================= */
 
-main.collectable.details #attributes {
-  grid-area: attrs;
-}
-
 main.collectable.details #attributes input[type="text"],
 main.collectable.details #attributes input[type="file"],
 main.collectable.details #attributes textarea,
 main.collectable.details #attributes select {
   width: 100%;
 }
-
 
 /* =========================================================
    Mobile
@@ -585,7 +601,6 @@ main.collectable.details #attributes select {
     width: 100%;
   }
 }
-
 
 /* =========================================================
    Very small screens
@@ -791,7 +806,6 @@ section#related {
   font-size: 2rem;
 }
 
-
 /* =========================================================
    Read-only collectable information
    ========================================================= */
@@ -812,7 +826,6 @@ section#related {
   margin-bottom: 1.75rem;
 }
 
-
 /* Description */
 
 .description-text {
@@ -830,7 +843,6 @@ section#related {
 .description-text p:last-child {
   margin-bottom: 0;
 }
-
 
 /* Tags */
 
@@ -863,7 +875,6 @@ section#related {
   transform: translateY(-1px);
 }
 
-
 /* Metadata */
 
 .collectable-metadata {
@@ -893,7 +904,6 @@ section#related {
   margin: 0;
   font-weight: 600;
 }
-
 
 /* Mobile */
 
