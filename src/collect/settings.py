@@ -298,6 +298,16 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
 
+# Rate limits, as "<number of requests>/<number of seconds>", applied per
+# client IP. `THROTTLE_NUM_PROXIES` is the number of trusted reverse proxies in
+# front of the app: with 0, the client IP is `REMOTE_ADDR`, otherwise it is read
+# from the `X-Forwarded-For` header (which only the closest proxies can be
+# trusted to have set).
+THROTTLE_NUM_PROXIES: int = config("DJANGO_THROTTLE_NUM_PROXIES", default=0, cast=int)
+THROTTLE_LOGIN = config("COLLECT_THROTTLE_LOGIN", default="20/300")
+THROTTLE_SIGNUP = config("COLLECT_THROTTLE_SIGNUP", default="5/3600")
+THROTTLE_SEARCH = config("COLLECT_THROTTLE_SEARCH", default="120/60")
+
 DEFAULT_TAGS: str = config("COLLECT_DEFAULT_TAGS", default="#{year}")
 
 COLLECTORS_GROUP_NAME: str = "collectors"
