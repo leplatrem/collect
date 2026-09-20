@@ -38,6 +38,9 @@ msgstr "Anglais"
 msgid "French"
 msgstr "Français"
 
+msgid "Too Many Requests"
+msgstr "Trop de requêtes"
+
 msgid "Rights confirmation"
 msgstr "Confirmation des droits"
 
@@ -241,10 +244,11 @@ msgstr[1] ""
 msgid "Your collection"
 msgstr "Votre collection"
 
+#, python-format
 msgid ""
 "\n"
-"                    You've collected %(p)s%% of this collection.\n"
-"                "
+"                        You've collected %(p)s%% of this collection.\n"
+"                    "
 msgstr ""
 "\n"
 "                    Vous possédez %(p)s%% de cette collection.\n"
@@ -482,6 +486,17 @@ msgstr "\"%s\" n'est pas une image carrée"
 msgid "%(file)s exceeds the maximum file size of %(max_size)s bytes."
 msgstr "%(file)s dépasse la taille maximale de fichier de %(max_size)s bytes."
 
+#, python-format
+msgid "%(extension)s files are not accepted. Allowed formats: %(allowed)s."
+msgstr "Les fichiers %(extension)s ne sont pas acceptés. Formats autorisés : %(allowed)s."
+
+msgid "Extension-less"
+msgstr "Sans extension"
+
+#, python-format
+msgid "%(file)s is too large to be processed (max %(max)s pixels)."
+msgstr "%(file)s est trop grande pour être traitée (maximum %(max)s pixels)."
+
 msgid "Latest collectables"
 msgstr "Derniers objets"
 
@@ -541,6 +556,14 @@ msgstr "Votre signalement de doublon a été annulé."
 
 msgid "Invalid crop dimensions."
 msgstr "Dimensions de rognage invalides."
+
+#, python-format
+msgid "The file exceeds the maximum size of %(max_size)s bytes."
+msgstr "Le fichier dépasse la taille maximale de %(max_size)s bytes."
+
+#, python-format
+msgid "The image is too large to be processed (max %(max)s pixels)."
+msgstr "L'image est trop grande pour être traitée (maximum %(max)s pixels)."
 
 msgid "Zoom:"
 msgstr ""

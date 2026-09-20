@@ -24,7 +24,9 @@ from collect.utils import tags_joiner
 from collectable.processors import FlattenOnWhite
 from collectable.search import QBuilder
 from collectable.validators import (
+    FileExtensionValidator,
     MaxFileSizeValidator,
+    MaxImagePixelsValidator,
     MimetypeValidator,
     SquareImageValidator,
 )
@@ -195,6 +197,7 @@ class Collectable(models.Model):
             MimetypeValidator(["image/jpeg", "image/png"]),
             SquareImageValidator(),
             MaxFileSizeValidator(),
+            MaxImagePixelsValidator(),
         ],
     )
     tags = TaggableManager(_("Tags"), through=UUIDTaggedItem)
@@ -247,6 +250,10 @@ class Collectable(models.Model):
         null=True,
         blank=True,
         help_text=_("Original editable file (e.g. .pdf, .png, .svg, ...)"),
+        validators=[
+            FileExtensionValidator(),
+            MaxFileSizeValidator("COLLECTABLE_SOURCE_FILE_MAX_UPLOAD_BYTES"),
+        ],
     )
 
     objects = CollectableManager()

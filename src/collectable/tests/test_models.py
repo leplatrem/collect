@@ -256,3 +256,46 @@ def test_history_with_deltas_shorter_than_the_limit(collectable):
         len(collectable.history_with_deltas(limit=10))
         == collectable.history.count() - 1
     )
+
+
+@pytest.mark.parametrize(
+    "filename, valid",
+    [
+        ("original.pdf", True),
+        ("original.svg", True),
+        ("original.PNG", True),
+        ("payload.html", False),
+        ("payload.js", False),
+        ("payload", False),
+    ],
+)
+def test_source_file_extension_is_validated(collectable, filename, valid):
+    # Source files are downloadable from the same origin as the site.
+    collectable.source_file = SimpleUploadedFile(filename, b"content")
+
+    if valid:
+        collectable.full_clean()
+    else:
+        with pytest.raises(ValidationError) as exc:
+            collectable.full_clean()
+        assert "source_file" in exc.value.error_dict
+
+
+def test_source_file_size_is_validated(collectable, settings):
+    settings.COLLECTABLE_SOURCE_FILE_MAX_UPLOAD_BYTES = 8
+    collectable.source_file = SimpleUploadedFile("original.pdf", b"x" * 9)
+
+    with pytest.raises(ValidationError) as exc:
+        collectable.full_clean()
+
+    assert "source_file" in exc.value.error_dict
+
+
+def test_photo_pixel_count_is_validated(collectable, settings):
+    settings.COLLECTABLE_MAX_IMAGE_PIXELS = 100
+
+    with pytest.raises(ValidationError) as exc:
+        collectable.full_clean()
+
+    # The factory photo is 100x100, which is 10000 pixels.
+    assert "photo" in exc.value.error_dict

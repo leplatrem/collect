@@ -305,6 +305,15 @@ TAGGIT_CASE_INSENSITIVE = True
 TAGGIT_TAGS_FROM_STRING = "collect.utils.tags_splitter"
 TAGGIT_STRING_FROM_TAGS = "collect.utils.tags_joiner"
 
+# Generate the thumbnails when the source image is saved, instead of lazily on
+# first access. The default `JustInTime` strategy checks whether the cache file
+# exists every time a thumbnail URL is rendered — one storage call per
+# thumbnail, per page, which is a network round-trip on remote storages — and
+# runs Pillow inside the request on a miss.
+# Run `manage.py generateimages` once to backfill existing collectables.
+IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "imagekit.cachefiles.strategies.Optimistic"
+IMAGEKIT_CACHE_BACKEND = "default"
+
 # Collect specific settings (`COLLECT_*` in env vars)
 
 COLLECTABLE_THUMBNAIL_SIZE = config(
@@ -321,6 +330,24 @@ COLLECTABLE_MAX_UPLOAD_BYTES = config(
 )
 COLLECTABLE_SQUARE_IMAGE_TOLERANCE_PX = config(
     "COLLECT_COLLECTABLE_SQUARE_IMAGE_TOLERANCE_PX", default=3, cast=int
+)
+# Decoding an image allocates roughly `width * height * 4` bytes, whatever the
+# size of the compressed file: a few megabytes of PNG can expand to gigabytes
+# of memory. Refuse to decode anything bigger than this.
+COLLECTABLE_MAX_IMAGE_PIXELS = config(
+    "COLLECT_COLLECTABLE_MAX_IMAGE_PIXELS", default=50 * 1024 * 1024, cast=int
+)
+# Source files are served as-is from the media folder. Only allow formats that
+# cannot be rendered as active content on our own origin (no .html, .htm, .js).
+COLLECTABLE_SOURCE_FILE_EXTENSIONS: list[str] = config(
+    "COLLECT_COLLECTABLE_SOURCE_FILE_EXTENSIONS",
+    default="pdf,svg,png,jpg,jpeg,ai,eps,psd,xcf,sketch,fig,zip",
+    cast=lambda v: [s.strip().lstrip(".").lower() for s in v.split(",") if s.strip()],
+)
+COLLECTABLE_SOURCE_FILE_MAX_UPLOAD_BYTES = config(
+    "COLLECT_COLLECTABLE_SOURCE_FILE_MAX_UPLOAD_BYTES",
+    default=20 * 1024 * 1024,
+    cast=int,
 )
 HOME_LIST_COUNT = config("COLLECT_HOME_LIST_COUNT", default=6, cast=int)
 # Bounded size of the tag cloud on the home page.

@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from django import forms
+from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
@@ -15,10 +16,16 @@ class CropImageField(forms.ImageField):
         if not data or not data.get("file"):
             return None
 
+        # Run checks before the image is decoded
+        self.check_file_size(data["file"])
+
         uploaded_file = super().clean(data["file"], initial)
         x, y, w, h = data["x"], data["y"], data["w"], data["h"]
 
+        # `Image.open()` only reads the header, it does not decode pixels.
         image = Image.open(uploaded_file)
+        self.check_pixel_count(image)
+
         width, height = image.size
 
         # Clamp coordinates
@@ -28,7 +35,9 @@ class CropImageField(forms.ImageField):
         h = min(h, height - y)
 
         if w <= 0 or h <= 0:
-            raise forms.ValidationError(_("Invalid crop dimensions."))
+            raise forms.ValidationError(
+                _("Invalid crop dimensions."), code="invalid-crop"
+            )
 
         # Force crop to square.
         size = min(w, h)
@@ -46,3 +55,22 @@ class CropImageField(forms.ImageField):
             size=buf.getbuffer().nbytes,
             charset=None,
         )
+
+    def check_file_size(self, uploaded_file):
+        max_bytes = settings.COLLECTABLE_MAX_UPLOAD_BYTES
+        if uploaded_file.size > max_bytes:
+            raise forms.ValidationError(
+                _("The file exceeds the maximum size of %(max_size)s bytes.")
+                % {"max_size": max_bytes},
+                code="max-file-size",
+            )
+
+    def check_pixel_count(self, image):
+        max_pixels = settings.COLLECTABLE_MAX_IMAGE_PIXELS
+        width, height = image.size
+        if width * height > max_pixels:
+            raise forms.ValidationError(
+                _("The image is too large to be processed (max %(max)s pixels).")
+                % {"max": max_pixels},
+                code="max-image-pixels",
+            )
