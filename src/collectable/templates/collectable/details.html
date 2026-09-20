@@ -76,7 +76,9 @@
                         <div>
                             <dt>{% translate "Source file" %}</dt>
                             <dd>
-                                <a href="{{ collectable.source_file.url }}">{{ collectable.source_filename }}</a>
+                                {# Downloaded, never rendered: see the media headers in `etc/apache/`. #}
+                                <a href="{{ collectable.source_file.url }}"
+                                   download>{{ collectable.source_filename }}</a>
                             </dd>
                         </div>
                     {% endif %}
