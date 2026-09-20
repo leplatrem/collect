@@ -323,6 +323,8 @@ COLLECTABLE_SQUARE_IMAGE_TOLERANCE_PX = config(
     "COLLECT_COLLECTABLE_SQUARE_IMAGE_TOLERANCE_PX", default=3, cast=int
 )
 HOME_LIST_COUNT = config("COLLECT_HOME_LIST_COUNT", default=6, cast=int)
+# Bounded size of the tag cloud on the home page.
+INDEX_TAG_LIST_COUNT = config("COLLECT_INDEX_TAG_LIST_COUNT", default=200, cast=int)
 DEFAULT_PAGE_SIZE = config("COLLECT_DEFAULT_PAGE_SIZE", default=20, cast=int)
 PAGE_REVEAL_LOAD_NEXT = config(
     "COLLECT_PAGE_REVEAL_LOAD_NEXT", default=0.25, cast=float
@@ -339,6 +341,11 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 )
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
+
+# Number of collectables shown per section of the profile page, and number of
+# history entries shown on the details page. Both are unbounded otherwise.
+PROFILE_LIST_COUNT: int = config("COLLECT_PROFILE_LIST_COUNT", default=200, cast=int)
+HISTORY_LIST_COUNT: int = config("COLLECT_HISTORY_LIST_COUNT", default=20, cast=int)
 
 # Rate limits, as "<number of requests>/<number of seconds>", applied per
 # client IP. `THROTTLE_NUM_PROXIES` is the number of trusted reverse proxies in

@@ -6,9 +6,12 @@
 {% block content %}
     <h1>{% translate "Profile" %} {{ user }}</h1>
     <h2>{% translate "Owned" %}</h2>
-    {% if collectable_owned %}
+    {% if total_owned %}
         <p>
-            {% blocktranslate count counter=collectable_owned.count %}{{counter}} item.{% plural %}{{counter}} items.{% endblocktranslate %}
+            {% blocktranslate count counter=total_owned %}{{ counter }} item.{% plural %}{{ counter }} items.{% endblocktranslate %}
+            {% if total_owned > list_count %}
+                {% blocktranslate with count=list_count %}(showing the {{ count }} most recent){% endblocktranslate %}
+            {% endif %}
         </p>
     {% endif %}
     <div class="collectable-grid">
@@ -19,9 +22,12 @@
         {% endfor %}
     </div>
     <h2>{% translate "Liked" %}</h2>
-    {% if collectable_liked %}
+    {% if total_liked %}
         <p>
-            {% blocktranslate count counter=collectable_liked.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
+            {% blocktranslate count counter=total_liked %}{{ counter }} item.{% plural %}{{ counter }} items.{% endblocktranslate %}
+            {% if total_liked > list_count %}
+                {% blocktranslate with count=list_count %}(showing the {{ count }} most recent){% endblocktranslate %}
+            {% endif %}
         </p>
     {% endif %}
     <div class="collectable-grid">
@@ -32,9 +38,12 @@
         {% endfor %}
     </div>
     <h2>{% translate "Wanted" %}</h2>
-    {% if collectable_wanted %}
+    {% if total_wanted %}
         <p>
-            {% blocktranslate count counter=collectable_wanted.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
+            {% blocktranslate count counter=total_wanted %}{{ counter }} item.{% plural %}{{ counter }} items.{% endblocktranslate %}
+            {% if total_wanted > list_count %}
+                {% blocktranslate with count=list_count %}(showing the {{ count }} most recent){% endblocktranslate %}
+            {% endif %}
         </p>
     {% endif %}
     <div class="collectable-grid">

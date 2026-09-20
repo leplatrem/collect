@@ -4,6 +4,7 @@ from typing import Any
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.forms import widgets as django_widgets
@@ -25,14 +26,14 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
-    # List of all tags with at least one collectable, ordered by
-    # number of collectables.
-    tag_list = (
+    # Most used tags, ordered by number of collectables. Evaluated once: the
+    # list is iterated several times below and in the template.
+    tag_list = list(
         Tag.objects.annotate(
             ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
         )
         .order_by("-ncollectable")
-        .filter(ncollectable__gt=1)
+        .filter(ncollectable__gt=1)[: settings.INDEX_TAG_LIST_COUNT]
     )
     # Add a size group for styling. Skip the biggest one.
     max_count = tag_list[1].ncollectable if len(tag_list) > 1 else 1
@@ -82,20 +83,26 @@ def index(request):
 class CollectableListView(ListView):
     model = Collectable
     kind = "latest"
-    paginate_by = settings.DEFAULT_PAGE_SIZE
     extra_context: dict[str, Any] = None  # type: ignore[assignment]
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.extra_context = {}
 
+    def get_paginate_by(self, queryset):
+        return settings.DEFAULT_PAGE_SIZE
+
+    # Lists that sort or filter on the number of possessions, and the
+    # annotation they rely on.
+    COUNT_SORTED_KINDS = {
+        "most_liked": "nlikes",
+        "most_wanted": "nwants",
+        "most_owned": "nowns",
+    }
+
     def get_queryset(self) -> QuerySet[Collectable]:
-        qs = (
-            super()
-            .get_queryset()
-            .with_possession_counts()
-            .prefetch_tags_and_possessions(self.request.user)
-        )
+        qs = super().get_queryset()
+
         sort_by = {
             "latest": "-created_at",
             "search": "-created_at",
@@ -103,14 +110,12 @@ class CollectableListView(ListView):
             "most_wanted": "-nwants",
             "most_owned": "-nowns",
         }[self.kind]
-        qs = qs.order_by(sort_by, "-created_at")
 
-        if self.kind == "most_liked":
-            qs = qs.filter(nlikes__gt=0)
-        elif self.kind == "most_wanted":
-            qs = qs.filter(nwants__gt=0)
-        elif self.kind == "most_owned":
-            qs = qs.filter(nowns__gt=0)
+        # Counting possessions means aggregating the whole possession table, so
+        # it is only done up front for the lists that sort on those counts.
+        counter = self.COUNT_SORTED_KINDS.get(self.kind)
+        if counter:
+            qs = qs.with_possession_counts().filter(**{f"{counter}__gt": 0})
         elif self.kind == "search":
             try:
                 qs = qs.advanced_search(self.search_keywords)
@@ -122,9 +127,16 @@ class CollectableListView(ListView):
                 qs = qs.basic_search(self.search_keywords)
                 self.extra_context["advanced_search"] = False
 
+        qs = qs.order_by(sort_by, "-created_at")
+
+        # Collect the IDs before adding the annotations and prefetches needed
+        # to render the page: they would make this second query as expensive as
+        # the page query itself.
         store_current_list_in_session(self.request, qs.values_list("id", flat=True))
 
-        return qs
+        if not counter:
+            qs = qs.with_possession_counts()
+        return qs.prefetch_tags_and_possessions(self.request.user)
 
     @property
     def search_keywords(self) -> str:
@@ -181,10 +193,15 @@ def store_current_list_in_session(request, ids):
     """
     Store the current list of collectable IDs in session, for easy navigation
     between previous and next in details view.
-    We only store the first 1000 IDs to avoid bloating the session.
+
+    The list is written on every list page view, and read back on every
+    subsequent request of the session, so its size is capped: it is a
+    navigation convenience, not a full result set.
     """
     # Store as strings to be JSON serializable.
-    request.session["collectable_list"] = [str(id_) for id_ in ids[:1000]]
+    request.session["collectable_list"] = [
+        str(id_) for id_ in ids[: settings.SESSION_LIST_MAX_SIZE]
+    ]
     request.session.modified = True
 
 
@@ -405,9 +422,13 @@ class DuplicateView(View):
 @login_required
 def possession(request, id):
     collectable = get_object_or_404(Collectable, id=id)
-    possession, _created = Possession.objects.get_or_create(
-        user=request.user, collectable=collectable
-    )
+    try:
+        with transaction.atomic():
+            possession, _created = Possession.objects.get_or_create(
+                user=request.user, collectable=collectable
+            )
+    except IntegrityError:
+        possession = Possession.objects.get(user=request.user, collectable=collectable)
     possession_form = PossessionForm(request.POST, instance=possession)
     if possession_form.is_valid():
         possession = possession_form.save()
@@ -429,24 +450,16 @@ def collection(request, slugs):
         Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
     )
 
-    collectable_list = Collectable.objects.with_counts_and_possessions(
-        request.user
-    ).order_by("-created_at")
-
+    # Plain queryset matching the collection, without the annotations and
+    # prefetches needed for rendering: used for the counts, the related tags
+    # and the session list, which would otherwise all pay for them.
+    base_qs = Collectable.objects.all()
     for slug in slugs:
-        collectable_list = collectable_list.filter(tags__slug=slug)
+        base_qs = base_qs.filter(tags__slug=slug)
 
-    # Evaluate the queryset once so we can reuse the results.
-    collectable_list = list(collectable_list)
-    collectable_ids = [c.id for c in collectable_list]
-
-    # Count how many are owned by the current user, taking advantage of prefetched
-    # data from above.
-    total_collectables = len(collectable_list)
-    total_owned = sum(
-        1
-        for c in collectable_list
-        if getattr(c, "possession_set_list", []) and c.possession_set_list[0].owns
+    total_collectables = base_qs.count()
+    total_owned = (
+        base_qs.owned_by(request.user).count() if request.user.is_authenticated else 0
     )
     percent_owned = total_owned / total_collectables * 100 if total_collectables else 0
 
@@ -456,19 +469,28 @@ def collection(request, slugs):
             tag_list.append(Tag(name=slug, slug=slug))  # Don't save.
 
     reltag_list = (
-        Tag.objects.filter(collectable__id__in=collectable_ids)
+        Tag.objects.filter(collectable__in=base_qs)
         .exclude(slug__in=slugs)
         .annotate(ncollectable=Count("collectable"))
         .order_by("-ncollectable")
         .filter(ncollectable__gt=1)
     )
 
-    store_current_list_in_session(request, collectable_ids)
+    store_current_list_in_session(request, base_qs.values_list("id", flat=True))
+
+    # Only the collectables of the requested page are fetched, with their tags
+    # and possessions.
+    collectable_list = (
+        base_qs.with_possession_counts()
+        .prefetch_tags_and_possessions(request.user)
+        .order_by("-created_at")
+    )
+    page_obj = paginate(request, qs=collectable_list, count=total_collectables)
 
     context = {
         "slugs": slugs,
-        "collectable_list": collectable_list,
-        "page_obj": paginate(request, qs=collectable_list),
+        "collectable_list": page_obj.object_list,
+        "page_obj": page_obj,
         "tag_list": tag_list,
         "reltag_list": reltag_list,
         "total_owned": total_owned,
@@ -480,10 +502,20 @@ def collection(request, slugs):
 
 @login_required
 def profile(request):
-    qs = Collectable.objects.with_counts_and_possessions(request.user)
+    qs = Collectable.objects.with_counts_and_possessions(request.user).order_by(
+        "-created_at"
+    )
+    # Each section is capped: the page renders a thumbnail per collectable, and
+    # a collector can own thousands of them. Totals are counted separately.
+    limit = settings.PROFILE_LIST_COUNT
+    base_qs = Collectable.objects.all()
     context = {
-        "collectable_liked": qs.liked_by(request.user),
-        "collectable_wanted": qs.wanted_by(request.user),
-        "collectable_owned": qs.owned_by(request.user),
+        "collectable_liked": qs.liked_by(request.user)[:limit],
+        "collectable_wanted": qs.wanted_by(request.user)[:limit],
+        "collectable_owned": qs.owned_by(request.user)[:limit],
+        "total_liked": base_qs.liked_by(request.user).count(),
+        "total_wanted": base_qs.wanted_by(request.user).count(),
+        "total_owned": base_qs.owned_by(request.user).count(),
+        "list_count": limit,
     }
     return render(request, "collectable/profile.html", context)
