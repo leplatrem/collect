@@ -338,6 +338,7 @@ class DuplicateView(View):
         response = self._render_details(request, collectable, form.instance.original_id)
         response["HX-Retarget"] = "main"
         response["HX-Reselect"] = "main"
+        response["HX-Reswap"] = "outerHTML"
         return response
 
     def delete(self, request, id):
