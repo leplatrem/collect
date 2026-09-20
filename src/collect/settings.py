@@ -17,6 +17,8 @@ from decouple import Config, RepositoryEnv
 from dj_database_url import parse as db_url
 from django.utils.translation import gettext_lazy as _
 
+from collect.config import checked_secret_key
+
 
 DOTENV_FILE = os.environ.get("DOTENV_FILE", ".env")
 print(f"Read config from {DOTENV_FILE}")
@@ -27,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-SECRET_KEY = config("DJANGO_SECRET_KEY", default="not-secret")
-
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
+
+SECRET_KEY = checked_secret_key(config("DJANGO_SECRET_KEY", default=""), debug=DEBUG)
 
 ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
 DEBUG_TOOLBAR_ENABLED = config("DJANGO_DEBUG_TOOLBAR_ENABLED", default=DEBUG, cast=bool)
