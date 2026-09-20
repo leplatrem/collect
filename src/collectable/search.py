@@ -268,8 +268,24 @@ class QBuilder:
 
         Adds annotations to count tags if needed (for exact tag matches)
         in the `self._tags_exact_specs` list.
+
+        Raises `ValueError` for queries too big to compile, since every term
+        adds a join (and a `tags:` term two aggregates) to the SQL query. The
+        caller is expected to fall back to the basic search.
         """
+        if len(query_string) > settings.MAX_SEARCH_QUERY_LENGTH:
+            raise ValueError(
+                f"Query is longer than {settings.MAX_SEARCH_QUERY_LENGTH} characters"
+            )
+
         boolean_str, literal_map = _parse_to_boolean_str_and_literals(query_string)
+
+        if len(literal_map) > settings.MAX_SEARCH_TERMS:
+            raise ValueError(
+                f"Query has more than {settings.MAX_SEARCH_TERMS} terms "
+                f"({len(literal_map)})"
+            )
+
         algebra = BooleanAlgebra()
         expr = algebra.parse(boolean_str)
 

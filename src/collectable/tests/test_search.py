@@ -1,6 +1,12 @@
+import sys
+import threading
+
 import pytest
+from django.conf import settings
+from django.urls import reverse
 
 from collectable.models import Collectable
+from collectable.search import QBuilder
 from collectable.tests.factories import CollectableFactory
 
 
@@ -166,3 +172,39 @@ def test_collectable_search_not_wild():
     CollectableFactory(description="y", tags=["bar"])
     res = Collectable.objects.all().advanced_search("NOT #ba*")
     assert list(res) == [a]
+
+
+def test_collectable_search_refuses_too_many_terms():
+    # Every term adds a join to the SQL query: an arbitrarily long query would
+    # otherwise be an easy way to keep the database busy.
+    query = " AND ".join(f"#tag{i}" for i in range(settings.MAX_SEARCH_TERMS + 1))
+
+    with pytest.raises(ValueError, match="more than"):
+        QBuilder().compile(query)
+
+
+def test_collectable_search_accepts_the_maximum_number_of_terms():
+    query = " AND ".join(f"#tag{i}" for i in range(settings.MAX_SEARCH_TERMS))
+
+    include_q, _exclude_q = QBuilder().compile(query)
+
+    assert include_q
+
+
+def test_collectable_search_refuses_long_queries():
+    with pytest.raises(ValueError, match="longer than"):
+        QBuilder().compile("a" * (settings.MAX_SEARCH_QUERY_LENGTH + 1))
+
+
+def test_collectable_search_falls_back_to_basic_search_when_refused(client):
+    # The view turns a refused query into a basic search rather than an error.
+    match = CollectableFactory(description="needle")
+    CollectableFactory(description="haystack")
+    query = " ".join(["needle"] * (settings.MAX_SEARCH_TERMS + 1))
+
+    resp = client.get(reverse("collectable:search"), {"q": query})
+
+    assert resp.status_code == 200
+    assert resp.context["advanced_search"] is False
+    assert list(resp.context["collectable_list"]) == [match]
+

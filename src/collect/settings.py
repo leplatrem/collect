@@ -340,6 +340,15 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
 
+# Each term of an advanced search query adds a join (and `tags:` terms add two
+# aggregates) to the SQL query, so an arbitrarily long query is an easy way to
+# bring the database down. Queries above these limits fall back to the basic
+# search.
+MAX_SEARCH_TERMS: int = config("COLLECT_MAX_SEARCH_TERMS", default=10, cast=int)
+MAX_SEARCH_QUERY_LENGTH: int = config(
+    "COLLECT_MAX_SEARCH_QUERY_LENGTH", default=200, cast=int
+)
+
 # Rate limits, as "<number of requests>/<number of seconds>", applied per
 # client IP. `THROTTLE_NUM_PROXIES` is the number of trusted reverse proxies in
 # front of the app: with 0, the client IP is `REMOTE_ADDR`, otherwise it is read
