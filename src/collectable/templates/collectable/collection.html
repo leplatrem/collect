@@ -21,7 +21,13 @@
         {% endblocktranslate %}
     </h2>
     {% if user.is_authenticated %}
-        <section class="collection-progress">
+        {# Marking an item owned changes the progress. #}
+        <section class="collection-progress"
+                 id="collection-progress"
+                 hx-get="{{ request.get_full_path }}"
+                 hx-trigger="htmx:afterRequest[event.detail.requestConfig.verb=='post'] from:body"
+                 hx-select="#collection-progress"
+                 hx-swap="outerHTML">
             {% comment %} djlint:off H021 {% endcomment %}
             <div class="collection-progress-ring"
                  style="--progress: {{ percent_owned|unlocalize }}%">
