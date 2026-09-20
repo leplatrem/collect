@@ -428,6 +428,14 @@ class Collectable(models.Model):
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
+        indexes = [
+            # Every queryset filters on `hidden` and most of them order by
+            # `created_at` (lists, `get_previous/next_by_created_at()`).
+            models.Index(
+                fields=["hidden", "-created_at"],
+                name="collectable_visible_recent",
+            ),
+        ]
 
 
 @receiver(post_save, sender=UUIDTaggedItem, dispatch_uid="update_computed_tags")
