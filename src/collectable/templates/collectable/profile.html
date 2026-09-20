@@ -39,7 +39,7 @@
     {% endif %}
     <div class="collectable-grid">
         {% for collectable in collectable_wanted %}
-            <p>{% include "collectable/collectable_thumbnail.html" %}</p>
+            {% include "collectable/collectable_thumbnail.html" %}
         {% empty %}
             {% translate "No collectable wanted." %}
         {% endfor %}
