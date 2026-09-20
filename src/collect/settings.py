@@ -116,6 +116,18 @@ DATABASES = {
     )
 }
 
+# Reuse database connections across requests instead of reconnecting every
+# time: PostgreSQL forks a backend process per connection, which becomes the
+# bottleneck long before the queries themselves do.
+# Keep this lower than the server-side idle timeout, and use a connection
+# pooler (pgbouncer) when running many workers.
+DATABASES["default"]["CONN_MAX_AGE"] = config(
+    "DJANGO_CONN_MAX_AGE", default=60, cast=int
+)
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = config(
+    "DJANGO_CONN_HEALTH_CHECKS", default=True, cast=bool
+)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
