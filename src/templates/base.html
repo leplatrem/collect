@@ -36,7 +36,8 @@
                   hx-select="main"
                   hx-push-url="true"
                   hx-swap="outerHTML"
-                  hx-trigger="submit, keyup changed delay:300ms from:input[type=search]">
+                  {# Wait for the visitor to pause typing to trigger search. #}
+                  hx-trigger="submit, keyup changed delay:450ms from:input[type=search]">
                 <input type="search"
                        name="q"
                        placeholder="{% translate "Search collectables..." %}"
