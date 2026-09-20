@@ -136,6 +136,34 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Caches
+# https://docs.djangoproject.com/en/stable/topics/cache/
+
+# Without a shared cache, every process keeps its own copy (and loses it on
+# restart), which defeats session caching and makes django-imagekit hit the
+# storage backend to check whether each thumbnail exists.
+REDIS_URL = config("DJANGO_REDIS_URL", default="")
+
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+        }
+    }
+    # Read sessions from the cache, write them through to the database, so that
+    # session reads (one per authenticated request) don't hit the database.
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "collect",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
