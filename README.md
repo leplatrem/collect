@@ -72,6 +72,20 @@ The command can be executed multiple times with the same folder, and only new fi
 > identify pictures, so that files can be moved into folders and not be duplicated.
 
 
+### Merge duplicates
+
+Collectables reported as duplicates are merged automatically once enough users
+have confirmed the report (see `COLLECT_DUPLICATE_CONFIRMATION_THRESHOLD`). To
+merge the ones still waiting for confirmations:
+
+```
+uv run manage.py mergeduplicates
+```
+
+Merging hides the duplicate and moves its tags, description and possessions to
+the original.
+
+
 ## Deploy
 
 Settings are read from environment variables, falling back to the file pointed
