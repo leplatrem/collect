@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from taggit.models import Tag
 
@@ -217,3 +218,41 @@ def test_duplicate_report_save_validates():
     c = CollectableFactory()
     with pytest.raises(ValidationError):
         DuplicateReport(reporter=UserFactory(), duplicate=c, original=c).save()
+
+
+def test_history_with_deltas_is_limited(collectable):
+    for i in range(10):
+        collectable.description = f"Update {i}"
+        collectable.save()
+
+    # The history of a collectable grows with every save, and the details page
+    # loads and diffs it on every view.
+    history = collectable.history_with_deltas(limit=3)
+
+    assert len(history) == 3
+    assert [c["new"] for r in history for c in r.history_delta_changes] == [
+        "Update 9",
+        "Update 8",
+        "Update 7",
+    ]
+
+
+def test_history_with_deltas_limit_defaults_to_the_setting(collectable, settings):
+    settings.HISTORY_LIST_COUNT = 2
+    for i in range(6):
+        collectable.description = f"Update {i}"
+        collectable.save()
+
+    assert len(collectable.history_with_deltas()) == 2
+
+
+def test_history_with_deltas_shorter_than_the_limit(collectable):
+    collectable.description = "Only update"
+    collectable.save()
+
+    # Every revision but the oldest one, which only serves as the reference
+    # the next one is compared against.
+    assert (
+        len(collectable.history_with_deltas(limit=10))
+        == collectable.history.count() - 1
+    )
