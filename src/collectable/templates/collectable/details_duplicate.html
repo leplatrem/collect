@@ -41,7 +41,8 @@
                         {% if already_reported %}
                             <form hx-delete="{% url 'collectable:duplicate' collectable.id %}"
                                   hx-select="main"
-                                  hx-target="main">
+                                  hx-target="main"
+                                  hx-swap="outerHTML">
                                 {% csrf_token %}
                                 {{ form }}
                                 <button type="submit">{% translate "Cancel" %}</button>
@@ -49,7 +50,8 @@
                         {% else %}
                             <form hx-post="{% url 'collectable:duplicate' collectable.id %}"
                                   hx-select="main"
-                                  hx-target="main">
+                                  hx-target="main"
+                                  hx-swap="outerHTML">
                                 {% csrf_token %}
                                 {{ form }}
                                 <button type="submit">{% translate "Confirm" %}</button>
