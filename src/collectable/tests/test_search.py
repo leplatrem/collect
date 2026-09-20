@@ -208,3 +208,42 @@ def test_collectable_search_falls_back_to_basic_search_when_refused(client):
     assert resp.context["advanced_search"] is False
     assert list(resp.context["collectable_list"]) == [match]
 
+
+def test_collectable_search_parses_concurrently():
+    # The `ply` lexer and parser are shared between threads, and keep the state
+    # of the parse (input position, state and symbol stacks) on the instance:
+    # without serialization, concurrent searches corrupt each other's results.
+    queries = [f"#tag{i} AND description:value{i}" for i in range(30)]
+    results = {}
+    errors = []
+
+    def compile_repeatedly(query):
+        for _ in range(40):
+            try:
+                results[query] = QBuilder().compile(query)
+            except Exception as exc:
+                errors.append(exc)
+                return
+
+    threads = [
+        threading.Thread(target=compile_repeatedly, args=(query,)) for query in queries
+    ]
+    # Switch between threads as often as possible, to make the interleaving
+    # happen reliably rather than once in a while.
+    previous_interval = sys.getswitchinterval()
+    sys.setswitchinterval(1e-9)
+    try:
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+    finally:
+        sys.setswitchinterval(previous_interval)
+
+    assert errors == []
+    assert len(results) == len(queries)
+    # Each thread must get the terms of its own query, not of another one.
+    for i, query in enumerate(queries):
+        include_q, _exclude_q = results[query]
+        assert f"value{i}" in str(include_q)
+        assert f"tag{i}" in str(include_q)

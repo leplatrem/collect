@@ -1,4 +1,5 @@
 import logging
+import threading
 from dataclasses import dataclass
 
 import ply.lex as lex
@@ -202,6 +203,9 @@ def p_error(p):
 _lexer = lex.lex()
 _parser = yacc.yacc(start="query", debug=False, write_tables=False)
 
+# `ply` lexers and parsers are not thread-safe (See Gunicorn config)
+_parser_lock = threading.Lock()
+
 
 def _parse_to_boolean_str_and_literals(
     query_string: str,
@@ -210,7 +214,8 @@ def _parse_to_boolean_str_and_literals(
     Parse query string to boolean expression string with T0, T1... placeholders
     and a mapping of those placeholders to `_Term(field, value)`.
     """
-    tree = _parser.parse(query_string, lexer=_lexer)
+    with _parser_lock:
+        tree = _parser.parse(query_string, lexer=_lexer)
     boolean_str, literal_map, _ = _to_boolean_expr(tree)
     return boolean_str, literal_map
 
