@@ -342,6 +342,22 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
 
+# Each term of an advanced search query adds a join (and `tags:` terms add two
+# aggregates) to the SQL query, so an arbitrarily long query is an easy way to
+# bring the database down. Queries above these limits fall back to the basic
+# search.
+MAX_SEARCH_TERMS: int = config("COLLECT_MAX_SEARCH_TERMS", default=10, cast=int)
+MAX_SEARCH_QUERY_LENGTH: int = config(
+    "COLLECT_MAX_SEARCH_QUERY_LENGTH", default=200, cast=int
+)
+
+# Number of collectable IDs kept in session to navigate from one collectable to
+# the previous/next one. Every list page stores them, and every request reads
+# them back, so this directly drives the size of each session.
+SESSION_LIST_MAX_SIZE: int = config(
+    "COLLECT_SESSION_LIST_MAX_SIZE", default=200, cast=int
+)
+
 # Number of collectables shown per section of the profile page, and number of
 # history entries shown on the details page. Both are unbounded otherwise.
 PROFILE_LIST_COUNT: int = config("COLLECT_PROFILE_LIST_COUNT", default=200, cast=int)
