@@ -59,6 +59,9 @@ def index(request):
         "most_owned": base_qs.order_by("-nowns").filter(nowns__gt=0)[
             : settings.HOME_LIST_COUNT
         ],
+        "most_spared": base_qs.order_by("-nswaps").filter(nswaps__gt=0)[
+            : settings.HOME_LIST_COUNT
+        ],
     }
 
     context = {
@@ -73,6 +76,9 @@ def index(request):
         .with_possession_counts()
         .prefetch_tags_and_possessions(request.user),
         "most_owned": Collectable.objects.filter(pk__in=querysets["most_owned"])
+        .with_possession_counts()
+        .prefetch_tags_and_possessions(request.user),
+        "most_spared": Collectable.objects.filter(pk__in=querysets["most_spared"])
         .with_possession_counts()
         .prefetch_tags_and_possessions(request.user),
         "tag_list": tag_list,
@@ -103,6 +109,7 @@ class CollectableListView(ListView):
             "most_liked": "-nlikes",
             "most_wanted": "-nwants",
             "most_owned": "-nowns",
+            "most_spared": "-nswaps",
         }[self.kind]
         qs = qs.order_by(sort_by, "-created_at")
 
@@ -112,6 +119,8 @@ class CollectableListView(ListView):
             qs = qs.filter(nwants__gt=0)
         elif self.kind == "most_owned":
             qs = qs.filter(nowns__gt=0)
+        elif self.kind == "most_spared":
+            qs = qs.filter(nswaps__gt=0)
         elif self.kind == "search":
             try:
                 qs = qs.advanced_search(self.search_keywords)
@@ -148,6 +157,7 @@ class CollectableListView(ListView):
             "most_liked": _("Most liked collectables"),
             "most_wanted": _("Most wanted collectables"),
             "most_owned": _("Most owned collectables"),
+            "most_spared": _("Most spared collectables"),
         }[self.kind]
         return context
 

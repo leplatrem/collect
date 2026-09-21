@@ -437,6 +437,9 @@ msgstr "Les plus possédés"
 msgid "No collectable owned."
 msgstr "Aucun objet possédé."
 
+msgid "Most spares"
+msgstr "Le plus de doubles"
+
 msgid "Collections"
 msgstr "Collections"
 
@@ -571,6 +574,9 @@ msgstr "Objets les plus recherchés"
 
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
+
+msgid "Most spared collectables"
+msgstr "Objets avec le plus de doubles"
 
 msgid "Collectable created successfully."
 msgstr "Objet créé avec succès."

@@ -31,6 +31,7 @@ from collectable.tests.factories import (
         "collectable:most-liked",
         "collectable:most-wanted",
         "collectable:most-owned",
+        "collectable:most-spared",
     ],
 )
 def test_list_views(db, client, path_name):
@@ -45,6 +46,16 @@ def test_index_view(db, client):
     response = client.get(url)
     assert response.status_code == 200
     assert "total_collectables" in response.context
+
+
+def test_index_view_lists_the_most_spared(client, user):
+    spared = CollectableFactory()
+    CollectableFactory()  # Owned, but no spare of it.
+    PossessionFactory(user=user, collectable=spared, owns=True, swaps=True)
+
+    response = client.get(reverse("collectable:index"))
+
+    assert list(response.context["most_spared"]) == [spared]
 
 
 def test_create_view_authenticated_get(db, logged_in_client, collectable):
@@ -708,6 +719,7 @@ def test_list_view_session_list_follows_the_displayed_order(db, client):
         ("collectable:most-liked", "likes"),
         ("collectable:most-wanted", "wants"),
         ("collectable:most-owned", "owns"),
+        ("collectable:most-spared", "swaps"),
     ],
 )
 def test_count_sorted_lists_still_filter_on_their_counter(
@@ -715,11 +727,10 @@ def test_count_sorted_lists_still_filter_on_their_counter(
 ):
     listed = CollectableFactory()
     CollectableFactory()  # No possession at all.
-    PossessionFactory(
-        user=user,
-        collectable=listed,
-        **{"likes": False, "wants": False, "owns": False, counter: True},
-    )
+    # Only the list's own counter is set, except for a spare: you cannot swap
+    # what you don't own, and the model enforces it.
+    marks = {"likes": False, "wants": False, "owns": counter == "swaps", counter: True}
+    PossessionFactory(user=user, collectable=listed, **marks)
 
     response = client.get(reverse(path_name))
 

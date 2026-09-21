@@ -52,6 +52,17 @@
             <a href="{% url "collectable:most-owned" %}" class="more">{% translate "More..." %}</a>
         {% endif %}
     </div>
+    <h2>{% translate "Most spares" %}</h2>
+    <div class="collectable-grid">
+        {% for collectable in most_spared %}
+            {% include "collectable/collectable_thumbnail.html" %}
+        {% empty %}
+            {% translate "No spare to swap." %}
+        {% endfor %}
+        {% if most_spared %}
+            <a href="{% url "collectable:most-spared" %}" class="more">{% translate "More..." %}</a>
+        {% endif %}
+    </div>
     <h2>{% translate "Collections" %}</h2>
     <ul class="as-columns">
         {% for tag in tag_list %}
