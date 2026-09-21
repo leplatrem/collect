@@ -77,6 +77,8 @@ class PossessionFactory(DjangoModelFactory):
     likes = FuzzyChoice([True, False])
     wants = FuzzyChoice([True, False])
     owns = FuzzyChoice([True, False])
+    # Not fuzzy: a spare is only valid on an owned collectable.
+    swaps = False
 
 
 class DuplicateReportFactory(DjangoModelFactory):

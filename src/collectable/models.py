@@ -81,6 +81,9 @@ class CollectableQuerySet(models.QuerySet):
     def owned_by(self, user):
         return self.filter(possession__user=user, possession__owns=True)
 
+    def swapped_by(self, user):
+        return self.filter(possession__user=user, possession__swaps=True)
+
     def with_possession_counts(self):
         """
         Annotate the queryset with counts of likes, wants, and owns for each collectable.
@@ -107,6 +110,14 @@ class CollectableQuerySet(models.QuerySet):
             nowns=Coalesce(
                 Count(
                     "possessions", filter=Q(**{"possession__owns": True}), distinct=True
+                ),
+                0,
+            ),
+            nswaps=Coalesce(
+                Count(
+                    "possessions",
+                    filter=Q(**{"possession__swaps": True}),
+                    distinct=True,
                 ),
                 0,
             ),
@@ -304,7 +315,7 @@ class Collectable(models.Model):
                 possession = cached_possessions[0]
         if possession is None:
             possession = Possession(
-                collectable=self, likes=False, wants=False, owns=False
+                collectable=self, likes=False, wants=False, owns=False, swaps=False
             )  # Don't save.
         return possession
 
@@ -381,6 +392,8 @@ class Collectable(models.Model):
                     poss.wants = True
                 if possession.owns:
                     poss.owns = True
+                if possession.swaps:
+                    poss.swaps = True
                 poss.save()
 
     def is_duplicate(self) -> bool:
@@ -435,9 +448,79 @@ class Possession(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     collectable = models.ForeignKey(Collectable, on_delete=models.CASCADE)
-    likes = models.BooleanField(_("Likes"), default=False)
-    wants = models.BooleanField(_("Wants"), default=False)
-    owns = models.BooleanField(_("Owns"), default=True)
+    # The possession form is icon-only: these help texts are what the tooltips show.
+    likes = models.BooleanField(
+        _("Likes"), default=False, help_text=_("I like this one.")
+    )
+    wants = models.BooleanField(
+        _("Wants"), default=False, help_text=_("I am looking for this one.")
+    )
+    owns = models.BooleanField(_("Owns"), default=True, help_text=_("I own this one."))
+    swaps = models.BooleanField(
+        _("Spare"),
+        default=False,
+        help_text=_("I have a spare copy of this one, available for swap."),
+    )
+
+    @classmethod
+    def trade_partners(cls, user):
+        """
+        The other collectors this user could trade with, annotated with:
+
+        - `nwanted`: how many of the user's spares they are looking for
+        - `noffered`: how many of their spares the user is looking for
+
+        A partner with both is a two-way trade. Returned as a single query, so
+        the caller can split it into the three lists without hitting the
+        database again.
+        """
+        my_spares = cls.objects.filter(user=user, swaps=True).values("collectable")
+        my_wants = cls.objects.filter(user=user, wants=True).values("collectable")
+        return (
+            get_user_model()
+            .objects.filter(is_active=True)
+            .exclude(pk=user.pk)
+            .annotate(
+                nwanted=Count(
+                    "possession",
+                    filter=Q(
+                        possession__wants=True,
+                        possession__collectable__in=my_spares,
+                    ),
+                    distinct=True,
+                ),
+                noffered=Count(
+                    "possession",
+                    filter=Q(
+                        possession__swaps=True,
+                        possession__collectable__in=my_wants,
+                    ),
+                    distinct=True,
+                ),
+            )
+            .filter(Q(nwanted__gt=0) | Q(noffered__gt=0))
+            .order_by("username")
+        )
+
+    def _drop_swap_if_not_owned(self):
+        """
+        You cannot swap what you don't own. Keep the two in sync.
+        """
+        if not self.owns:
+            self.swaps = False
+
+    def clean(self):
+        super().clean()
+        # `full_clean()` checks the constraint right after this, so normalizing
+        # here is what keeps the edit valid on the form path.
+        self._drop_swap_if_not_owned()
+
+    def save(self, *args, **kwargs):
+        # `save()` does not go through `clean()`, so normalize here too.
+        self._drop_swap_if_not_owned()
+        if not self.owns and (update_fields := kwargs.get("update_fields")) is not None:
+            kwargs["update_fields"] = {*update_fields, "swaps"}
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = _("Possession")
@@ -445,6 +528,10 @@ class Possession(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "collectable"], name="unique_possession"
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(swaps=True, owns=False),
+                name="swap_requires_owns",
             ),
         ]
 

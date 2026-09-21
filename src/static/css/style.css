@@ -167,6 +167,18 @@ button.link {
   display: none;
 }
 
+/* Hidden on screen, still announced by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 a.more {
   display: flex;
   align-items: center;
@@ -286,6 +298,117 @@ a.more:hover {
 .possession-form {
   padding: 5px;
   line-height: 1;
+}
+
+.possession-form label {
+  display: none;
+}
+
+/* The icon row is the whole UI, so the help text becomes a hover tooltip. */
+.possession-form form {
+  position: relative;
+}
+
+.possession-form form .helptext {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+
+  padding: 0.4rem 0.6rem;
+  /* Centered within the row, so it does not stretch on the wide details form. */
+  max-width: 17rem;
+  margin: 0 auto 0.4rem;
+
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px var(--card-shadow-hover);
+
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* Hovering the <p> rather than the input since browsers do not fire mouse events
+   on a disabled control. */
+.possession-form form p:hover .helptext,
+.possession-form form input:focus-visible ~ .helptext {
+  opacity: 1;
+}
+
+.possession-form p {
+  display: inline-block;
+  margin: 0;
+  width: 23%;
+  text-align: center;
+}
+
+.possession-form input[type="checkbox"] {
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin-left: 33%;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  background-color: transparent;
+}
+
+/* Applied to p since dark mode already fades every checkbox to 0.8. */
+.possession-form p:has(input:disabled) {
+  opacity: 0.5;
+}
+
+.possession-form input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+.possession-form #id_likes {
+  background-image: url(../icons/unliked.svg);
+}
+.possession-form #id_likes:checked {
+  background-image: url(../icons/liked.svg);
+}
+.possession-form #id_wants {
+  background-image: url(../icons/unwanted.svg);
+}
+.possession-form #id_wants:checked {
+  background-image: url(../icons/wanted.svg);
+}
+.possession-form #id_owns {
+  background-image: url(../icons/unowned.svg);
+}
+.possession-form #id_owns:checked {
+  background-image: url(../icons/owned.svg);
+}
+.possession-form #id_swaps {
+  background-image: url(../icons/nospare.svg);
+}
+.possession-form #id_swaps:checked {
+  background-image: url(../icons/spare.svg);
+}
+
+.counters {
+  display: flex;
+}
+
+.counters p {
+  flex: 1;
+  width: auto;
+  white-space: nowrap;
+  font-size: 70%;
+  line-height: 1.2;
 }
 
 main {
@@ -673,50 +796,6 @@ section#related {
   margin-bottom: 1em;
 }
 
-.possession-form label {
-  display: none;
-}
-
-.possession-form p {
-  display: inline-block;
-  margin: 0;
-  width: 32%;
-  text-align: center;
-}
-
-.possession-form input[type="checkbox"] {
-  display: block;
-  width: 30px;
-  height: 30px;
-  margin-left: 33%;
-  cursor: pointer;
-  appearance: none;
-  outline: none;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-  background-color: transparent;
-}
-
-.possession-form #id_likes {
-  background-image: url(../icons/unliked.svg);
-}
-.possession-form #id_likes:checked {
-  background-image: url(../icons/liked.svg);
-}
-.possession-form #id_wants {
-  background-image: url(../icons/unwanted.svg);
-}
-.possession-form #id_wants:checked {
-  background-image: url(../icons/wanted.svg);
-}
-.possession-form #id_owns {
-  background-image: url(../icons/unowned.svg);
-}
-.possession-form #id_owns:checked {
-  background-image: url(../icons/owned.svg);
-}
-
 #messages {
   list-style: none;
   padding: 0;
@@ -1066,4 +1145,163 @@ section#related {
     width: 58px;
     height: 58px;
   }
+}
+
+/* =========================================================
+   Pure CSS tabs (radio buttons)
+   ========================================================= */
+
+.tabs .tab-state {
+  /* Kept in the DOM (and focusable) but out of sight: the labels are the UI. */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tab-labels label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.6rem 1.1rem;
+  margin-bottom: -1px;
+
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tab-labels label:hover {
+  opacity: 0.9;
+  background: var(--card-bg);
+}
+
+.tab-count {
+  padding: 0.05rem 0.5rem;
+  background: var(--tag-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tag-color);
+}
+
+.tab-panel {
+  display: none;
+}
+
+/* Selected tab and its panel. */
+#profile-tab-owned:checked ~ .tab-labels label[for="profile-tab-owned"],
+#profile-tab-liked:checked ~ .tab-labels label[for="profile-tab-liked"],
+#profile-tab-wanted:checked ~ .tab-labels label[for="profile-tab-wanted"],
+#profile-tab-swapped:checked ~ .tab-labels label[for="profile-tab-swapped"],
+#profile-tab-matched:checked ~ .tab-labels label[for="profile-tab-matched"] {
+  opacity: 1;
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  border-bottom-color: var(--link-color);
+}
+
+#profile-tab-owned:checked ~ #profile-panel-owned,
+#profile-tab-liked:checked ~ #profile-panel-liked,
+#profile-tab-wanted:checked ~ #profile-panel-wanted,
+#profile-tab-swapped:checked ~ #profile-panel-swapped,
+#profile-tab-matched:checked ~ #profile-panel-matched {
+  display: block;
+}
+
+/* Keyboard users need to see where they are, since the radio itself is hidden. */
+#profile-tab-owned:focus-visible ~ .tab-labels label[for="profile-tab-owned"],
+#profile-tab-liked:focus-visible ~ .tab-labels label[for="profile-tab-liked"],
+#profile-tab-wanted:focus-visible ~ .tab-labels label[for="profile-tab-wanted"],
+#profile-tab-swapped:focus-visible
+  ~ .tab-labels
+  label[for="profile-tab-swapped"],
+#profile-tab-matched:focus-visible
+  ~ .tab-labels
+  label[for="profile-tab-matched"] {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.tab-hint {
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Trade partners: three plain name lists, side by side when there is room. */
+.trade-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+.trade-lists h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.trade-lists .tab-hint {
+  margin-top: 0;
+}
+
+.trade-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.trade-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.trade-list li:last-child {
+  border-bottom: none;
+}
+
+.trade-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.trade-count {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--tag-color);
+  white-space: nowrap;
+}
+
+.trade-empty {
+  font-size: 0.9rem;
+  opacity: 0.7;
 }

@@ -1,6 +1,7 @@
 import pytest
 
-from collectable.forms import DuplicateReportForm
+from collectable.forms import DuplicateReportForm, PossessionForm
+from collectable.models import Possession
 from collectable.tests.factories import CollectableFactory, UserFactory
 
 
@@ -46,3 +47,34 @@ def test_duplicate_report_form_invalid(input_data, error_msg):
     form = DuplicateReportForm(data={"original_input": input_data})
     assert not form.is_valid()
     assert error_msg in str(form.errors["original_input"][0])
+
+
+@pytest.mark.django_db
+def test_possession_form_disables_swaps_when_not_owned(collectable):
+    form = PossessionForm(instance=Possession(collectable=collectable, owns=False))
+    assert form.fields["swaps"].disabled is True
+    assert "disabled" in str(form["swaps"])
+
+
+@pytest.mark.django_db
+def test_possession_form_explains_why_swaps_is_disabled(collectable):
+    # The tooltip is the only affordance: the icon alone cannot say why.
+    disabled = PossessionForm(instance=Possession(collectable=collectable, owns=False))
+    enabled = PossessionForm(instance=Possession(collectable=collectable, owns=True))
+    assert "possédé" in str(disabled.fields["swaps"].help_text)
+    assert disabled.fields["swaps"].help_text != enabled.fields["swaps"].help_text
+
+
+@pytest.mark.django_db
+def test_possession_form_enables_swaps_when_owned(collectable):
+    form = PossessionForm(instance=Possession(collectable=collectable, owns=True))
+    assert form.fields["swaps"].disabled is False
+    assert "disabled" not in str(form["swaps"])
+
+
+@pytest.mark.django_db
+def test_possession_form_ignores_swaps_when_not_owned(user, collectable):
+    possession = Possession(user=user, collectable=collectable, owns=False)
+    form = PossessionForm({"owns": False, "swaps": True}, instance=possession)
+    assert form.is_valid(), form.errors
+    assert form.save().swaps is False

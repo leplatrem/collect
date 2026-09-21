@@ -12,6 +12,7 @@ from collectable.models import Collectable, DuplicateReport, Possession
 from collectable.tests.factories import (
     CollectableFactory,
     DuplicateReportFactory,
+    PossessionFactory,
     UserFactory,
 )
 
@@ -124,6 +125,38 @@ def test_possession_view_post_creates(user, logged_in_client, collectable):
     assert Possession.objects.filter(user=user, collectable=collectable).exists()
 
 
+def test_possession_view_enables_swaps_once_owned(user, logged_in_client, collectable):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    # Not owned yet: the checkbox is there, but inert.
+    response = logged_in_client.post(url, {"owns": False})
+    assert response.context["form"].fields["swaps"].disabled is True
+    assert "id_swaps" in response.content.decode()
+    # It becomes usable in the very response that marks the collectable as owned.
+    response = logged_in_client.post(url, {"owns": True})
+    assert response.context["form"].fields["swaps"].disabled is False
+
+
+def test_possession_view_ignores_swaps_when_not_owned(
+    user, logged_in_client, collectable
+):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    # A crafted POST cannot offer a spare of something the user does not own.
+    logged_in_client.post(url, {"owns": False, "swaps": True})
+    assert Possession.objects.get(user=user, collectable=collectable).swaps is False
+
+
+def test_possession_view_post_swaps(user, logged_in_client, collectable):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    logged_in_client.post(url, {"owns": True})
+    logged_in_client.post(url, {"owns": True, "swaps": True})
+    assert Possession.objects.get(user=user, collectable=collectable).swaps is True
+    # Un-owning drops the spare offer along with it.
+    logged_in_client.post(url, {"owns": False, "swaps": True})
+    possession = Possession.objects.get(user=user, collectable=collectable)
+    assert possession.owns is False
+    assert possession.swaps is False
+
+
 def test_collection_view_with_valid_tag(client, collectable):
     collectable.tags.add("tag1")
     url = reverse("collectable:collection", kwargs={"slugs": "tag1"})
@@ -155,6 +188,88 @@ def test_profile_view(db, logged_in_client):
     response = logged_in_client.get(url)
     assert response.status_code == 200
     assert "collectable_liked" in response.context
+    assert "collectable_swapped" in response.context
+    assert "trade_partners" in response.context
+
+
+def test_profile_view_trade_lists(
+    user, logged_in_client, collectable, another_collectable
+):
+    wanter = UserFactory(username="wanter")
+    mate = UserFactory(username="mate")
+    url = reverse("collectable:profile")
+
+    # One of our spares, nobody after it yet.
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    response = logged_in_client.get(url)
+    assert list(response.context["collectable_swapped"]) == [collectable]
+    assert response.context["trade_partners"] == []
+
+    # Somebody wants it: one-way only.
+    PossessionFactory(
+        user=wanter, collectable=collectable, likes=False, wants=True, owns=False
+    )
+    response = logged_in_client.get(url)
+    assert [u.username for u in response.context["trade_wanting_our_spares"]] == [
+        "wanter"
+    ]
+    assert response.context["trade_offering_our_wants"] == []
+    assert response.context["trade_both_ways"] == []
+
+    # Somebody offers a spare we want, and wants one of ours: two-way.
+    PossessionFactory(
+        user=user, collectable=another_collectable, likes=False, wants=True, owns=False
+    )
+    PossessionFactory(
+        user=mate,
+        collectable=another_collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=mate, collectable=collectable, likes=False, wants=True, owns=False
+    )
+    response = logged_in_client.get(url)
+    assert [u.username for u in response.context["trade_both_ways"]] == ["mate"]
+    assert sorted(u.username for u in response.context["trade_wanting_our_spares"]) == [
+        "mate",
+        "wanter",
+    ]
+    assert [u.username for u in response.context["trade_offering_our_wants"]] == [
+        "mate"
+    ]
+
+
+def test_profile_view_renders_trade_names(user, logged_in_client, collectable):
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=UserFactory(username="collectomane"),
+        collectable=collectable,
+        likes=False,
+        wants=True,
+        owns=False,
+    )
+
+    content = logged_in_client.get(reverse("collectable:profile")).content.decode()
+
+    assert "collectomane" in content
+    assert "1 double recherch" in content
 
 
 @pytest.mark.django_db
@@ -317,3 +432,25 @@ def test_list_view_extra_context_not_shared_across_requests(client, collectable)
     response = client.get(reverse("collectable:latest"))
 
     assert "advanced_search" not in response.context
+
+
+def test_profile_view_trade_lists_hit_the_database_once(
+    user, logged_in_client, collectable, django_assert_num_queries
+):
+    # The three lists are sliced from one annotated query, not three.
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=UserFactory(), collectable=collectable, likes=False, wants=True, owns=False
+    )
+    url = reverse("collectable:profile")
+    logged_in_client.get(url)  # warm up sessions/auth queries
+
+    with django_assert_num_queries(1):
+        list(Possession.trade_partners(user))

@@ -4,7 +4,7 @@ from django.urls import reverse
 from taggit.models import Tag
 
 from collect.utils import tags_joiner
-from collectable.models import Collectable, DuplicateReport
+from collectable.models import Collectable, DuplicateReport, Possession
 from collectable.tests.factories import (
     CollectableFactory,
     DuplicateReportFactory,
@@ -217,3 +217,140 @@ def test_duplicate_report_save_validates():
     c = CollectableFactory()
     with pytest.raises(ValidationError):
         DuplicateReport(reporter=UserFactory(), duplicate=c, original=c).save()
+
+
+def test_swaps_is_cleared_when_not_owned(user, collectable):
+    possession = PossessionFactory(user=user, collectable=collectable, owns=True)
+    possession.swaps = True
+    possession.save()
+    assert possession.swaps is True
+
+    possession.owns = False
+    possession.save()
+    possession.refresh_from_db()
+    assert possession.swaps is False
+
+
+def test_swaps_is_cleared_with_update_fields(user, collectable):
+    possession = PossessionFactory(
+        user=user, collectable=collectable, owns=True, swaps=True
+    )
+    possession.owns = False
+    possession.save(update_fields=["owns"])
+    possession.refresh_from_db()
+    assert possession.swaps is False
+
+
+def test_swapped_by(user, collectable, another_collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(user=user, collectable=another_collectable, owns=True)
+
+    results = Collectable.objects.all().swapped_by(user)
+
+    assert [c.id for c in results] == [collectable.id]
+
+
+def test_swaps_count_annotation(user, collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(collectable=collectable, owns=True, swaps=False)
+
+    result = Collectable.objects.with_counts_and_possessions(user).get(
+        id=collectable.id
+    )
+
+    assert result.nswaps == 2
+
+
+def spare(user, collectable):
+    """A collectable this user owns and offers for swap."""
+    return PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+
+
+def want(user, collectable):
+    """A collectable this user is looking for."""
+    return PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=True,
+        owns=False,
+        swaps=False,
+    )
+
+
+def test_trade_partners_one_way(user, collectable, another_collectable):
+    wanter = UserFactory(username="wanter")
+    offerer = UserFactory(username="offerer")
+    # They want one of our spares.
+    spare(user, collectable)
+    want(wanter, collectable)
+    # They offer a spare we are looking for.
+    want(user, another_collectable)
+    spare(offerer, another_collectable)
+
+    partners = {
+        p.username: (p.nwanted, p.noffered) for p in Possession.trade_partners(user)
+    }
+
+    assert partners == {"wanter": (1, 0), "offerer": (0, 1)}
+
+
+def test_trade_partners_both_ways(user, collectable, another_collectable):
+    mate = UserFactory(username="mate")
+    spare(user, collectable)
+    want(mate, collectable)
+    want(user, another_collectable)
+    spare(mate, another_collectable)
+
+    (partner,) = Possession.trade_partners(user)
+
+    assert partner.username == "mate"
+    assert (partner.nwanted, partner.noffered) == (1, 1)
+
+
+def test_trade_partners_excludes_self_and_non_matches(user, collectable):
+    # Wanting our own spare does not make us our own partner.
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=True,
+        owns=True,
+        swaps=True,
+    )
+    # Owning it without offering a spare is not offering anything.
+    PossessionFactory(
+        user=UserFactory(), collectable=collectable, likes=False, wants=False, owns=True
+    )
+    # Merely liking it either.
+    PossessionFactory(
+        user=UserFactory(), collectable=collectable, likes=True, wants=False, owns=False
+    )
+
+    assert list(Possession.trade_partners(user)) == []
+
+
+def test_trade_partners_ignores_inactive_users(user, collectable):
+    inactive = UserFactory(is_active=False)
+    spare(user, collectable)
+    want(inactive, collectable)
+
+    assert list(Possession.trade_partners(user)) == []
+
+
+def test_merge_into_keeps_swaps(user, collectable, another_collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+
+    collectable.merge_into(another_collectable)
+
+    merged = another_collectable.possession_set.get(user=user)
+    assert merged.owns is True
+    assert merged.swaps is True
