@@ -505,6 +505,14 @@ OWN_PROFILE_TAB_EMPTY_MESSAGES = {
     "swapped": _("No spare to swap. Mark the collectables you own twice as spare."),
 }
 
+# On somebody else's lists, the visitor can narrow them down to what a trade
+# with them would be made of. The checkbox is hidden, and the CSS reads the
+# possession marks of the thumbnails to hide the rest: see `style.css`.
+PROFILE_TAB_FILTERS = {
+    "swapped": {"id": "only-wanted", "label": _("Only the ones I want")},
+    "wanted": {"id": "only-spared", "label": _("Only the ones I have a spare of")},
+}
+
 
 @login_required
 def profile(request):
@@ -557,9 +565,16 @@ def user_profile(request, username):
     if is_own_profile:
         empty_message = OWN_PROFILE_TAB_EMPTY_MESSAGES.get(active_tab, empty_message)
 
+    # Filtering is only useful on somebody else's lists, and only makes sense
+    # for a visitor who has marks of their own to compare them with.
+    tab_filter = None
+    if request.user.is_authenticated and not is_own_profile:
+        tab_filter = PROFILE_TAB_FILTERS.get(active_tab)
+
     context = {
         "profile_user": profile_user,
         "is_own_profile": is_own_profile,
+        "tab_filter": tab_filter,
         "tabs": [
             {"name": name, "label": PROFILE_TAB_LABELS[name], "count": counts[name]}
             for name in PROFILE_TABS

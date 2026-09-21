@@ -1129,14 +1129,17 @@ section#related {
   opacity: 0.7;
 }
 
-/* A switch for the `#hide-owned` checkbox, which is itself out of sight. */
-.hide-owned-toggle {
+.collection-progress-info .filter-toggle {
+  margin-top: 0.6rem;
+}
+
+/* A switch for a `.filter-toggle-input` checkbox, which is itself out of sight.
+   The two are tied by `for`/`id`, so the switch can live anywhere after it. */
+.filter-toggle {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-
-  margin-top: 0.6rem;
 
   font-size: 0.85rem;
   opacity: 0.7;
@@ -1144,7 +1147,7 @@ section#related {
   user-select: none;
 }
 
-.hide-owned-toggle::before {
+.filter-toggle::before {
   content: "";
 
   width: 2.25rem;
@@ -1156,7 +1159,7 @@ section#related {
 }
 
 /* The knob. */
-.hide-owned-toggle::after {
+.filter-toggle::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -1171,26 +1174,42 @@ section#related {
   transition: translate 0.2s ease;
 }
 
-#hide-owned:checked + .collection-progress .hide-owned-toggle {
+/* The switch of a checked filter, be it a sibling of the checkbox or nested
+   in one. */
+.filter-toggle-input:checked + .filter-toggle,
+.filter-toggle-input:checked ~ * .filter-toggle {
   opacity: 1;
 }
 
-#hide-owned:checked + .collection-progress .hide-owned-toggle::before {
+.filter-toggle-input:checked + .filter-toggle::before,
+.filter-toggle-input:checked ~ * .filter-toggle::before {
   background: var(--link-color);
 }
 
-#hide-owned:checked + .collection-progress .hide-owned-toggle::after {
+.filter-toggle-input:checked + .filter-toggle::after,
+.filter-toggle-input:checked ~ * .filter-toggle::after {
   translate: 1rem -50%;
 }
 
 /* The checkbox being invisible, the switch carries its focus ring. */
-#hide-owned:focus-visible + .collection-progress .hide-owned-toggle::before {
+.filter-toggle-input:focus-visible + .filter-toggle::before,
+.filter-toggle-input:focus-visible ~ * .filter-toggle::before {
   outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
 
-/* Each thumbnail states whether the visitor owns it, in its possession form. */
+/* Each thumbnail states what the visitor owns, wants or has a spare of, in its
+   possession form: the filters read the checkboxes the visitor sees. */
 #hide-owned:checked ~ #collectable-list .thumbnail:has([name="owns"]:checked) {
+  display: none;
+}
+
+#only-wanted:checked
+  ~ #collectable-list
+  .thumbnail:not(:has([name="wants"]:checked)),
+#only-spared:checked
+  ~ #collectable-list
+  .thumbnail:not(:has([name="swaps"]:checked)) {
   display: none;
 }
 
@@ -1281,6 +1300,10 @@ section#related {
   margin-bottom: 1rem;
   font-size: 0.9rem;
   opacity: 0.8;
+}
+
+.tab-panel .filter-toggle {
+  margin-bottom: 1.25rem;
 }
 
 /* Profile page: when the collector joined, under the title. */

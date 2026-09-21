@@ -21,7 +21,9 @@
         {% endblocktranslate %}
     </h2>
     {% if user.is_authenticated %}
-        <input type="checkbox" id="hide-owned" class="visually-hidden">
+        <input type="checkbox"
+               id="hide-owned"
+               class="visually-hidden filter-toggle-input">
         {# Marking an item owned changes the progress. #}
         <section class="collection-progress"
                  id="collection-progress"
@@ -45,7 +47,7 @@
                         You've collected {{ p }}% of this collection.
                     {% endblocktranslate %}
                 </p>
-                <label for="hide-owned" class="hide-owned-toggle">{% translate "Hide the ones I own" %}</label>
+                <label for="hide-owned" class="filter-toggle">{% translate "Hide the ones I own" %}</label>
             </div>
         </section>
     {% endif %}

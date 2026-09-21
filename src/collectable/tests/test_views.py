@@ -737,3 +737,48 @@ def test_details_view_shows_a_bounded_history(logged_in_client, collectable, set
 
     assert response.status_code == 200
     assert len(response.context["collectable"].history_with_deltas()) == 2
+
+
+@pytest.mark.parametrize(
+    "tab, toggle_id",
+    [("swapped", "only-wanted"), ("wanted", "only-spared")],
+)
+def test_user_profile_trade_filter_toggle(logged_in_client, tab, toggle_id):
+    other = UserFactory()
+    url = reverse("user-profile", kwargs={"username": other.username})
+
+    response = logged_in_client.get(url, {"tab": tab})
+
+    # The checkbox the CSS filter reads, and the switch that drives it.
+    content = response.content.decode()
+    assert f'id="{toggle_id}"' in content
+    assert f'for="{toggle_id}"' in content
+
+
+@pytest.mark.parametrize("tab", ["owned", "liked"])
+def test_user_profile_has_no_filter_on_other_tabs(logged_in_client, tab):
+    other = UserFactory()
+    url = reverse("user-profile", kwargs={"username": other.username})
+
+    response = logged_in_client.get(url, {"tab": tab})
+
+    assert response.context["tab_filter"] is None
+
+
+def test_own_profile_has_no_trade_filter(user, logged_in_client):
+    # Nothing to compare our own lists with.
+    url = reverse("user-profile", kwargs={"username": user.username})
+
+    response = logged_in_client.get(url, {"tab": "swapped"})
+
+    assert response.context["tab_filter"] is None
+
+
+def test_anonymous_profile_visit_has_no_trade_filter(client, user):
+    # A visitor without marks of their own has nothing to filter on.
+    url = reverse("user-profile", kwargs={"username": user.username})
+
+    response = client.get(url, {"tab": "swapped"})
+
+    assert response.context["tab_filter"] is None
+    assert "filter-toggle-input" not in response.content.decode()

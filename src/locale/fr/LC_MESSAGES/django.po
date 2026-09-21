@@ -275,6 +275,12 @@ msgstr ""
 msgid "Hide the ones I own"
 msgstr "Masquer ceux que je possède"
 
+msgid "Only the ones I have a spare of"
+msgstr "Seulement ceux dont j'ai un double"
+
+msgid "Only the ones I want"
+msgstr "Seulement ceux que je recherche"
+
 msgid "Related collections"
 msgstr "Collections associées"
 

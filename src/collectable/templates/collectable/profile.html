@@ -34,6 +34,12 @@
         </div>
         <section class="tab-panel">
             <h2 class="visually-hidden">{{ active_label }}</h2>
+            {% if tab_filter %}
+                <input type="checkbox"
+                       id="{{ tab_filter.id }}"
+                       class="visually-hidden filter-toggle-input">
+                <label for="{{ tab_filter.id }}" class="filter-toggle">{{ tab_filter.label }}</label>
+            {% endif %}
             <div class="collectable-grid" id="collectable-list">
                 {% for collectable in page_obj %}
                     {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
