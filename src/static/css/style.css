@@ -1218,6 +1218,13 @@ section#related {
   opacity: 0.8;
 }
 
+/* Profile page: when the collector joined, under the title. */
+.profile-meta {
+  margin: -0.5rem 0 1.5rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
 /* Trade partners: three plain name lists, side by side when there is room. */
 .trade-lists {
   display: grid;

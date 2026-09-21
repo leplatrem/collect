@@ -8,6 +8,7 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("profile/", views.profile, name="profile"),
+    path("trades/", views.trades, name="trades"),
     path(
         "latest/",
         views.CollectableListView.as_view(kind="latest"),

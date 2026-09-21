@@ -3,6 +3,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
@@ -482,69 +483,107 @@ def collection(request, slugs):
     return render(request, "collectable/collection.html", context)
 
 
-PROFILE_TABS = ("owned", "liked", "wanted", "swapped", "matched")
+PROFILE_TABS = ("owned", "liked", "wanted", "swapped")
 
 PROFILE_TAB_LABELS = {
     "owned": _("Owned"),
     "liked": _("Liked"),
     "wanted": _("Wanted"),
     "swapped": _("Spares"),
-    "matched": _("Matches"),
 }
 
 PROFILE_TAB_EMPTY_MESSAGES = {
     "owned": _("No collectable owned."),
     "liked": _("No collectable liked."),
     "wanted": _("No collectable wanted."),
+    "swapped": _("No spare to swap."),
+}
+
+# Visitors looking at their own profile get the message that tells them what
+# to do about it.
+OWN_PROFILE_TAB_EMPTY_MESSAGES = {
     "swapped": _("No spare to swap. Mark the collectables you own twice as spare."),
 }
 
 
 @login_required
 def profile(request):
+    """
+    Shortcut to the visitor's own public profile.
+    """
+    return redirect("user-profile", username=request.user.username)
+
+
+def user_profile(request, username):
+    """
+    A collector's collection, public: anybody can see what others own, like,
+    want, or have a spare of.
+    """
+    profile_user = get_object_or_404(
+        get_user_model(), username=username, is_active=True
+    )
+    is_own_profile = request.user == profile_user
+
     # Tabs are served one at a time, so that a profile with a big collection
     # does not have to load every list on every page view.
     active_tab = request.GET.get("tab", "")
     if active_tab not in PROFILE_TABS:
         active_tab = "owned"
 
-    # A single query, split three ways: who could trade both directions, who
-    # is after one of our spares, and who offers one we are looking for.
-    partners = list(Possession.trade_partners(request.user))
-
     # Counts shown on the tab labels, all in one query.
     counts = Possession.objects.filter(
-        user=request.user, collectable__hidden=False
+        user=profile_user, collectable__hidden=False
     ).aggregate(
         owned=Count("pk", filter=Q(owns=True)),
         liked=Count("pk", filter=Q(likes=True)),
         wanted=Count("pk", filter=Q(wants=True)),
         swapped=Count("pk", filter=Q(swaps=True)),
     )
-    counts["matched"] = len(partners)
 
-    page_obj = None
-    if active_tab != "matched":
-        qs = Collectable.objects.with_counts_and_possessions(request.user)
-        tab_querysets = {
-            "owned": qs.owned_by,
-            "liked": qs.liked_by,
-            "wanted": qs.wanted_by,
-            "swapped": qs.swapped_by,
-        }
-        # The model has no default ordering, and the paginator needs a stable one.
-        tab_qs = tab_querysets[active_tab](request.user).order_by("-created_at")
-        page_obj = paginate(request, qs=tab_qs)
+    # The lists are the profile owner's, but the possession marks shown on each
+    # thumbnail are the visitor's.
+    qs = Collectable.objects.with_counts_and_possessions(request.user)
+    tab_querysets = {
+        "owned": qs.owned_by,
+        "liked": qs.liked_by,
+        "wanted": qs.wanted_by,
+        "swapped": qs.swapped_by,
+    }
+    # The model has no default ordering, and the paginator needs a stable one.
+    tab_qs = tab_querysets[active_tab](profile_user).order_by("-created_at")
+    page_obj = paginate(request, qs=tab_qs)
+
+    empty_message = PROFILE_TAB_EMPTY_MESSAGES[active_tab]
+    if is_own_profile:
+        empty_message = OWN_PROFILE_TAB_EMPTY_MESSAGES.get(active_tab, empty_message)
 
     context = {
+        "profile_user": profile_user,
+        "is_own_profile": is_own_profile,
         "tabs": [
             {"name": name, "label": PROFILE_TAB_LABELS[name], "count": counts[name]}
             for name in PROFILE_TABS
         ],
         "active_tab": active_tab,
         "active_label": PROFILE_TAB_LABELS[active_tab],
-        "empty_message": PROFILE_TAB_EMPTY_MESSAGES.get(active_tab),
+        "empty_message": empty_message,
         "page_obj": page_obj,
+    }
+    return render(request, "collectable/profile.html", context)
+
+
+@login_required
+def trades(request):
+    """
+    The collectors the visitor could trade with. On its own page, because the
+    lists are personal, and because building them scans everybody's spares
+    and wants.
+    """
+    # A single query, split three ways: who could trade both directions, who
+    # is after one of our spares, and who offers one we are looking for.
+    partners = list(Possession.trade_partners(request.user))
+
+    context = {
         "trade_partners": partners,
         "trade_both_ways": sorted(
             [p for p in partners if p.nwanted and p.noffered],
@@ -558,4 +597,4 @@ def profile(request):
             [p for p in partners if p.noffered], key=lambda p: p.noffered, reverse=True
         ),
     }
-    return render(request, "collectable/profile.html", context)
+    return render(request, "collectable/trades.html", context)

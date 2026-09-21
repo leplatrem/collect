@@ -2,10 +2,17 @@
 {% load i18n %}
 {% load collectable_extras %}
 {% block title %}
-    {% translate "Profile" %}
+    {% blocktranslate with username=profile_user %}User {{ username }}{% endblocktranslate %}
 {% endblock %}
 {% block content %}
-    <h1>{% translate "Profile" %} {{ user }}</h1>
+    <h1>
+        {% if is_own_profile %}
+            {% translate "You" %}
+{% else %}{% blocktranslate with username=profile_user %}User {{ username }}{% endblocktranslate %}{% endif %}
+    </h1>
+    <p class="profile-meta">
+        {% blocktranslate with date=profile_user.date_joined|date_only %}Member since {{ date }}{% endblocktranslate %}
+    </p>
     {% comment %}
     Only the selected tab is rendered: htmx swaps the whole block, and without
     JavaScript the links fall back to a plain page load of the same URL.
@@ -27,74 +34,21 @@
         </div>
         <section class="tab-panel">
             <h2 class="visually-hidden">{{ active_label }}</h2>
-            {% if active_tab == "matched" %}
-                <div class="trade-lists">
-                    <section>
-                        <h3>{% translate "Two-way trades" %}</h3>
-                        <p class="tab-hint">{% translate "You each have a spare the other is looking for." %}</p>
-                        <ul class="trade-list">
-                            {% for partner in trade_both_ways %}
-                                <li>
-                                    <span class="trade-name">{{ partner }}</span>
-                                    <span class="trade-count">
-                                        {% with total=partner.nwanted|add:partner.noffered %}
-                                            {% blocktranslate count counter=total %}{{ counter }} collectable to trade{% plural %}{{ counter }} collectables to trade{% endblocktranslate %}
-                                        {% endwith %}
-                                    </span>
-                                </li>
-                            {% empty %}
-                                <li class="trade-empty">{% translate "No two-way trade yet." %}</li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                    <section>
-                        <h3>{% translate "They want your spares" %}</h3>
-                        <ul class="trade-list">
-                            {% for partner in trade_wanting_our_spares %}
-                                <li>
-                                    <span class="trade-name">{{ partner }}</span>
-                                    <span class="trade-count">
-                                        {% blocktranslate count counter=partner.nwanted %}{{ counter }} spare wanted{% plural %}{{ counter }} spares wanted{% endblocktranslate %}
-                                    </span>
-                                </li>
-                            {% empty %}
-                                <li class="trade-empty">{% translate "Nobody is looking for your spares yet." %}</li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                    <section>
-                        <h3>{% translate "They have spares you want" %}</h3>
-                        <ul class="trade-list">
-                            {% for partner in trade_offering_our_wants %}
-                                <li>
-                                    <span class="trade-name">{{ partner }}</span>
-                                    <span class="trade-count">
-                                        {% blocktranslate count counter=partner.noffered %}{{ counter }} spare offered{% plural %}{{ counter }} spares offered{% endblocktranslate %}
-                                    </span>
-                                </li>
-                            {% empty %}
-                                <li class="trade-empty">{% translate "No collector offers a spare you are looking for yet." %}</li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                </div>
-            {% else %}
-                <div class="collectable-grid" id="collectable-list">
-                    {% for collectable in page_obj %}
-                        {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
-                            <span class="invisible"
-                                  hx-get="{% page_url page_obj.next_page_number %}"
-                                  hx-swap="beforeend"
-                                  hx-target="#collectable-list"
-                                  hx-select="#collectable-list > *"
-                                  hx-trigger="revealed"></span>
-                        {% endif %}
-                        {% include "collectable/collectable_thumbnail.html" %}
-                    {% empty %}
-                        {{ empty_message }}
-                    {% endfor %}
-                </div>
-            {% endif %}
+            <div class="collectable-grid" id="collectable-list">
+                {% for collectable in page_obj %}
+                    {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
+                        <span class="invisible"
+                              hx-get="{% page_url page_obj.next_page_number %}"
+                              hx-swap="beforeend"
+                              hx-target="#collectable-list"
+                              hx-select="#collectable-list > *"
+                              hx-trigger="revealed"></span>
+                    {% endif %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {{ empty_message }}
+                {% endfor %}
+            </div>
         </section>
     </div>
 {% endblock %}

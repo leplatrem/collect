@@ -120,7 +120,8 @@
                 {% for record in collectable.history_with_deltas %}
                     <li>
                         {{ record.history_date|date_only }}:
-                        {% blocktranslate with action=record.get_history_type_display user=record.history_user %}
+                        {% user_link record.history_user as history_user_link %}
+                        {% blocktranslate with action=record.get_history_type_display user=history_user_link %}
                         {{ action }} by {{ user }}
                     {% endblocktranslate %}
                         {% if record.history_delta_changes %}

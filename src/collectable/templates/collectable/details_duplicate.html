@@ -27,7 +27,8 @@
                 <ul>
                     {% for report in reports %}
                         <li>
-                            {% blocktranslate with who=report.reporter when=report.created_at|date_only %}
+                            {% user_link report.reporter as reporter_link %}
+                            {% blocktranslate with who=reporter_link when=report.created_at|date_only %}
                             {{ who }} on {{ when }}
                         {% endblocktranslate %}
                         </li>

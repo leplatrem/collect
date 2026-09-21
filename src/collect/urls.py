@@ -5,6 +5,8 @@ from django.contrib import admin
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import RedirectView
 
+from collectable.views import user_profile
+
 
 urlpatterns = i18n_patterns(
     path(
@@ -12,6 +14,9 @@ urlpatterns = i18n_patterns(
         RedirectView.as_view(url=reverse_lazy("collectable:index"), permanent=False),
         name="home",
     ),
+    # Public collector pages, at the root: they are the addresses every
+    # username on the site links to.
+    path("user/<str:username>/", user_profile, name="user-profile"),
     path(
         "collectable/",
         include(("collectable.urls", "collectable"), namespace="collectable"),

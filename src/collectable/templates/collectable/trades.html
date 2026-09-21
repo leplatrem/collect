@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load collectable_extras %}
+{% block title %}
+    {% translate "Trades" %}
+{% endblock %}
+{% block content %}
+    <h1>{% translate "Trades" %}</h1>
+    <p class="tab-hint">{% translate "The collectors you could trade with, based on your spares and the collectables you are looking for." %}</p>
+    <div class="trade-lists">
+        <section>
+            <h3>{% translate "Two-way trades" %}</h3>
+            <p class="tab-hint">{% translate "You each have a spare the other is looking for." %}</p>
+            <ul class="trade-list">
+                {% for partner in trade_both_ways %}
+                    <li>
+                        <span class="trade-name">{% user_link partner %}</span>
+                        <span class="trade-count">
+                            {% with total=partner.nwanted|add:partner.noffered %}
+                                {% blocktranslate count counter=total %}{{ counter }} collectable to trade{% plural %}{{ counter }} collectables to trade{% endblocktranslate %}
+                            {% endwith %}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="trade-empty">{% translate "No two-way trade yet." %}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section>
+            <h3>{% translate "They want your spares" %}</h3>
+            <ul class="trade-list">
+                {% for partner in trade_wanting_our_spares %}
+                    <li>
+                        <span class="trade-name">{% user_link partner tab="wanted" %}</span>
+                        <span class="trade-count">
+                            {% blocktranslate count counter=partner.nwanted %}{{ counter }} spare wanted{% plural %}{{ counter }} spares wanted{% endblocktranslate %}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="trade-empty">{% translate "Nobody is looking for your spares yet." %}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section>
+            <h3>{% translate "They have spares you want" %}</h3>
+            <ul class="trade-list">
+                {% for partner in trade_offering_our_wants %}
+                    <li>
+                        <span class="trade-name">{% user_link partner tab="swapped" %}</span>
+                        <span class="trade-count">
+                            {% blocktranslate count counter=partner.noffered %}{{ counter }} spare offered{% plural %}{{ counter }} spares offered{% endblocktranslate %}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="trade-empty">{% translate "No collector offers a spare you are looking for yet." %}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+{% endblock %}

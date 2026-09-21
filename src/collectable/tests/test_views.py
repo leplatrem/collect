@@ -6,9 +6,15 @@ import pytest
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils.translation import gettext
 from PIL import Image
 
-from collectable.models import Collectable, DuplicateReport, Possession
+from collectable.models import (
+    Collectable,
+    DuplicateReport,
+    Possession,
+    get_unknown_user,
+)
 from collectable.tests.factories import (
     CollectableFactory,
     DuplicateReportFactory,
@@ -183,39 +189,103 @@ def test_invalid_tag_fallback(db, client):
     assert any(t.name == "invalidtag" for t in response.context["tag_list"])
 
 
-def test_profile_view(db, logged_in_client):
-    url = reverse("collectable:profile")
+def test_profile_view_redirects_to_public_page(user, logged_in_client):
+    response = logged_in_client.get(reverse("collectable:profile"))
+    assert response.status_code == 302
+    assert response.url == reverse("user-profile", kwargs={"username": user.username})
+
+
+def test_profile_view_requires_login(db, client):
+    response = client.get(reverse("collectable:profile"))
+    assert response.status_code == 302
+    assert response.url.startswith(settings.LOGIN_URL)
+
+
+def test_user_profile_view(user, logged_in_client):
+    url = reverse("user-profile", kwargs={"username": user.username})
     response = logged_in_client.get(url)
     assert response.status_code == 200
+    assert response.context["profile_user"] == user
+    assert response.context["is_own_profile"]
     assert response.context["active_tab"] == "owned"
     assert [t["name"] for t in response.context["tabs"]] == [
         "owned",
         "liked",
         "wanted",
         "swapped",
-        "matched",
     ]
     assert "page_obj" in response.context
-    assert "trade_partners" in response.context
+    content = response.content.decode()
+    # Visitors looking at their own page are told so, and trades are on their
+    # own page now, linked from the top menu.
+    assert gettext("You") in content
+    assert reverse("collectable:trades") in content
+
+
+def test_user_profile_view_is_public(client, user, collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True)
+    url = reverse("user-profile", kwargs={"username": user.username})
+
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert not response.context["is_own_profile"]
+    assert list(response.context["page_obj"]) == [collectable]
+    content = response.content.decode()
+    assert gettext("User %(username)s") % {"username": user.username} in content
+    # Trades are personal: the menu does not offer them to a visitor.
+    assert reverse("collectable:trades") not in content
+
+
+def test_user_profile_view_shows_member_since(client, user):
+    url = reverse("user-profile", kwargs={"username": user.username})
+
+    content = client.get(url).content.decode()
+
+    assert 'class="profile-meta"' in content
+    assert str(user.date_joined.year) in content
+
+
+def test_user_profile_view_of_someone_else(logged_in_client, collectable):
+    other = UserFactory(username="othercollector")
+    PossessionFactory(user=other, collectable=collectable, owns=True)
+
+    response = logged_in_client.get(
+        reverse("user-profile", kwargs={"username": "othercollector"})
+    )
+
+    assert response.status_code == 200
+    assert response.context["profile_user"] == other
+    assert not response.context["is_own_profile"]
+    assert list(response.context["page_obj"]) == [collectable]
+
+
+@pytest.mark.parametrize("username", ["ghost", "unknown"])
+def test_user_profile_view_unknown_or_inactive_user(db, client, username):
+    # The `unknown` placeholder user is inactive: it has no public profile.
+    get_unknown_user()
+
+    response = client.get(reverse("user-profile", kwargs={"username": username}))
+
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize(
     "tab,expected",
     [
         ("liked", "liked"),
-        ("matched", "matched"),
+        ("swapped", "swapped"),
         # Unknown tabs fall back to the default one.
+        ("matched", "owned"),
         ("unknown", "owned"),
         ("", "owned"),
     ],
 )
-def test_profile_view_tabs(db, logged_in_client, tab, expected):
-    url = reverse("collectable:profile")
+def test_user_profile_view_tabs(user, logged_in_client, tab, expected):
+    url = reverse("user-profile", kwargs={"username": user.username})
     response = logged_in_client.get(url, {"tab": tab})
     assert response.status_code == 200
     assert response.context["active_tab"] == expected
-    # The matches tab has no collectable list.
-    assert (response.context["page_obj"] is None) == (expected == "matched")
 
 
 def test_profile_view_paginates_tab(user, logged_in_client, collectable, settings):
@@ -224,7 +294,7 @@ def test_profile_view_paginates_tab(user, logged_in_client, collectable, setting
     for c in (collectable, another):
         PossessionFactory(user=user, collectable=c, likes=True, wants=False, owns=False)
 
-    url = reverse("collectable:profile")
+    url = reverse("user-profile", kwargs={"username": user.username})
     page1 = logged_in_client.get(url, {"tab": "liked"})
     page2 = logged_in_client.get(url, {"tab": "liked", "page": 2})
 
@@ -239,12 +309,18 @@ def test_profile_view_paginates_tab(user, logged_in_client, collectable, setting
     assert "?tab=liked&amp;page=2" in page1.content.decode()
 
 
-def test_profile_view_trade_lists(
+def test_trades_view_requires_login(db, client):
+    response = client.get(reverse("collectable:trades"))
+    assert response.status_code == 302
+    assert response.url.startswith(settings.LOGIN_URL)
+
+
+def test_trades_view_trade_lists(
     user, logged_in_client, collectable, another_collectable
 ):
     wanter = UserFactory(username="wanter")
     mate = UserFactory(username="mate")
-    url = reverse("collectable:profile")
+    url = reverse("collectable:trades")
 
     # One of our spares, nobody after it yet.
     PossessionFactory(
@@ -255,8 +331,7 @@ def test_profile_view_trade_lists(
         owns=True,
         swaps=True,
     )
-    response = logged_in_client.get(url, {"tab": "swapped"})
-    assert list(response.context["page_obj"]) == [collectable]
+    response = logged_in_client.get(url)
     assert response.context["trade_partners"] == []
 
     # Somebody wants it: one-way only.
@@ -296,7 +371,7 @@ def test_profile_view_trade_lists(
     ]
 
 
-def test_profile_view_renders_trade_names(user, logged_in_client, collectable):
+def test_trades_view_renders_trade_names(user, logged_in_client, collectable):
     PossessionFactory(
         user=user,
         collectable=collectable,
@@ -313,11 +388,15 @@ def test_profile_view_renders_trade_names(user, logged_in_client, collectable):
         owns=False,
     )
 
-    response = logged_in_client.get(reverse("collectable:profile"), {"tab": "matched"})
+    response = logged_in_client.get(reverse("collectable:trades"))
     content = response.content.decode()
 
     assert "collectomane" in content
     assert "1 double recherch" in content
+    # Partner names link to the list that matters for that direction: here,
+    # what they are looking for.
+    url = reverse("user-profile", kwargs={"username": "collectomane"})
+    assert f'href="{url}?tab=wanted"' in content
 
 
 @pytest.mark.django_db
@@ -482,7 +561,7 @@ def test_list_view_extra_context_not_shared_across_requests(client, collectable)
     assert "advanced_search" not in response.context
 
 
-def test_profile_view_trade_lists_hit_the_database_once(
+def test_trades_view_trade_lists_hit_the_database_once(
     user, logged_in_client, collectable, django_assert_num_queries
 ):
     # The three lists are sliced from one annotated query, not three.
@@ -497,8 +576,48 @@ def test_profile_view_trade_lists_hit_the_database_once(
     PossessionFactory(
         user=UserFactory(), collectable=collectable, likes=False, wants=True, owns=False
     )
-    url = reverse("collectable:profile")
+    url = reverse("collectable:trades")
     logged_in_client.get(url)  # warm up sessions/auth queries
 
     with django_assert_num_queries(1):
         list(Possession.trade_partners(user))
+
+
+def test_duplicate_page_links_the_reporter(
+    logged_in_client, collectable, another_collectable, user
+):
+    DuplicateReportFactory(
+        original=another_collectable, duplicate=collectable, reporter=user
+    )
+    url = reverse("collectable:duplicate", kwargs={"id": collectable.id})
+
+    response = logged_in_client.get(url)
+
+    assert (
+        reverse("user-profile", kwargs={"username": user.username})
+        in response.content.decode()
+    )
+
+
+def test_details_page_links_the_history_user(logged_in_client, collectable, user):
+    url = reverse("collectable:details", kwargs={"id": collectable.id})
+    logged_in_client.post(
+        url,
+        {
+            "description": "Edited via test",
+            "tags": "tag1",
+            "license": "CC-BY-SA-4.0",
+            "photo": collectable.photo,
+            "photo_x": 0,
+            "photo_y": 0,
+            "photo_w": 400,
+            "photo_h": 400,
+        },
+    )
+
+    content = logged_in_client.get(url).content.decode()
+
+    assert (
+        f'<a href="{reverse("user-profile", kwargs={"username": user.username})}"'
+        in content
+    )

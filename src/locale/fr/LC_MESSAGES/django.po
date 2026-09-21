@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 09:57+0000\n"
+"POT-Creation-Date: 2026-09-21 18:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,9 @@ msgstr "Anglais"
 
 msgid "French"
 msgstr "Français"
+
+msgid "Too Many Requests"
+msgstr "Trop de requêtes"
 
 msgid "Rights confirmation"
 msgstr "Confirmation des droits"
@@ -473,28 +476,26 @@ msgid_plural "%(counter)s spares"
 msgstr[0] "%(counter)s double"
 msgstr[1] "%(counter)s doubles"
 
-msgid "Profile"
-msgstr "Profil"
+#, python-format
+msgid "User %(username)s"
+msgstr "Utilisateur %(username)s"
 
-msgid "Owned"
-msgstr "Possédé"
+msgid "You"
+msgstr "Vous"
 
-msgid "Liked"
-msgstr "Aimé"
+#, python-format
+msgid "Member since %(date)s"
+msgstr "Membre depuis le %(date)s"
 
-msgid "Wanted"
-msgstr "Recherché"
+msgid "Trades"
+msgstr "Échanges"
 
-msgid "Spares"
-msgstr "Doubles"
-
-msgid "Matches"
-msgstr "Correspondances"
-
-msgid "No spare to swap. Mark the collectables you own twice as spare."
+msgid ""
+"The collectors you could trade with, based on your spares and the "
+"collectables you are looking for."
 msgstr ""
-"Aucun double à échanger. Marquez comme double les objets que vous possédez "
-"en plusieurs exemplaires."
+"Les collectionneurs avec qui vous pourriez échanger, d'après vos doubles et "
+"les objets que vous recherchez."
 
 msgid "Two-way trades"
 msgstr "Échanges croisés"
@@ -534,8 +535,10 @@ msgstr[1] "%(counter)s doubles proposés"
 
 msgid "No collector offers a spare you are looking for yet."
 msgstr ""
-"Aucun collectionneur ne propose un double que vous recherchez pour le "
-"moment."
+"Aucun collectionneur ne propose un double que vous recherchez pour le moment."
+
+msgid "Back to profile"
+msgstr "Retour au profil"
 
 #, python-format
 msgid "%s is not an acceptable file type."
@@ -606,6 +609,26 @@ msgstr "Introuvable"
 msgid "Your duplicate report has been cancelled."
 msgstr "Votre signalement de doublon a été annulé."
 
+msgid "Owned"
+msgstr "Possédé"
+
+msgid "Liked"
+msgstr "Aimé"
+
+msgid "Wanted"
+msgstr "Recherché"
+
+msgid "Spares"
+msgstr "Doubles"
+
+msgid "No spare to swap."
+msgstr "Aucun double à échanger."
+
+msgid "No spare to swap. Mark the collectables you own twice as spare."
+msgstr ""
+"Aucun double à échanger. Marquez comme double les objets que vous possédez "
+"en plusieurs exemplaires."
+
 msgid "Invalid crop dimensions."
 msgstr "Dimensions de rognage invalides."
 
@@ -675,6 +698,12 @@ msgstr "S'inscrire"
 
 msgid "Sign Up"
 msgstr "S'inscrire"
+
+#~ msgid "Matches"
+#~ msgstr "Correspondances"
+
+#~ msgid "Profile"
+#~ msgstr "Profil"
 
 #~ msgid "None of your spares is wanted by another collector yet."
 #~ msgstr ""

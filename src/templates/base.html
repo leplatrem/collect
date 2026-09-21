@@ -25,6 +25,7 @@
                 {% if perms.collectable.add_collectable %}
                     <a href="{% url 'collectable:create' %}">{% translate "Create collectable" %}</a>
                 {% endif %}
+                <a href="{% url 'collectable:trades' %}">{% translate "Trades" %}</a>
                 {% if perms.collectable.add_duplicatereport %}
                     <a href="{% url 'collectable:collection' 'duplicate' %}">{% translate "Review duplicates" %}</a>
                 {% endif %}
