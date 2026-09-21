@@ -295,6 +295,10 @@ a.more:hover {
   transform: translateY(-2px);
 }
 
+.collectable.thumbnail .counters {
+  font-size: 70%;
+}
+
 .possession-form {
   padding: 5px;
   line-height: 1;
@@ -307,6 +311,8 @@ a.more:hover {
 /* The icon row is the whole UI, so the help text becomes a hover tooltip. */
 .possession-form form {
   position: relative;
+  display: flex;
+  width: 100%;
 }
 
 .possession-form form .helptext {
@@ -345,17 +351,14 @@ a.more:hover {
 }
 
 .possession-form p {
-  display: inline-block;
+  flex: 1;
   margin: 0;
-  width: 23%;
   text-align: center;
 }
 
 .possession-form input[type="checkbox"] {
-  display: block;
   width: 30px;
   height: 30px;
-  margin-left: 33%;
   cursor: pointer;
   appearance: none;
   outline: none;
@@ -407,7 +410,6 @@ a.more:hover {
   flex: 1;
   width: auto;
   white-space: nowrap;
-  font-size: 70%;
   line-height: 1.2;
 }
 
