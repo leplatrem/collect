@@ -70,6 +70,13 @@ class PossessionForm(ModelForm):
                 "Mark this collectable as owned to offer a spare."
             )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # Getting a collectable fulfills the want.
+        if cleaned_data.get("owns") and not self.instance.owns:
+            cleaned_data["wants"] = False
+        return cleaned_data
+
 
 class DuplicateReportForm(ModelForm):
     original_input = CharField(

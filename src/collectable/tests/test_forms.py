@@ -78,3 +78,24 @@ def test_possession_form_ignores_swaps_when_not_owned(user, collectable):
     form = PossessionForm({"owns": False, "swaps": True}, instance=possession)
     assert form.is_valid(), form.errors
     assert form.save().swaps is False
+
+
+@pytest.mark.django_db
+def test_possession_form_drops_want_when_becoming_owned(user, collectable):
+    possession = Possession.objects.create(
+        user=user, collectable=collectable, owns=False, wants=True
+    )
+    form = PossessionForm({"owns": True, "wants": True}, instance=possession)
+    assert form.is_valid(), form.errors
+    assert form.save().wants is False
+
+
+@pytest.mark.django_db
+def test_possession_form_keeps_want_of_already_owned(user, collectable):
+    # Wanting something you own means looking for another copy of it.
+    possession = Possession.objects.create(
+        user=user, collectable=collectable, owns=True, wants=False
+    )
+    form = PossessionForm({"owns": True, "wants": True}, instance=possession)
+    assert form.is_valid(), form.errors
+    assert form.save().wants is True
