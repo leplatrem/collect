@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 18:26+0000\n"
+"POT-Creation-Date: 2026-09-21 20:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -275,12 +275,6 @@ msgstr ""
 msgid "Hide the ones I own"
 msgstr "Masquer ceux que je possède"
 
-msgid "Only the ones I have a spare of"
-msgstr "Seulement ceux dont j'ai un double"
-
-msgid "Only the ones I want"
-msgstr "Seulement ceux que je recherche"
-
 msgid "Related collections"
 msgstr "Collections associées"
 
@@ -546,9 +540,6 @@ msgid "No collector offers a spare you are looking for yet."
 msgstr ""
 "Aucun collectionneur ne propose un double que vous recherchez pour le moment."
 
-msgid "Back to profile"
-msgstr "Retour au profil"
-
 #, python-format
 msgid "%s is not an acceptable file type."
 msgstr "%s n'a pas le bon format de fichier."
@@ -638,6 +629,12 @@ msgstr ""
 "Aucun double à échanger. Marquez comme double les objets que vous possédez "
 "en plusieurs exemplaires."
 
+msgid "Only the ones I want"
+msgstr "Seulement ceux que je recherche"
+
+msgid "Only the ones I have a spare of"
+msgstr "Seulement ceux dont j'ai un double"
+
 msgid "Invalid crop dimensions."
 msgstr "Dimensions de rognage invalides."
 
@@ -707,6 +704,9 @@ msgstr "S'inscrire"
 
 msgid "Sign Up"
 msgstr "S'inscrire"
+
+#~ msgid "Back to profile"
+#~ msgstr "Retour au profil"
 
 #~ msgid "Matches"
 #~ msgstr "Correspondances"
