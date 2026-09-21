@@ -80,6 +80,7 @@ services:
       sh -c "
         uv run manage.py smart_create_user --admin admin s3cr3t &&
         uv run manage.py smart_create_user testuser testpass &&
+        uv run manage.py smart_create_user --collector collector collectorpass
         uv run manage.py loadfolder testuser /mnt/demo
       "
     volumes:
