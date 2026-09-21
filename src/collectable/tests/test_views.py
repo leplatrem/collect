@@ -782,3 +782,15 @@ def test_anonymous_profile_visit_has_no_trade_filter(client, user):
 
     assert response.context["tab_filter"] is None
     assert "filter-toggle-input" not in response.content.decode()
+
+
+def test_collection_view_tag_count_ignores_hidden(db, client):
+    CollectableFactory(tags=["big"])
+    CollectableFactory(tags=["big"], hidden=True)
+
+    url = reverse("collectable:collection", kwargs={"slugs": "big"})
+    response = client.get(url)
+
+    # The counter of the heading matches the list below it.
+    assert [t.ncollectable for t in response.context["tag_list"]] == [1]
+    assert response.context["total_collectables"] == 1

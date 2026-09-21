@@ -273,7 +273,11 @@ class Collectable(models.Model):
         """
         return (
             Tag.objects.filter(slug__in=self.tags.slugs())
-            .annotate(ncollectable=Count("collectable"))
+            # Only what a visitor can reach: a tag of hidden collectables is a
+            # dead end.
+            .annotate(
+                ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
+            )
             .order_by("-ncollectable")
         )
 

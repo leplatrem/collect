@@ -431,7 +431,11 @@ def possession(request, id):
 def collection(request, slugs):
     slugs = slugs.split(",")
     tag_list = list(
-        Tag.objects.filter(slug__in=slugs).annotate(ncollectable=Count("collectable"))
+        Tag.objects.filter(slug__in=slugs).annotate(
+            # Hidden collectables are not in the list below, so they are not in
+            # the count either.
+            ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
+        )
     )
 
     collectable_list = Collectable.objects.with_counts_and_possessions(

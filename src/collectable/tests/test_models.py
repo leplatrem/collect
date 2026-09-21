@@ -27,6 +27,13 @@ def test_tags_with_count(collectable):
     assert tags[0].ncollectable > 0 or tags[1].ncollectable > 0
 
 
+def test_tags_with_count_ignores_hidden(collectable):
+    collectable.tags.add("foo")
+    CollectableFactory(tags=["foo"], hidden=True)
+
+    assert [t.ncollectable for t in collectable.tags_with_count()] == [1]
+
+
 def test_possession_of_authenticated(user, collectable):
     PossessionFactory(user=user, collectable=collectable, likes=True)
     collectable = Collectable.objects.with_counts_and_possessions(user).get(
