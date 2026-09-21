@@ -25,6 +25,18 @@ def next_page_reveal_index(value):
 
 
 @register.simple_tag(takes_context=True)
+def page_url(context, page_number):
+    """
+    URL of the given page, leaving the other query string parameters untouched
+    (eg. search keywords, profile tab).
+    """
+    # requires 'django.template.context_processors.request' context processor
+    params = context["request"].GET.copy()
+    params["page"] = page_number
+    return f"?{params.urlencode()}"
+
+
+@register.simple_tag(takes_context=True)
 def fullurl(context, path=""):
     """
     Returns the full absolute URL.

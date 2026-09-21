@@ -507,7 +507,6 @@ class Possession(models.Model):
                 ),
             )
             .filter(Q(nwanted__gt=0) | Q(noffered__gt=0))
-            .order_by("username")
         )
 
     def _drop_swap_if_not_owned(self):

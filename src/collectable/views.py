@@ -482,21 +482,80 @@ def collection(request, slugs):
     return render(request, "collectable/collection.html", context)
 
 
+PROFILE_TABS = ("owned", "liked", "wanted", "swapped", "matched")
+
+PROFILE_TAB_LABELS = {
+    "owned": _("Owned"),
+    "liked": _("Liked"),
+    "wanted": _("Wanted"),
+    "swapped": _("Spares"),
+    "matched": _("Matches"),
+}
+
+PROFILE_TAB_EMPTY_MESSAGES = {
+    "owned": _("No collectable owned."),
+    "liked": _("No collectable liked."),
+    "wanted": _("No collectable wanted."),
+    "swapped": _("No spare to swap. Mark the collectables you own twice as spare."),
+}
+
+
 @login_required
 def profile(request):
-    qs = Collectable.objects.with_counts_and_possessions(request.user)
+    # Tabs are served one at a time, so that a profile with a big collection
+    # does not have to load every list on every page view.
+    active_tab = request.GET.get("tab", "")
+    if active_tab not in PROFILE_TABS:
+        active_tab = "owned"
+
     # A single query, split three ways: who could trade both directions, who
     # is after one of our spares, and who offers one we are looking for.
     partners = list(Possession.trade_partners(request.user))
 
+    # Counts shown on the tab labels, all in one query.
+    counts = Possession.objects.filter(
+        user=request.user, collectable__hidden=False
+    ).aggregate(
+        owned=Count("pk", filter=Q(owns=True)),
+        liked=Count("pk", filter=Q(likes=True)),
+        wanted=Count("pk", filter=Q(wants=True)),
+        swapped=Count("pk", filter=Q(swaps=True)),
+    )
+    counts["matched"] = len(partners)
+
+    page_obj = None
+    if active_tab != "matched":
+        qs = Collectable.objects.with_counts_and_possessions(request.user)
+        tab_querysets = {
+            "owned": qs.owned_by,
+            "liked": qs.liked_by,
+            "wanted": qs.wanted_by,
+            "swapped": qs.swapped_by,
+        }
+        # The model has no default ordering, and the paginator needs a stable one.
+        tab_qs = tab_querysets[active_tab](request.user).order_by("-created_at")
+        page_obj = paginate(request, qs=tab_qs)
+
     context = {
-        "collectable_liked": qs.liked_by(request.user),
-        "collectable_wanted": qs.wanted_by(request.user),
-        "collectable_owned": qs.owned_by(request.user),
-        "collectable_swapped": qs.swapped_by(request.user),
+        "tabs": [
+            {"name": name, "label": PROFILE_TAB_LABELS[name], "count": counts[name]}
+            for name in PROFILE_TABS
+        ],
+        "active_tab": active_tab,
+        "active_label": PROFILE_TAB_LABELS[active_tab],
+        "empty_message": PROFILE_TAB_EMPTY_MESSAGES.get(active_tab),
+        "page_obj": page_obj,
         "trade_partners": partners,
-        "trade_both_ways": [p for p in partners if p.nwanted and p.noffered],
-        "trade_wanting_our_spares": [p for p in partners if p.nwanted],
-        "trade_offering_our_wants": [p for p in partners if p.noffered],
+        "trade_both_ways": sorted(
+            [p for p in partners if p.nwanted and p.noffered],
+            key=lambda p: p.nwanted + p.noffered,
+            reverse=True,
+        ),
+        "trade_wanting_our_spares": sorted(
+            [p for p in partners if p.nwanted], key=lambda p: p.nwanted, reverse=True
+        ),
+        "trade_offering_our_wants": sorted(
+            [p for p in partners if p.noffered], key=lambda p: p.noffered, reverse=True
+        ),
     }
     return render(request, "collectable/profile.html", context)

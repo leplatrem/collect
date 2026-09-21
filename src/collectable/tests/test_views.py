@@ -187,9 +187,56 @@ def test_profile_view(db, logged_in_client):
     url = reverse("collectable:profile")
     response = logged_in_client.get(url)
     assert response.status_code == 200
-    assert "collectable_liked" in response.context
-    assert "collectable_swapped" in response.context
+    assert response.context["active_tab"] == "owned"
+    assert [t["name"] for t in response.context["tabs"]] == [
+        "owned",
+        "liked",
+        "wanted",
+        "swapped",
+        "matched",
+    ]
+    assert "page_obj" in response.context
     assert "trade_partners" in response.context
+
+
+@pytest.mark.parametrize(
+    "tab,expected",
+    [
+        ("liked", "liked"),
+        ("matched", "matched"),
+        # Unknown tabs fall back to the default one.
+        ("unknown", "owned"),
+        ("", "owned"),
+    ],
+)
+def test_profile_view_tabs(db, logged_in_client, tab, expected):
+    url = reverse("collectable:profile")
+    response = logged_in_client.get(url, {"tab": tab})
+    assert response.status_code == 200
+    assert response.context["active_tab"] == expected
+    # The matches tab has no collectable list.
+    assert (response.context["page_obj"] is None) == (expected == "matched")
+
+
+def test_profile_view_paginates_tab(user, logged_in_client, collectable, settings):
+    settings.DEFAULT_PAGE_SIZE = 1
+    another = CollectableFactory()
+    for c in (collectable, another):
+        PossessionFactory(user=user, collectable=c, likes=True, wants=False, owns=False)
+
+    url = reverse("collectable:profile")
+    page1 = logged_in_client.get(url, {"tab": "liked"})
+    page2 = logged_in_client.get(url, {"tab": "liked", "page": 2})
+
+    assert page1.context["tabs"][1]["count"] == 2
+    assert len(page1.context["page_obj"]) == 1
+    assert len(page2.context["page_obj"]) == 1
+    assert set(page1.context["page_obj"]) | set(page2.context["page_obj"]) == {
+        collectable,
+        another,
+    }
+    # The next page is fetched when the visitor scrolls down.
+    assert "?tab=liked&amp;page=2" in page1.content.decode()
 
 
 def test_profile_view_trade_lists(
@@ -208,8 +255,8 @@ def test_profile_view_trade_lists(
         owns=True,
         swaps=True,
     )
-    response = logged_in_client.get(url)
-    assert list(response.context["collectable_swapped"]) == [collectable]
+    response = logged_in_client.get(url, {"tab": "swapped"})
+    assert list(response.context["page_obj"]) == [collectable]
     assert response.context["trade_partners"] == []
 
     # Somebody wants it: one-way only.
@@ -266,7 +313,8 @@ def test_profile_view_renders_trade_names(user, logged_in_client, collectable):
         owns=False,
     )
 
-    content = logged_in_client.get(reverse("collectable:profile")).content.decode()
+    response = logged_in_client.get(reverse("collectable:profile"), {"tab": "matched"})
+    content = response.content.decode()
 
     assert "collectomane" in content
     assert "1 double recherch" in content

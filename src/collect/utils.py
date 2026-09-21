@@ -15,7 +15,7 @@ def tags_joiner(tags: list) -> str:
     return ", ".join(sorted(f"#{tag.name}" for tag in tags))
 
 
-def paginate(request, qs, limit=settings.DEFAULT_PAGE_SIZE):
-    paginated_qs = Paginator(qs, limit)
+def paginate(request, qs, limit=None):
+    paginated_qs = Paginator(qs, limit or settings.DEFAULT_PAGE_SIZE)
     page_no = request.GET.get("page")
     return paginated_qs.get_page(page_no)

@@ -1,147 +1,105 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load collectable_extras %}
 {% block title %}
     {% translate "Profile" %}
 {% endblock %}
 {% block content %}
     <h1>{% translate "Profile" %} {{ user }}</h1>
-    {# Tabs are pure CSS: the radio inputs hold the state, the labels are the tab buttons. #}
-    <div class="tabs">
-        <input type="radio"
-               name="profile-tab"
-               id="profile-tab-owned"
-               class="tab-state"
-               checked>
-        <input type="radio"
-               name="profile-tab"
-               id="profile-tab-liked"
-               class="tab-state">
-        <input type="radio"
-               name="profile-tab"
-               id="profile-tab-wanted"
-               class="tab-state">
-        <input type="radio"
-               name="profile-tab"
-               id="profile-tab-swapped"
-               class="tab-state">
-        <input type="radio"
-               name="profile-tab"
-               id="profile-tab-matched"
-               class="tab-state">
+    {% comment %}
+    Only the selected tab is rendered: htmx swaps the whole block, and without
+    JavaScript the links fall back to a plain page load of the same URL.
+    {% endcomment %}
+    <div class="tabs" id="profile-tabs">
         <div class="tab-labels">
-            <label for="profile-tab-owned">
-                {% translate "Owned" %}
-                <span class="tab-count">{{ collectable_owned.count }}</span>
-            </label>
-            <label for="profile-tab-liked">
-                {% translate "Liked" %}
-                <span class="tab-count">{{ collectable_liked.count }}</span>
-            </label>
-            <label for="profile-tab-wanted">
-                {% translate "Wanted" %}
-                <span class="tab-count">{{ collectable_wanted.count }}</span>
-            </label>
-            <label for="profile-tab-swapped">
-                {% translate "Spares" %}
-                <span class="tab-count">{{ collectable_swapped.count }}</span>
-            </label>
-            <label for="profile-tab-matched">
-                {% translate "Matches" %}
-                <span class="tab-count">{{ trade_partners|length }}</span>
-            </label>
+            {% for tab in tabs %}
+                <a href="?tab={{ tab.name }}"
+                   {% if tab.name == active_tab %}class="active" aria-current="page"{% endif %}
+                   hx-get="?tab={{ tab.name }}"
+                   hx-target="#profile-tabs"
+                   hx-select="#profile-tabs"
+                   hx-swap="outerHTML"
+                   hx-push-url="true">
+                    {{ tab.label }}
+                    <span class="tab-count">{{ tab.count }}</span>
+                </a>
+            {% endfor %}
         </div>
-        <section class="tab-panel" id="profile-panel-owned">
-            <h2 class="visually-hidden">{% translate "Owned" %}</h2>
-            <div class="collectable-grid">
-                {% for collectable in collectable_owned %}
-                    {% include "collectable/collectable_thumbnail.html" %}
-                {% empty %}
-                    {% translate "No collectable owned." %}
-                {% endfor %}
-            </div>
-        </section>
-        <section class="tab-panel" id="profile-panel-liked">
-            <h2 class="visually-hidden">{% translate "Liked" %}</h2>
-            <div class="collectable-grid">
-                {% for collectable in collectable_liked %}
-                    {% include "collectable/collectable_thumbnail.html" %}
-                {% empty %}
-                    {% translate "No collectable liked." %}
-                {% endfor %}
-            </div>
-        </section>
-        <section class="tab-panel" id="profile-panel-wanted">
-            <h2 class="visually-hidden">{% translate "Wanted" %}</h2>
-            <div class="collectable-grid">
-                {% for collectable in collectable_wanted %}
-                    {% include "collectable/collectable_thumbnail.html" %}
-                {% empty %}
-                    {% translate "No collectable wanted." %}
-                {% endfor %}
-            </div>
-        </section>
-        <section class="tab-panel" id="profile-panel-swapped">
-            <h2 class="visually-hidden">{% translate "Spares" %}</h2>
-            <div class="collectable-grid">
-                {% for collectable in collectable_swapped %}
-                    {% include "collectable/collectable_thumbnail.html" %}
-                {% empty %}
-                    {% translate "No spare to swap. Mark the collectables you own twice as spare." %}
-                {% endfor %}
-            </div>
-        </section>
-        <section class="tab-panel" id="profile-panel-matched">
-            <h2 class="visually-hidden">{% translate "Matches" %}</h2>
-            <div class="trade-lists">
-                <section>
-                    <h3>{% translate "Two-way trades" %}</h3>
-                    <p class="tab-hint">{% translate "You each have a spare the other is looking for." %}</p>
-                    <ul class="trade-list">
-                        {% for partner in trade_both_ways %}
-                            <li>
-                                <span class="trade-name">{{ partner }}</span>
-                                <span class="trade-count">
-                                    {% with total=partner.nwanted|add:partner.noffered %}
-                                        {% blocktranslate count counter=total %}{{ counter }} collectable to trade{% plural %}{{ counter }} collectables to trade{% endblocktranslate %}
-                                    {% endwith %}
-                                </span>
-                            </li>
-                        {% empty %}
-                            <li class="trade-empty">{% translate "No two-way trade yet." %}</li>
-                        {% endfor %}
-                    </ul>
-                </section>
-                <section>
-                    <h3>{% translate "They want your spares" %}</h3>
-                    <ul class="trade-list">
-                        {% for partner in trade_wanting_our_spares %}
-                            <li>
-                                <span class="trade-name">{{ partner }}</span>
-                                <span class="trade-count">
-                                    {% blocktranslate count counter=partner.nwanted %}{{ counter }} spare wanted{% plural %}{{ counter }} spares wanted{% endblocktranslate %}
-                                </span>
-                            </li>
-                        {% empty %}
-                            <li class="trade-empty">{% translate "Nobody is looking for your spares yet." %}</li>
-                        {% endfor %}
-                    </ul>
-                </section>
-                <section>
-                    <h3>{% translate "They have spares you want" %}</h3>
-                    <ul class="trade-list">
-                        {% for partner in trade_offering_our_wants %}
-                            <li>
-                                <span class="trade-name">{{ partner }}</span>
-                                <span class="trade-count">
-                                    {% blocktranslate count counter=partner.noffered %}{{ counter }} spare offered{% plural %}{{ counter }} spares offered{% endblocktranslate %}
-                                </span>
-                            </li>
-                        {% empty %}
-                            <li class="trade-empty">{% translate "No collector offers a spare you are looking for yet." %}</li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            </div>
+        <section class="tab-panel">
+            <h2 class="visually-hidden">{{ active_label }}</h2>
+            {% if active_tab == "matched" %}
+                <div class="trade-lists">
+                    <section>
+                        <h3>{% translate "Two-way trades" %}</h3>
+                        <p class="tab-hint">{% translate "You each have a spare the other is looking for." %}</p>
+                        <ul class="trade-list">
+                            {% for partner in trade_both_ways %}
+                                <li>
+                                    <span class="trade-name">{{ partner }}</span>
+                                    <span class="trade-count">
+                                        {% with total=partner.nwanted|add:partner.noffered %}
+                                            {% blocktranslate count counter=total %}{{ counter }} collectable to trade{% plural %}{{ counter }} collectables to trade{% endblocktranslate %}
+                                        {% endwith %}
+                                    </span>
+                                </li>
+                            {% empty %}
+                                <li class="trade-empty">{% translate "No two-way trade yet." %}</li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>{% translate "They want your spares" %}</h3>
+                        <ul class="trade-list">
+                            {% for partner in trade_wanting_our_spares %}
+                                <li>
+                                    <span class="trade-name">{{ partner }}</span>
+                                    <span class="trade-count">
+                                        {% blocktranslate count counter=partner.nwanted %}{{ counter }} spare wanted{% plural %}{{ counter }} spares wanted{% endblocktranslate %}
+                                    </span>
+                                </li>
+                            {% empty %}
+                                <li class="trade-empty">{% translate "Nobody is looking for your spares yet." %}</li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>{% translate "They have spares you want" %}</h3>
+                        <ul class="trade-list">
+                            {% for partner in trade_offering_our_wants %}
+                                <li>
+                                    <span class="trade-name">{{ partner }}</span>
+                                    <span class="trade-count">
+                                        {% blocktranslate count counter=partner.noffered %}{{ counter }} spare offered{% plural %}{{ counter }} spares offered{% endblocktranslate %}
+                                    </span>
+                                </li>
+                            {% empty %}
+                                <li class="trade-empty">{% translate "No collector offers a spare you are looking for yet." %}</li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+            {% else %}
+                <div class="collectable-grid" id="collectable-list">
+                    {% for collectable in page_obj %}
+                        {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
+                            <span class="invisible"
+                                  hx-get="{% page_url page_obj.next_page_number %}"
+                                  hx-swap="beforeend"
+                                  hx-target="#collectable-list"
+                                  hx-select="#collectable-list > *"
+                                  hx-trigger="revealed"></span>
+                        {% endif %}
+                        {% include "collectable/collectable_thumbnail.html" %}
+                    {% empty %}
+                        {{ empty_message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </section>
     </div>
+{% endblock %}
+{% block nav %}
+    {% if page_obj %}
+        {% include "paginator.html" with page_obj=page_obj %}
+    {% endif %}
 {% endblock %}

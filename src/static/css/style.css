@@ -1148,15 +1148,8 @@ section#related {
 }
 
 /* =========================================================
-   Pure CSS tabs (radio buttons)
+   Tabs (one panel served at a time, the links are the UI)
    ========================================================= */
-
-.tabs .tab-state {
-  /* Kept in the DOM (and focusable) but out of sight: the labels are the UI. */
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
 
 .tab-labels {
   display: flex;
@@ -1166,7 +1159,7 @@ section#related {
   border-bottom: 1px solid var(--card-border);
 }
 
-.tab-labels label {
+.tab-labels a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -1180,6 +1173,7 @@ section#related {
 
   font-weight: 600;
   color: var(--text-color);
+  text-decoration: none;
   opacity: 0.6;
   cursor: pointer;
   user-select: none;
@@ -1189,7 +1183,7 @@ section#related {
     border-color 0.2s ease;
 }
 
-.tab-labels label:hover {
+.tab-labels a:hover {
   opacity: 0.9;
   background: var(--card-bg);
 }
@@ -1204,40 +1198,15 @@ section#related {
   color: var(--tag-color);
 }
 
-.tab-panel {
-  display: none;
-}
-
-/* Selected tab and its panel. */
-#profile-tab-owned:checked ~ .tab-labels label[for="profile-tab-owned"],
-#profile-tab-liked:checked ~ .tab-labels label[for="profile-tab-liked"],
-#profile-tab-wanted:checked ~ .tab-labels label[for="profile-tab-wanted"],
-#profile-tab-swapped:checked ~ .tab-labels label[for="profile-tab-swapped"],
-#profile-tab-matched:checked ~ .tab-labels label[for="profile-tab-matched"] {
+/* Selected tab. */
+.tab-labels a.active {
   opacity: 1;
   background: var(--card-bg);
   border-color: var(--card-border);
   border-bottom-color: var(--link-color);
 }
 
-#profile-tab-owned:checked ~ #profile-panel-owned,
-#profile-tab-liked:checked ~ #profile-panel-liked,
-#profile-tab-wanted:checked ~ #profile-panel-wanted,
-#profile-tab-swapped:checked ~ #profile-panel-swapped,
-#profile-tab-matched:checked ~ #profile-panel-matched {
-  display: block;
-}
-
-/* Keyboard users need to see where they are, since the radio itself is hidden. */
-#profile-tab-owned:focus-visible ~ .tab-labels label[for="profile-tab-owned"],
-#profile-tab-liked:focus-visible ~ .tab-labels label[for="profile-tab-liked"],
-#profile-tab-wanted:focus-visible ~ .tab-labels label[for="profile-tab-wanted"],
-#profile-tab-swapped:focus-visible
-  ~ .tab-labels
-  label[for="profile-tab-swapped"],
-#profile-tab-matched:focus-visible
-  ~ .tab-labels
-  label[for="profile-tab-matched"] {
+.tab-labels a:focus-visible {
   outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
