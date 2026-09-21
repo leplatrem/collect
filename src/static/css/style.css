@@ -1129,6 +1129,71 @@ section#related {
   opacity: 0.7;
 }
 
+/* A switch for the `#hide-owned` checkbox, which is itself out of sight. */
+.hide-owned-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-top: 0.6rem;
+
+  font-size: 0.85rem;
+  opacity: 0.7;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hide-owned-toggle::before {
+  content: "";
+
+  width: 2.25rem;
+  height: 1.25rem;
+
+  border-radius: 1rem;
+  background: var(--card-border);
+  transition: background 0.2s ease;
+}
+
+/* The knob. */
+.hide-owned-toggle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.2rem;
+
+  width: 0.85rem;
+  height: 0.85rem;
+
+  border-radius: 50%;
+  background: var(--card-bg);
+  translate: 0 -50%;
+  transition: translate 0.2s ease;
+}
+
+#hide-owned:checked + .collection-progress .hide-owned-toggle {
+  opacity: 1;
+}
+
+#hide-owned:checked + .collection-progress .hide-owned-toggle::before {
+  background: var(--link-color);
+}
+
+#hide-owned:checked + .collection-progress .hide-owned-toggle::after {
+  translate: 1rem -50%;
+}
+
+/* The checkbox being invisible, the switch carries its focus ring. */
+#hide-owned:focus-visible + .collection-progress .hide-owned-toggle::before {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+/* Each thumbnail states whether the visitor owns it, in its possession form. */
+#hide-owned:checked ~ #collectable-list .thumbnail:has([name="owns"]:checked) {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .collection-progress {
     gap: 1rem;

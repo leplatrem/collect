@@ -173,6 +173,19 @@ def test_collection_view_with_valid_tag(client, collectable):
     assert "reltag_list" in response.context
 
 
+def test_collection_view_hide_owned_toggle(possession, logged_in_client, collectable):
+    collectable.tags.add("tag1")
+    url = reverse("collectable:collection", kwargs={"slugs": "tag1"})
+
+    response = logged_in_client.get(url)
+
+    content = response.content.decode()
+    # The toggle, and the checkbox it hides the owned thumbnails with (CSS only).
+    assert 'id="hide-owned"' in content
+    assert 'for="hide-owned"' in content
+    assert 'name="owns"' in content
+
+
 def test_collection_view_with_multiple_tags(client, collectable):
     collectable.tags.add("tag1", "tag2")
     url = reverse("collectable:collection", kwargs={"slugs": "tag1,tag2"})

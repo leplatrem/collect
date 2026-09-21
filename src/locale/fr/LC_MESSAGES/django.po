@@ -272,6 +272,9 @@ msgstr ""
 "                    Vous possédez %(p)s%% de cette collection.\n"
 "                "
 
+msgid "Hide the ones I own"
+msgstr "Masquer ceux que je possède"
+
 msgid "Related collections"
 msgstr "Collections associées"
 
