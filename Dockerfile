@@ -62,8 +62,8 @@ ARG COMMANDS_CACHE_BUST=1
 # Compile translation messages
 RUN uv run django-admin compilemessages
 
-# Collect static files
-RUN uv run django-admin collectstatic --noinput --settings=collect.settings
+RUN DJANGO_SECRET_KEY=build-time-only-never-used-at-runtime \
+    uv run django-admin collectstatic --noinput --settings=collect.settings
 
 USER app
 EXPOSE $PORT
