@@ -319,15 +319,24 @@ class Collectable(models.Model):
             )  # Don't save.
         return possession
 
-    def history_with_deltas(self):
+    def history_with_deltas(self, limit=None):
         """
-        Return the history entries with delta information.
+        Return the most recent history entries with delta information.
 
         We wish this was built-in to simple_history, but it is not.
+
+        Every save appends a revision, so the history of a collectable grows
+        without bound: only the last `limit` entries are loaded and diffed.
+        One extra record is fetched, because computing a delta needs the entry
+        that precedes the oldest one we display.
         """
-        history_records = (
-            self.history.select_related("history_user").all().order_by("history_date")
-        )
+        if limit is None:
+            limit = settings.HISTORY_LIST_COUNT
+        history_records = self.history.select_related("history_user").order_by(
+            "-history_date"
+        )[: limit + 1]
+        # Oldest first, as deltas are computed against the previous entry.
+        history_records = sorted(history_records, key=lambda r: r.history_date)
         filtered = []
 
         previous = None

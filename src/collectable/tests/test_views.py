@@ -20,6 +20,7 @@ from collectable.tests.factories import (
     DuplicateReportFactory,
     PossessionFactory,
     UserFactory,
+    image_upload,
 )
 
 
@@ -53,13 +54,13 @@ def test_create_view_authenticated_get(db, logged_in_client, collectable):
     assert "form" in response.context
 
 
-def test_create_view_authenticated_post(db, logged_in_client, collectable):
+def test_create_view_authenticated_post(db, logged_in_client):
     url = reverse("collectable:create")
     data = {
         "description": "Created via test",
         "tags": "tag1,tag2",
         "license": "CC-BY-SA-4.0",
-        "photo": collectable.photo,
+        "photo": image_upload(),
         "photo_x": 0,
         "photo_y": 0,
         "photo_w": 400,
@@ -111,7 +112,7 @@ def test_details_view_authenticated_post(db, logged_in_client, collectable):
         "description": "Edited via test",
         "tags": "tag1,tag2",
         "license": "CC-BY-SA-4.0",
-        "photo": collectable.photo,
+        "photo": image_upload(),
         "photo_x": 0,
         "photo_y": 0,
         "photo_w": 400,
@@ -620,7 +621,7 @@ def test_details_page_links_the_history_user(logged_in_client, collectable, user
             "description": "Edited via test",
             "tags": "tag1",
             "license": "CC-BY-SA-4.0",
-            "photo": collectable.photo,
+            "photo": image_upload(),
             "photo_x": 0,
             "photo_y": 0,
             "photo_w": 400,
@@ -634,3 +635,105 @@ def test_details_page_links_the_history_user(logged_in_client, collectable, user
         f'<a href="{reverse("user-profile", kwargs={"username": user.username})}"'
         in content
     )
+
+
+def test_collection_view_page_size(db, client, settings):
+    settings.DEFAULT_PAGE_SIZE = 5
+    for _ in range(8):
+        CollectableFactory(tags=["big"])
+    url = reverse("collectable:collection", kwargs={"slugs": "big"})
+
+    response = client.get(url)
+
+    assert len(response.context["page_obj"].object_list) == 5
+    assert response.context["page_obj"].paginator.count == 8
+    assert response.context["page_obj"].has_next()
+
+    response = client.get(url, {"page": 2})
+    assert len(response.context["page_obj"].object_list) == 3
+
+
+def test_collection_view_counts_what_the_user_owns(logged_in_client, user):
+    owned = CollectableFactory(tags=["big"])
+    CollectableFactory(tags=["big"])
+    PossessionFactory(user=user, collectable=owned, owns=True, likes=False, wants=False)
+
+    url = reverse("collectable:collection", kwargs={"slugs": "big"})
+    response = logged_in_client.get(url)
+
+    assert response.context["total_owned"] == 1
+    assert response.context["total_collectables"] == 2
+    assert response.context["percent_owned"] == 50
+
+
+def test_collection_view_of_anonymous_user_owns_nothing(client, user):
+    owned = CollectableFactory(tags=["big"])
+    PossessionFactory(user=user, collectable=owned, owns=True, likes=False, wants=False)
+
+    url = reverse("collectable:collection", kwargs={"slugs": "big"})
+    response = client.get(url)
+
+    assert response.context["total_owned"] == 0
+    assert response.context["percent_owned"] == 0
+
+
+def test_collection_view_related_tags(db, client):
+    CollectableFactory(tags=["big", "shared"])
+    CollectableFactory(tags=["big", "shared"])
+    CollectableFactory(tags=["big", "alone"])
+    CollectableFactory(tags=["elsewhere", "shared"])
+
+    url = reverse("collectable:collection", kwargs={"slugs": "big"})
+    response = client.get(url)
+
+    related = {t.name: t.ncollectable for t in response.context["reltag_list"]}
+    # "shared" is on two members of the collection, "alone" on only one (below
+    # the threshold), "big" is the collection itself, "elsewhere" is outside.
+    assert related == {"shared": 2}
+
+
+def test_list_view_session_list_follows_the_displayed_order(db, client):
+    oldest = CollectableFactory()
+    newest = CollectableFactory()
+
+    client.get(reverse("collectable:latest"))
+
+    # Read back on the details page, to navigate to the previous and next.
+    assert client.session["collectable_list"] == [str(newest.id), str(oldest.id)]
+
+
+@pytest.mark.parametrize(
+    "path_name, counter",
+    [
+        ("collectable:most-liked", "likes"),
+        ("collectable:most-wanted", "wants"),
+        ("collectable:most-owned", "owns"),
+    ],
+)
+def test_count_sorted_lists_still_filter_on_their_counter(
+    client, user, path_name, counter
+):
+    listed = CollectableFactory()
+    CollectableFactory()  # No possession at all.
+    PossessionFactory(
+        user=user,
+        collectable=listed,
+        **{"likes": False, "wants": False, "owns": False, counter: True},
+    )
+
+    response = client.get(reverse(path_name))
+
+    assert list(response.context["object_list"]) == [listed]
+
+
+def test_details_view_shows_a_bounded_history(logged_in_client, collectable, settings):
+    settings.HISTORY_LIST_COUNT = 2
+    for i in range(6):
+        collectable.description = f"Update {i}"
+        collectable.save()
+
+    url = reverse("collectable:details", kwargs={"id": collectable.id})
+    response = logged_in_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.context["collectable"].history_with_deltas()) == 2

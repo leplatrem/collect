@@ -13,6 +13,29 @@ from PIL import Image
 from collectable.models import Collectable, DuplicateReport, Possession
 
 
+def image_upload(filename=None, img_format="JPEG", size=(100, 100)):
+    """
+    Build an uploadable square image, JPEG by default, PNG (with
+    transparency) on request.
+    """
+    if img_format == "PNG":
+        img = Image.new("RGBA", size, color=(255, 0, 0, 0))
+        default_filename = "sticker-filename.png"
+        content_type = "image/png"
+    else:
+        img = Image.new("RGB", size, color="white")
+        default_filename = "sticker-filename.jpg"
+        content_type = "image/jpeg"
+    buffer = io.BytesIO()
+    img.save(buffer, format=img_format)
+    buffer.seek(0)
+    return SimpleUploadedFile(
+        filename or default_filename,
+        buffer.read(),
+        content_type=content_type,
+    )
+
+
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = get_user_model()
@@ -38,25 +61,10 @@ class CollectableFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        # Add a fake image, JPEG by default, PNG (with transparency) on request.
-        img_format = kwargs.pop("img_format", "JPEG")
-        if img_format == "PNG":
-            img = Image.new("RGBA", (100, 100), color=(255, 0, 0, 0))
-            default_filename = "sticker-filename.png"
-            content_type = "image/png"
-        else:
-            img = Image.new("RGB", (100, 100), color="white")
-            default_filename = "sticker-filename.jpg"
-            content_type = "image/jpeg"
-        buffer = io.BytesIO()
-        img.save(buffer, format=img_format)
-        buffer.seek(0)
-        file = SimpleUploadedFile(
-            kwargs.pop("filename", default_filename),
-            buffer.read(),
-            content_type=content_type,
+        kwargs["photo"] = image_upload(
+            filename=kwargs.pop("filename", None),
+            img_format=kwargs.pop("img_format", "JPEG"),
         )
-        kwargs["photo"] = file
         return super()._create(model_class, *args, **kwargs)
 
     @factory.post_generation
