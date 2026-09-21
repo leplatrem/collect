@@ -30,9 +30,9 @@ urlpatterns = [
         name="most-owned",
     ),
     path(
-        "most-spared/",
-        views.CollectableListView.as_view(kind="most_spared"),
-        name="most-spared",
+        "most-spares/",
+        views.CollectableListView.as_view(kind="most_spares"),
+        name="most-spares",
     ),
     # Searching is the most expensive read of the site (it scans descriptions
     # and tags), and the search box queries it as the visitor types.

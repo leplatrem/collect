@@ -31,7 +31,7 @@ from collectable.tests.factories import (
         "collectable:most-liked",
         "collectable:most-wanted",
         "collectable:most-owned",
-        "collectable:most-spared",
+        "collectable:most-spares",
     ],
 )
 def test_list_views(db, client, path_name):
@@ -48,14 +48,14 @@ def test_index_view(db, client):
     assert "total_collectables" in response.context
 
 
-def test_index_view_lists_the_most_spared(client, user):
+def test_index_view_lists_the_most_spares(client, user):
     spared = CollectableFactory()
     CollectableFactory()  # Owned, but no spare of it.
     PossessionFactory(user=user, collectable=spared, owns=True, swaps=True)
 
     response = client.get(reverse("collectable:index"))
 
-    assert list(response.context["most_spared"]) == [spared]
+    assert list(response.context["most_spares"]) == [spared]
 
 
 def test_create_view_authenticated_get(db, logged_in_client, collectable):
@@ -719,7 +719,7 @@ def test_list_view_session_list_follows_the_displayed_order(db, client):
         ("collectable:most-liked", "likes"),
         ("collectable:most-wanted", "wants"),
         ("collectable:most-owned", "owns"),
-        ("collectable:most-spared", "swaps"),
+        ("collectable:most-spares", "swaps"),
     ],
 )
 def test_count_sorted_lists_still_filter_on_their_counter(

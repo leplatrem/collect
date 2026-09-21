@@ -575,7 +575,7 @@ msgstr "Objets les plus recherchés"
 msgid "Most owned collectables"
 msgstr "Objets les plus possédés"
 
-msgid "Most spared collectables"
+msgid "Collectables with the most spares"
 msgstr "Objets avec le plus de doubles"
 
 msgid "Collectable created successfully."
