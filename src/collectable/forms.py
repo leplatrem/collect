@@ -58,7 +58,17 @@ class CollectableForm(ModelForm):
 class PossessionForm(ModelForm):
     class Meta:
         model = Possession
-        fields = ["likes", "wants", "owns"]
+        fields = ["likes", "wants", "owns", "swaps"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # You can only offer a spare of something you own. The tooltip says why,
+        # since the icon alone cannot explain why it is greyed out.
+        if not self.instance.owns:
+            self.fields["swaps"].disabled = True
+            self.fields["swaps"].help_text = _(
+                "Mark this collectable as owned to offer a spare."
+            )
 
 
 class DuplicateReportForm(ModelForm):

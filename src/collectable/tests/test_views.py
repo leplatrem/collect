@@ -12,6 +12,7 @@ from collectable.models import Collectable, DuplicateReport, Possession
 from collectable.tests.factories import (
     CollectableFactory,
     DuplicateReportFactory,
+    PossessionFactory,
     UserFactory,
 )
 
@@ -124,6 +125,38 @@ def test_possession_view_post_creates(user, logged_in_client, collectable):
     assert Possession.objects.filter(user=user, collectable=collectable).exists()
 
 
+def test_possession_view_enables_swaps_once_owned(user, logged_in_client, collectable):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    # Not owned yet: the checkbox is there, but inert.
+    response = logged_in_client.post(url, {"owns": False})
+    assert response.context["form"].fields["swaps"].disabled is True
+    assert "id_swaps" in response.content.decode()
+    # It becomes usable in the very response that marks the collectable as owned.
+    response = logged_in_client.post(url, {"owns": True})
+    assert response.context["form"].fields["swaps"].disabled is False
+
+
+def test_possession_view_ignores_swaps_when_not_owned(
+    user, logged_in_client, collectable
+):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    # A crafted POST cannot offer a spare of something the user does not own.
+    logged_in_client.post(url, {"owns": False, "swaps": True})
+    assert Possession.objects.get(user=user, collectable=collectable).swaps is False
+
+
+def test_possession_view_post_swaps(user, logged_in_client, collectable):
+    url = reverse("collectable:possession", kwargs={"id": collectable.id})
+    logged_in_client.post(url, {"owns": True})
+    logged_in_client.post(url, {"owns": True, "swaps": True})
+    assert Possession.objects.get(user=user, collectable=collectable).swaps is True
+    # Un-owning drops the spare offer along with it.
+    logged_in_client.post(url, {"owns": False, "swaps": True})
+    possession = Possession.objects.get(user=user, collectable=collectable)
+    assert possession.owns is False
+    assert possession.swaps is False
+
+
 def test_collection_view_with_valid_tag(client, collectable):
     collectable.tags.add("tag1")
     url = reverse("collectable:collection", kwargs={"slugs": "tag1"})
@@ -155,6 +188,22 @@ def test_profile_view(db, logged_in_client):
     response = logged_in_client.get(url)
     assert response.status_code == 200
     assert "collectable_liked" in response.context
+    assert "collectable_swapped" in response.context
+    assert "collectable_matched" in response.context
+
+
+def test_profile_view_swaps_and_matches(user, logged_in_client, collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    url = reverse("collectable:profile")
+
+    response = logged_in_client.get(url)
+    assert list(response.context["collectable_swapped"]) == [collectable]
+    assert list(response.context["collectable_matched"]) == []
+
+    # Another collector wants it: it becomes a match.
+    PossessionFactory(user=UserFactory(), collectable=collectable, wants=True)
+    response = logged_in_client.get(url)
+    assert list(response.context["collectable_matched"]) == [collectable]
 
 
 @pytest.mark.django_db

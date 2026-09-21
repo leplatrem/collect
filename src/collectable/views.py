@@ -412,6 +412,9 @@ def possession(request, id):
     possession_form = PossessionForm(request.POST, instance=possession)
     if possession_form.is_valid():
         possession = possession_form.save()
+        # Rebuild an unbound form so that the conditional "swaps" field reflects
+        # the freshly saved state (eg. appears right after checking "owns").
+        possession_form = PossessionForm(instance=possession)
 
     # Refresh counters
     possession.collectable = Collectable.objects.with_counts_and_possessions(
@@ -486,5 +489,7 @@ def profile(request):
         "collectable_liked": qs.liked_by(request.user),
         "collectable_wanted": qs.wanted_by(request.user),
         "collectable_owned": qs.owned_by(request.user),
+        "collectable_swapped": qs.swapped_by(request.user),
+        "collectable_matched": qs.swaps_wanted_by_others(request.user),
     }
     return render(request, "collectable/profile.html", context)

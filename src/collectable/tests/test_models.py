@@ -217,3 +217,78 @@ def test_duplicate_report_save_validates():
     c = CollectableFactory()
     with pytest.raises(ValidationError):
         DuplicateReport(reporter=UserFactory(), duplicate=c, original=c).save()
+
+
+def test_swaps_is_cleared_when_not_owned(user, collectable):
+    possession = PossessionFactory(user=user, collectable=collectable, owns=True)
+    possession.swaps = True
+    possession.save()
+    assert possession.swaps is True
+
+    possession.owns = False
+    possession.save()
+    possession.refresh_from_db()
+    assert possession.swaps is False
+
+
+def test_swaps_is_cleared_with_update_fields(user, collectable):
+    possession = PossessionFactory(
+        user=user, collectable=collectable, owns=True, swaps=True
+    )
+    possession.owns = False
+    possession.save(update_fields=["owns"])
+    possession.refresh_from_db()
+    assert possession.swaps is False
+
+
+def test_swapped_by(user, collectable, another_collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(user=user, collectable=another_collectable, owns=True)
+
+    results = Collectable.objects.all().swapped_by(user)
+
+    assert [c.id for c in results] == [collectable.id]
+
+
+def test_swaps_count_annotation(user, collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(collectable=collectable, owns=True, swaps=False)
+
+    result = Collectable.objects.with_counts_and_possessions(user).get(
+        id=collectable.id
+    )
+
+    assert result.nswaps == 2
+
+
+def test_swaps_wanted_by_others(user, collectable, another_collectable):
+    other = UserFactory()
+    # A spare that somebody else wants: a match.
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+    PossessionFactory(user=other, collectable=collectable, wants=True)
+    # A spare that nobody wants.
+    PossessionFactory(user=user, collectable=another_collectable, owns=True, swaps=True)
+
+    results = Collectable.objects.all().swaps_wanted_by_others(user)
+
+    assert [c.id for c in results] == [collectable.id]
+
+
+def test_swaps_wanted_by_others_ignores_own_want(user, collectable):
+    # Wanting your own spare is not a match.
+    PossessionFactory(
+        user=user, collectable=collectable, owns=True, swaps=True, wants=True
+    )
+
+    assert not Collectable.objects.all().swaps_wanted_by_others(user).exists()
+
+
+def test_merge_into_keeps_swaps(user, collectable, another_collectable):
+    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+
+    collectable.merge_into(another_collectable)
+
+    merged = another_collectable.possession_set.get(user=user)
+    assert merged.owns is True
+    assert merged.swaps is True

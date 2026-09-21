@@ -20,6 +20,14 @@
                name="profile-tab"
                id="profile-tab-wanted"
                class="tab-state">
+        <input type="radio"
+               name="profile-tab"
+               id="profile-tab-swapped"
+               class="tab-state">
+        <input type="radio"
+               name="profile-tab"
+               id="profile-tab-matched"
+               class="tab-state">
         <div class="tab-labels">
             <label for="profile-tab-owned">
                 {% translate "Owned" %}
@@ -32,6 +40,14 @@
             <label for="profile-tab-wanted">
                 {% translate "Wanted" %}
                 <span class="tab-count">{{ collectable_wanted.count }}</span>
+            </label>
+            <label for="profile-tab-swapped">
+                {% translate "Spares" %}
+                <span class="tab-count">{{ collectable_swapped.count }}</span>
+            </label>
+            <label for="profile-tab-matched">
+                {% translate "Matches" %}
+                <span class="tab-count">{{ collectable_matched.count }}</span>
             </label>
         </div>
         <section class="tab-panel" id="profile-panel-owned">
@@ -61,6 +77,27 @@
                     {% include "collectable/collectable_thumbnail.html" %}
                 {% empty %}
                     {% translate "No collectable wanted." %}
+                {% endfor %}
+            </div>
+        </section>
+        <section class="tab-panel" id="profile-panel-swapped">
+            <h2 class="visually-hidden">{% translate "Spares" %}</h2>
+            <div class="collectable-grid">
+                {% for collectable in collectable_swapped %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {% translate "No spare to swap. Mark the collectables you own twice as spare." %}
+                {% endfor %}
+            </div>
+        </section>
+        <section class="tab-panel" id="profile-panel-matched">
+            <h2 class="visually-hidden">{% translate "Matches" %}</h2>
+            <p class="tab-hint">{% translate "Your spares that other collectors are looking for." %}</p>
+            <div class="collectable-grid">
+                {% for collectable in collectable_matched %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {% translate "None of your spares is wanted by another collector yet." %}
                 {% endfor %}
             </div>
         </section>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 03:23+0200\n"
+"POT-Creation-Date: 2026-09-21 09:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,6 +51,9 @@ msgstr ""
 
 msgid "Description, author, history, ..."
 msgstr "Description, auteur, histoire, ..."
+
+msgid "Mark this collectable as owned to offer a spare."
+msgstr "Marquez cet objet comme possédé pour proposer un double."
 
 msgid "Original"
 msgstr "Original"
@@ -192,11 +195,26 @@ msgstr "Objets"
 msgid "Likes"
 msgstr "Aime"
 
+msgid "I like this one."
+msgstr "J'aime cet objet."
+
 msgid "Wants"
 msgstr "Recherche"
 
+msgid "I am looking for this one."
+msgstr "Je recherche cet objet."
+
 msgid "Owns"
 msgstr "Possède"
+
+msgid "I own this one."
+msgstr "Je possède cet objet."
+
+msgid "Spare"
+msgstr "Double"
+
+msgid "I have a spare copy of this one, available for swap."
+msgstr "J'ai un double de cet objet, disponible pour un échange."
 
 msgid "Possession"
 msgstr "Possession"
@@ -241,10 +259,11 @@ msgstr[1] ""
 msgid "Your collection"
 msgstr "Votre collection"
 
+#, python-format
 msgid ""
 "\n"
-"                    You've collected %(p)s%% of this collection.\n"
-"                "
+"                        You've collected %(p)s%% of this collection.\n"
+"                    "
 msgstr ""
 "\n"
 "                    Vous possédez %(p)s%% de cette collection.\n"
@@ -448,23 +467,42 @@ msgid_plural "%(counter)s owners"
 msgstr[0] "%(counter)s propriétaire"
 msgstr[1] "%(counter)s propriétaires"
 
+#, python-format
+msgid "%(counter)s spare"
+msgid_plural "%(counter)s spares"
+msgstr[0] "%(counter)s double"
+msgstr[1] "%(counter)s doubles"
+
 msgid "Profile"
 msgstr "Profil"
 
 msgid "Owned"
 msgstr "Possédé"
 
-#, python-format
-msgid "%(counter)s item."
-msgid_plural "%(counter)s items."
-msgstr[0] "%(counter)s objets."
-msgstr[1] "%(counter)s objets."
-
 msgid "Liked"
 msgstr "Aimé"
 
 msgid "Wanted"
 msgstr "Recherché"
+
+msgid "Spares"
+msgstr "Doubles"
+
+msgid "Matches"
+msgstr "Correspondances"
+
+msgid "No spare to swap. Mark the collectables you own twice as spare."
+msgstr ""
+"Aucun double à échanger. Marquez comme double les objets que vous possédez "
+"en plusieurs exemplaires."
+
+msgid "Your spares that other collectors are looking for."
+msgstr "Vos doubles que d'autres collectionneurs recherchent."
+
+msgid "None of your spares is wanted by another collector yet."
+msgstr ""
+"Aucun de vos doubles n'est recherché par un autre collectionneur pour le "
+"moment."
 
 #, python-format
 msgid "%s is not an acceptable file type."
@@ -604,3 +642,9 @@ msgstr "S'inscrire"
 
 msgid "Sign Up"
 msgstr "S'inscrire"
+
+#, python-format
+#~ msgid "%(counter)s item."
+#~ msgid_plural "%(counter)s items."
+#~ msgstr[0] "%(counter)s objets."
+#~ msgstr[1] "%(counter)s objets."
