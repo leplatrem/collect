@@ -62,9 +62,6 @@ jobs:
     - name: Initialize database
       run: docker compose run init
 
-    - name: Add demo data
-      run: docker compose run demo
-
     - name: Run application containers
       run: docker compose up -d
 
@@ -83,6 +80,9 @@ jobs:
           echo "Waiting for app to be ready..."
           sleep 3
         done
+
+    - name: Add demo data
+      run: docker compose run demo
 
     - uses: actions/setup-node@v7
       with:
