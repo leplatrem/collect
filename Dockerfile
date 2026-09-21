@@ -12,9 +12,20 @@ ENV PYTHONUNBUFFERED=1 \
     DJANGO_STATIC_ROOT=/mnt/static \
     DJANGO_DEBUG=false \
     DJANGO_SECURE_SSL_REDIRECT=false \
-    DJANGO_MEDIA_FILE_SERVED=true
+    # Media files are served by the web server in front of the app (see
+    # `etc/apache/`), never by Django, which would serve them one worker at a
+    # time and inline (see `DJANGO_MEDIA_FILES_SERVED`).
+    DJANGO_MEDIA_FILES_SERVED=false \
+    # Number of gunicorn worker processes. Without it, gunicorn defaults to a
+    # single worker, which serves a single request at a time. Rule of thumb:
+    # twice the number of CPU cores, plus one.
+    WEB_CONCURRENCY=5
 
-ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --access-logfile '-' --error-logfile '-' --capture-output"
+# `--threads` above 1 switches gunicorn to threaded workers, so each worker can
+# serve several requests while waiting on the database.
+# `--max-requests` recycles workers regularly, so that the memory held after
+# processing a big image is returned to the system.
+ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --threads 4 --timeout 60 --max-requests 1000 --max-requests-jitter 100 --access-logfile '-' --error-logfile '-' --capture-output"
 
 # Install system dependencies
 RUN apt-get update && \
@@ -51,8 +62,8 @@ ARG COMMANDS_CACHE_BUST=1
 # Compile translation messages
 RUN uv run django-admin compilemessages
 
-# Collect static files
-RUN uv run django-admin collectstatic --noinput --settings=collect.settings
+RUN DJANGO_SECRET_KEY=build-time-only-never-used-at-runtime \
+    uv run django-admin collectstatic --noinput --settings=collect.settings
 
 USER app
 EXPOSE $PORT

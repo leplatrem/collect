@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 
+from collect.throttle import throttle
+
 from . import views
 
 
@@ -26,7 +28,15 @@ urlpatterns = [
         views.CollectableListView.as_view(kind="most_owned"),
         name="most-owned",
     ),
-    path("search/", views.CollectableListView.as_view(kind="search"), name="search"),
+    # Searching is the most expensive read of the site (it scans descriptions
+    # and tags), and the search box queries it as the visitor types.
+    path(
+        "search/",
+        throttle("search", "THROTTLE_SEARCH", methods=("GET",))(
+            views.CollectableListView.as_view(kind="search")
+        ),
+        name="search",
+    ),
     path("create/", views.create, name="create"),
     path("<uuid:id>/", views.details, name="details"),
     path("<uuid:id>/duplicate/", views.DuplicateView.as_view(), name="duplicate"),

@@ -72,6 +72,50 @@ The command can be executed multiple times with the same folder, and only new fi
 > identify pictures, so that files can be moved into folders and not be duplicated.
 
 
+### Merge duplicates
+
+Collectables reported as duplicates are merged automatically once enough users
+have confirmed the report (see `COLLECT_DUPLICATE_CONFIRMATION_THRESHOLD`). To
+merge the ones still waiting for confirmations:
+
+```
+uv run manage.py mergeduplicates
+```
+
+Merging hides the duplicate and moves its tags, description and possessions to
+the original.
+
+
+## Deploy
+
+Settings are read from environment variables, falling back to the file pointed
+at by `DOTENV_FILE` (`.env` by default). See `env.local` for an example.
+
+Two settings are critical secrets:
+
+- `DJANGO_SECRET_KEY`: session cookies and password reset tokens are signed
+  with it.
+- `COLLECT_SIGNUP_SECRETS_WORDS`: invitation secrets, which grant the
+  permission to upload.
+
+Recommended:
+
+- `WEB_CONCURRENCY`: number of worker processes (2 x cores + 1).
+- `DJANGO_REDIS_URL`: a shared cache.
+- `DJANGO_CONN_MAX_AGE`: keeps database connections open across requests.
+- `DJANGO_THROTTLE_NUM_PROXIES`: number of reverse proxies in front of the app,
+  so that rate limits are keyed on the real client address (`1` with the
+  configuration in `etc/apache/`).
+
+Media files are served by the web server: see `etc/apache/` for recommended
+headers settings.
+
+Thumbnails are generated when a photo is uploaded. Generate missing ones with:
+
+```
+uv run manage.py generateimages
+```
+
 ## License
 
 * BSD 3-Clause License

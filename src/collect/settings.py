@@ -17,6 +17,8 @@ from decouple import Config, RepositoryEnv
 from dj_database_url import parse as db_url
 from django.utils.translation import gettext_lazy as _
 
+from collect.config import checked_secret_key
+
 
 DOTENV_FILE = os.environ.get("DOTENV_FILE", ".env")
 print(f"Read config from {DOTENV_FILE}")
@@ -27,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-SECRET_KEY = config("DJANGO_SECRET_KEY", default="not-secret")
-
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
+
+SECRET_KEY = checked_secret_key(config("DJANGO_SECRET_KEY", default=""), debug=DEBUG)
 
 ADMIN_ENABLED = config("DJANGO_ADMIN_ENABLED", default=DEBUG, cast=bool)
 DEBUG_TOOLBAR_ENABLED = config("DJANGO_DEBUG_TOOLBAR_ENABLED", default=DEBUG, cast=bool)
@@ -114,6 +116,18 @@ DATABASES = {
     )
 }
 
+# Reuse database connections across requests instead of reconnecting every
+# time: PostgreSQL forks a backend process per connection, which becomes the
+# bottleneck long before the queries themselves do.
+# Keep this lower than the server-side idle timeout, and use a connection
+# pooler (pgbouncer) when running many workers.
+DATABASES["default"]["CONN_MAX_AGE"] = config(
+    "DJANGO_CONN_MAX_AGE", default=60, cast=int
+)
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = config(
+    "DJANGO_CONN_HEALTH_CHECKS", default=True, cast=bool
+)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -132,6 +146,34 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+
+# Caches
+# https://docs.djangoproject.com/en/stable/topics/cache/
+
+# Without a shared cache, every process keeps its own copy (and loses it on
+# restart), which defeats session caching and makes django-imagekit hit the
+# storage backend to check whether each thumbnail exists.
+REDIS_URL = config("DJANGO_REDIS_URL", default="")
+
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+        }
+    }
+    # Read sessions from the cache, write them through to the database, so that
+    # session reads (one per authenticated request) don't hit the database.
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "collect",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
 LOGGING = {
@@ -297,6 +339,25 @@ DUPLICATE_CONFIRMATION_THRESHOLD: int = config(
 )
 
 MAX_SEARCH_KEYWORDS: int = config("COLLECT_MAX_SEARCH_KEYWORDS", default=5, cast=int)
+
+# Each term of an advanced search query adds a join (and `tags:` terms add two
+# aggregates) to the SQL query, so an arbitrarily long query is an easy way to
+# bring the database down. Queries above these limits fall back to the basic
+# search.
+MAX_SEARCH_TERMS: int = config("COLLECT_MAX_SEARCH_TERMS", default=10, cast=int)
+MAX_SEARCH_QUERY_LENGTH: int = config(
+    "COLLECT_MAX_SEARCH_QUERY_LENGTH", default=200, cast=int
+)
+
+# Rate limits, as "<number of requests>/<number of seconds>", applied per
+# client IP. `THROTTLE_NUM_PROXIES` is the number of trusted reverse proxies in
+# front of the app: with 0, the client IP is `REMOTE_ADDR`, otherwise it is read
+# from the `X-Forwarded-For` header (which only the closest proxies can be
+# trusted to have set).
+THROTTLE_NUM_PROXIES: int = config("DJANGO_THROTTLE_NUM_PROXIES", default=0, cast=int)
+THROTTLE_LOGIN = config("COLLECT_THROTTLE_LOGIN", default="20/300")
+THROTTLE_SIGNUP = config("COLLECT_THROTTLE_SIGNUP", default="5/3600")
+THROTTLE_SEARCH = config("COLLECT_THROTTLE_SEARCH", default="120/60")
 
 DEFAULT_TAGS: str = config("COLLECT_DEFAULT_TAGS", default="#{year}")
 

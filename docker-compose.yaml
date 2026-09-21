@@ -1,3 +1,15 @@
+# Local composition. Not meant to be deployed as-is: the credentials below are
+# public, and the database is not reachable from outside the compose network.
+x-app-env: &app-env
+  # Without this, the app reads the `env.local` file baked into the image
+  # instead of the `.env` mounted below.
+  DOTENV_FILE: .env
+  DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+  # Local value only. In production, set a private random one (the app refuses
+  # to start with a published key when DJANGO_DEBUG is off).
+  DJANGO_SECRET_KEY: local-composition-only
+  DJANGO_REDIS_URL: redis://cache:6379/0
+
 services:
   web:
     image: collect:latest
@@ -6,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      <<: *app-env
       DJANGO_MEDIA_ROOT: /mnt/media
     # Let the init system handle signals for us.
     # among other things this helps shutdown be fast
@@ -16,6 +28,7 @@ services:
       - media-folder:/mnt/media:rw
     depends_on:
       - db
+      - cache
       - init
 
   db:
@@ -32,15 +45,24 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
-    ports:
-      - "5432:5432"
+
+  # Shared cache: sessions and thumbnail existence, so that they are not
+  # recomputed by every worker process.
+  cache:
+    image: redis:7-alpine
+    command: redis-server --save "" --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   init:
     image: collect:latest
     build:
       context: .
     environment:
-      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      <<: *app-env
     command: uv run manage.py migrate --noinput
     volumes:
       - ./.env:/app/.env
@@ -52,12 +74,13 @@ services:
     build:
       context: .
     environment:
-      DJANGO_DATABASE_URL: postgres://dbuser:dbpassword@db:5432/collectdb
+      <<: *app-env
       DJANGO_MEDIA_ROOT: /mnt/media
     command: >
       sh -c "
         uv run manage.py smart_create_user --admin admin s3cr3t &&
         uv run manage.py smart_create_user testuser testpass &&
+        uv run manage.py smart_create_user --collector collector collectorpass
         uv run manage.py loadfolder testuser /mnt/demo
       "
     volumes:

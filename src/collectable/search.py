@@ -1,4 +1,5 @@
 import logging
+import threading
 from dataclasses import dataclass
 
 import ply.lex as lex
@@ -202,6 +203,9 @@ def p_error(p):
 _lexer = lex.lex()
 _parser = yacc.yacc(start="query", debug=False, write_tables=False)
 
+# `ply` lexers and parsers are not thread-safe (See Gunicorn config)
+_parser_lock = threading.Lock()
+
 
 def _parse_to_boolean_str_and_literals(
     query_string: str,
@@ -210,7 +214,8 @@ def _parse_to_boolean_str_and_literals(
     Parse query string to boolean expression string with T0, T1... placeholders
     and a mapping of those placeholders to `_Term(field, value)`.
     """
-    tree = _parser.parse(query_string, lexer=_lexer)
+    with _parser_lock:
+        tree = _parser.parse(query_string, lexer=_lexer)
     boolean_str, literal_map, _ = _to_boolean_expr(tree)
     return boolean_str, literal_map
 
@@ -268,8 +273,24 @@ class QBuilder:
 
         Adds annotations to count tags if needed (for exact tag matches)
         in the `self._tags_exact_specs` list.
+
+        Raises `ValueError` for queries too big to compile, since every term
+        adds a join (and a `tags:` term two aggregates) to the SQL query. The
+        caller is expected to fall back to the basic search.
         """
+        if len(query_string) > settings.MAX_SEARCH_QUERY_LENGTH:
+            raise ValueError(
+                f"Query is longer than {settings.MAX_SEARCH_QUERY_LENGTH} characters"
+            )
+
         boolean_str, literal_map = _parse_to_boolean_str_and_literals(query_string)
+
+        if len(literal_map) > settings.MAX_SEARCH_TERMS:
+            raise ValueError(
+                f"Query has more than {settings.MAX_SEARCH_TERMS} terms "
+                f"({len(literal_map)})"
+            )
+
         algebra = BooleanAlgebra()
         expr = algebra.parse(boolean_str)
 
