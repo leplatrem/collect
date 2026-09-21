@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, Exists, OuterRef, Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -83,16 +83,6 @@ class CollectableQuerySet(models.QuerySet):
 
     def swapped_by(self, user):
         return self.filter(possession__user=user, possession__swaps=True)
-
-    def swaps_wanted_by_others(self, user):
-        """
-        The user's spares that at least one *other* collector wants.
-        This is the trade matching: my `swaps` ∩ someone else's `wants`.
-        """
-        wanted_by_others = Possession.objects.filter(
-            collectable=OuterRef("pk"), wants=True
-        ).exclude(user=user)
-        return self.swapped_by(user).filter(Exists(wanted_by_others))
 
     def with_possession_counts(self):
         """
@@ -471,6 +461,46 @@ class Possession(models.Model):
         default=False,
         help_text=_("I have a spare copy of this one, available for swap."),
     )
+
+    @classmethod
+    def trade_partners(cls, user):
+        """
+        The other collectors this user could trade with, annotated with:
+
+        - `nwanted`: how many of the user's spares they are looking for
+        - `noffered`: how many of their spares the user is looking for
+
+        A partner with both is a two-way trade. Returned as a single query, so
+        the caller can split it into the three lists without hitting the
+        database again.
+        """
+        my_spares = cls.objects.filter(user=user, swaps=True).values("collectable")
+        my_wants = cls.objects.filter(user=user, wants=True).values("collectable")
+        return (
+            get_user_model()
+            .objects.filter(is_active=True)
+            .exclude(pk=user.pk)
+            .annotate(
+                nwanted=Count(
+                    "possession",
+                    filter=Q(
+                        possession__wants=True,
+                        possession__collectable__in=my_spares,
+                    ),
+                    distinct=True,
+                ),
+                noffered=Count(
+                    "possession",
+                    filter=Q(
+                        possession__swaps=True,
+                        possession__collectable__in=my_wants,
+                    ),
+                    distinct=True,
+                ),
+            )
+            .filter(Q(nwanted__gt=0) | Q(noffered__gt=0))
+            .order_by("username")
+        )
 
     def _drop_swap_if_not_owned(self):
         """

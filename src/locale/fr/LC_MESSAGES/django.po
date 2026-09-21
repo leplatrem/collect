@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 09:25+0000\n"
+"POT-Creation-Date: 2026-09-21 09:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mathieu Leplatre <mathieu@email.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -496,12 +496,45 @@ msgstr ""
 "Aucun double à échanger. Marquez comme double les objets que vous possédez "
 "en plusieurs exemplaires."
 
-msgid "Your spares that other collectors are looking for."
-msgstr "Vos doubles que d'autres collectionneurs recherchent."
+msgid "Two-way trades"
+msgstr "Échanges croisés"
 
-msgid "None of your spares is wanted by another collector yet."
+msgid "You each have a spare the other is looking for."
+msgstr "Vous avez chacun un double que l'autre recherche."
+
+#, python-format
+msgid "%(counter)s collectable to trade"
+msgid_plural "%(counter)s collectables to trade"
+msgstr[0] "%(counter)s objet à échanger"
+msgstr[1] "%(counter)s objets à échanger"
+
+msgid "No two-way trade yet."
+msgstr "Aucun échange croisé pour le moment."
+
+msgid "They want your spares"
+msgstr "Ils recherchent vos doubles"
+
+#, python-format
+msgid "%(counter)s spare wanted"
+msgid_plural "%(counter)s spares wanted"
+msgstr[0] "%(counter)s double recherché"
+msgstr[1] "%(counter)s doubles recherchés"
+
+msgid "Nobody is looking for your spares yet."
+msgstr "Personne ne recherche vos doubles pour le moment."
+
+msgid "They have spares you want"
+msgstr "Ils ont des doubles que vous recherchez"
+
+#, python-format
+msgid "%(counter)s spare offered"
+msgid_plural "%(counter)s spares offered"
+msgstr[0] "%(counter)s double proposé"
+msgstr[1] "%(counter)s doubles proposés"
+
+msgid "No collector offers a spare you are looking for yet."
 msgstr ""
-"Aucun de vos doubles n'est recherché par un autre collectionneur pour le "
+"Aucun collectionneur ne propose un double que vous recherchez pour le "
 "moment."
 
 #, python-format
@@ -642,6 +675,11 @@ msgstr "S'inscrire"
 
 msgid "Sign Up"
 msgstr "S'inscrire"
+
+#~ msgid "None of your spares is wanted by another collector yet."
+#~ msgstr ""
+#~ "Aucun de vos doubles n'est recherché par un autre collectionneur pour le "
+#~ "moment."
 
 #, python-format
 #~ msgid "%(counter)s item."

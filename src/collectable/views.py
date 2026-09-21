@@ -485,11 +485,18 @@ def collection(request, slugs):
 @login_required
 def profile(request):
     qs = Collectable.objects.with_counts_and_possessions(request.user)
+    # A single query, split three ways: who could trade both directions, who
+    # is after one of our spares, and who offers one we are looking for.
+    partners = list(Possession.trade_partners(request.user))
+
     context = {
         "collectable_liked": qs.liked_by(request.user),
         "collectable_wanted": qs.wanted_by(request.user),
         "collectable_owned": qs.owned_by(request.user),
         "collectable_swapped": qs.swapped_by(request.user),
-        "collectable_matched": qs.swaps_wanted_by_others(request.user),
+        "trade_partners": partners,
+        "trade_both_ways": [p for p in partners if p.nwanted and p.noffered],
+        "trade_wanting_our_spares": [p for p in partners if p.nwanted],
+        "trade_offering_our_wants": [p for p in partners if p.noffered],
     }
     return render(request, "collectable/profile.html", context)

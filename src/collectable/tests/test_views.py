@@ -189,21 +189,87 @@ def test_profile_view(db, logged_in_client):
     assert response.status_code == 200
     assert "collectable_liked" in response.context
     assert "collectable_swapped" in response.context
-    assert "collectable_matched" in response.context
+    assert "trade_partners" in response.context
 
 
-def test_profile_view_swaps_and_matches(user, logged_in_client, collectable):
-    PossessionFactory(user=user, collectable=collectable, owns=True, swaps=True)
+def test_profile_view_trade_lists(
+    user, logged_in_client, collectable, another_collectable
+):
+    wanter = UserFactory(username="wanter")
+    mate = UserFactory(username="mate")
     url = reverse("collectable:profile")
 
+    # One of our spares, nobody after it yet.
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
     response = logged_in_client.get(url)
     assert list(response.context["collectable_swapped"]) == [collectable]
-    assert list(response.context["collectable_matched"]) == []
+    assert response.context["trade_partners"] == []
 
-    # Another collector wants it: it becomes a match.
-    PossessionFactory(user=UserFactory(), collectable=collectable, wants=True)
+    # Somebody wants it: one-way only.
+    PossessionFactory(
+        user=wanter, collectable=collectable, likes=False, wants=True, owns=False
+    )
     response = logged_in_client.get(url)
-    assert list(response.context["collectable_matched"]) == [collectable]
+    assert [u.username for u in response.context["trade_wanting_our_spares"]] == [
+        "wanter"
+    ]
+    assert response.context["trade_offering_our_wants"] == []
+    assert response.context["trade_both_ways"] == []
+
+    # Somebody offers a spare we want, and wants one of ours: two-way.
+    PossessionFactory(
+        user=user, collectable=another_collectable, likes=False, wants=True, owns=False
+    )
+    PossessionFactory(
+        user=mate,
+        collectable=another_collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=mate, collectable=collectable, likes=False, wants=True, owns=False
+    )
+    response = logged_in_client.get(url)
+    assert [u.username for u in response.context["trade_both_ways"]] == ["mate"]
+    assert sorted(u.username for u in response.context["trade_wanting_our_spares"]) == [
+        "mate",
+        "wanter",
+    ]
+    assert [u.username for u in response.context["trade_offering_our_wants"]] == [
+        "mate"
+    ]
+
+
+def test_profile_view_renders_trade_names(user, logged_in_client, collectable):
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=UserFactory(username="collectomane"),
+        collectable=collectable,
+        likes=False,
+        wants=True,
+        owns=False,
+    )
+
+    content = logged_in_client.get(reverse("collectable:profile")).content.decode()
+
+    assert "collectomane" in content
+    assert "1 double recherch" in content
 
 
 @pytest.mark.django_db
@@ -366,3 +432,25 @@ def test_list_view_extra_context_not_shared_across_requests(client, collectable)
     response = client.get(reverse("collectable:latest"))
 
     assert "advanced_search" not in response.context
+
+
+def test_profile_view_trade_lists_hit_the_database_once(
+    user, logged_in_client, collectable, django_assert_num_queries
+):
+    # The three lists are sliced from one annotated query, not three.
+    PossessionFactory(
+        user=user,
+        collectable=collectable,
+        likes=False,
+        wants=False,
+        owns=True,
+        swaps=True,
+    )
+    PossessionFactory(
+        user=UserFactory(), collectable=collectable, likes=False, wants=True, owns=False
+    )
+    url = reverse("collectable:profile")
+    logged_in_client.get(url)  # warm up sessions/auth queries
+
+    with django_assert_num_queries(1):
+        list(Possession.trade_partners(user))

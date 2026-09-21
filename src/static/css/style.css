@@ -1248,3 +1248,60 @@ section#related {
   font-size: 0.9rem;
   opacity: 0.8;
 }
+
+/* Trade partners: three plain name lists, side by side when there is room. */
+.trade-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+.trade-lists h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.trade-lists .tab-hint {
+  margin-top: 0;
+}
+
+.trade-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.trade-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.trade-list li:last-child {
+  border-bottom: none;
+}
+
+.trade-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.trade-count {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--tag-color);
+  white-space: nowrap;
+}
+
+.trade-empty {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
