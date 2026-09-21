@@ -167,6 +167,18 @@ button.link {
   display: none;
 }
 
+/* Hidden on screen, still announced by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 a.more {
   display: flex;
   align-items: center;
@@ -1066,4 +1078,91 @@ section#related {
     width: 58px;
     height: 58px;
   }
+}
+
+/* =========================================================
+   Pure CSS tabs (radio buttons)
+   ========================================================= */
+
+.tabs .tab-state {
+  /* Kept in the DOM (and focusable) but out of sight: the labels are the UI. */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tab-labels label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.6rem 1.1rem;
+  margin-bottom: -1px;
+
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tab-labels label:hover {
+  opacity: 0.9;
+  background: var(--card-bg);
+}
+
+.tab-count {
+  padding: 0.05rem 0.5rem;
+  background: var(--tag-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tag-color);
+}
+
+.tab-panel {
+  display: none;
+}
+
+/* Selected tab and its panel. */
+#profile-tab-owned:checked ~ .tab-labels label[for="profile-tab-owned"],
+#profile-tab-liked:checked ~ .tab-labels label[for="profile-tab-liked"],
+#profile-tab-wanted:checked ~ .tab-labels label[for="profile-tab-wanted"] {
+  opacity: 1;
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  border-bottom-color: var(--link-color);
+}
+
+#profile-tab-owned:checked ~ #profile-panel-owned,
+#profile-tab-liked:checked ~ #profile-panel-liked,
+#profile-tab-wanted:checked ~ #profile-panel-wanted {
+  display: block;
+}
+
+/* Keyboard users need to see where they are, since the radio itself is hidden. */
+#profile-tab-owned:focus-visible ~ .tab-labels label[for="profile-tab-owned"],
+#profile-tab-liked:focus-visible ~ .tab-labels label[for="profile-tab-liked"],
+#profile-tab-wanted:focus-visible
+  ~ .tab-labels
+  label[for="profile-tab-wanted"] {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
 }

@@ -5,43 +5,64 @@
 {% endblock %}
 {% block content %}
     <h1>{% translate "Profile" %} {{ user }}</h1>
-    <h2>{% translate "Owned" %}</h2>
-    {% if collectable_owned %}
-        <p>
-            {% blocktranslate count counter=collectable_owned.count %}{{counter}} item.{% plural %}{{counter}} items.{% endblocktranslate %}
-        </p>
-    {% endif %}
-    <div class="collectable-grid">
-        {% for collectable in collectable_owned %}
-            {% include "collectable/collectable_thumbnail.html" %}
-        {% empty %}
-            {% translate "No collectable owned." %}
-        {% endfor %}
-    </div>
-    <h2>{% translate "Liked" %}</h2>
-    {% if collectable_liked %}
-        <p>
-            {% blocktranslate count counter=collectable_liked.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
-        </p>
-    {% endif %}
-    <div class="collectable-grid">
-        {% for collectable in collectable_liked %}
-            {% include "collectable/collectable_thumbnail.html" %}
-        {% empty %}
-            {% translate "No collectable liked." %}
-        {% endfor %}
-    </div>
-    <h2>{% translate "Wanted" %}</h2>
-    {% if collectable_wanted %}
-        <p>
-            {% blocktranslate count counter=collectable_wanted.count %}{{counter}} item.{% plural %}{{counter}}items.{% endblocktranslate %}
-        </p>
-    {% endif %}
-    <div class="collectable-grid">
-        {% for collectable in collectable_wanted %}
-            {% include "collectable/collectable_thumbnail.html" %}
-        {% empty %}
-            {% translate "No collectable wanted." %}
-        {% endfor %}
+    {# Tabs are pure CSS: the radio inputs hold the state, the labels are the tab buttons. #}
+    <div class="tabs">
+        <input type="radio"
+               name="profile-tab"
+               id="profile-tab-owned"
+               class="tab-state"
+               checked>
+        <input type="radio"
+               name="profile-tab"
+               id="profile-tab-liked"
+               class="tab-state">
+        <input type="radio"
+               name="profile-tab"
+               id="profile-tab-wanted"
+               class="tab-state">
+        <div class="tab-labels">
+            <label for="profile-tab-owned">
+                {% translate "Owned" %}
+                <span class="tab-count">{{ collectable_owned.count }}</span>
+            </label>
+            <label for="profile-tab-liked">
+                {% translate "Liked" %}
+                <span class="tab-count">{{ collectable_liked.count }}</span>
+            </label>
+            <label for="profile-tab-wanted">
+                {% translate "Wanted" %}
+                <span class="tab-count">{{ collectable_wanted.count }}</span>
+            </label>
+        </div>
+        <section class="tab-panel" id="profile-panel-owned">
+            <h2 class="visually-hidden">{% translate "Owned" %}</h2>
+            <div class="collectable-grid">
+                {% for collectable in collectable_owned %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {% translate "No collectable owned." %}
+                {% endfor %}
+            </div>
+        </section>
+        <section class="tab-panel" id="profile-panel-liked">
+            <h2 class="visually-hidden">{% translate "Liked" %}</h2>
+            <div class="collectable-grid">
+                {% for collectable in collectable_liked %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {% translate "No collectable liked." %}
+                {% endfor %}
+            </div>
+        </section>
+        <section class="tab-panel" id="profile-panel-wanted">
+            <h2 class="visually-hidden">{% translate "Wanted" %}</h2>
+            <div class="collectable-grid">
+                {% for collectable in collectable_wanted %}
+                    {% include "collectable/collectable_thumbnail.html" %}
+                {% empty %}
+                    {% translate "No collectable wanted." %}
+                {% endfor %}
+            </div>
+        </section>
     </div>
 {% endblock %}
