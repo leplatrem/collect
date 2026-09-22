@@ -42,7 +42,23 @@
                 <input type="search"
                        name="q"
                        placeholder="{% translate "Search collectables..." %}"
+                       aria-describedby="search-hint"
                        value="{{ request.GET.q|default_if_none:'' }}" />
+                <div id="search-hint" class="search-hint">
+                    <p class="search-hint-label">{% translate "Searching goes further than words:" %}</p>
+                    <ul>
+                        <li>
+                            <code>#tag</code> <span class="search-hint-what">{% translate "that tag, exactly" %}</span>
+                        </li>
+                        <li>
+                            <code>#tag1 AND #tag2</code> <span class="search-hint-what">{% translate "both, among any others" %}</span>
+                        </li>
+                        <li>
+                            <code>-#tag</code> <span class="search-hint-what">{% translate "everything but those" %}</span>
+                        </li>
+                    </ul>
+                    <p class="search-hint-more">{% translate "The whole syntax is listed under the results of a search." %}</p>
+                </div>
             </form>
             {% if user.is_authenticated %}
                 <a href="{% url 'auth:password_change' %}">{% translate "Password Change" %}</a>

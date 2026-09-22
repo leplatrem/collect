@@ -4,6 +4,8 @@ import threading
 import pytest
 from django.conf import settings
 from django.urls import reverse
+from django.utils.html import escape
+from django.utils.translation import gettext
 
 from collectable.models import Collectable
 from collectable.search import QBuilder
@@ -207,6 +209,47 @@ def test_collectable_search_falls_back_to_basic_search_when_refused(client):
     assert resp.status_code == 200
     assert resp.context["advanced_search"] is False
     assert list(resp.context["collectable_list"]) == [match]
+
+
+def fallback_notice(keywords):
+    """
+    The notice shown when the query could not be compiled, as the page shows
+    it: tests run in French, and only what is interpolated is escaped.
+    """
+    return gettext(
+        '"%(keywords)s" could not be read as a query, so its words were '
+        "searched as they are."
+    ) % {"keywords": escape(keywords)}
+
+
+def test_search_results_explain_a_query_that_could_not_be_read(client):
+    CollectableFactory(description="sticker", tags=["bug"])
+
+    response = client.get(reverse("collectable:search"), {"q": "#bug AND"})
+
+    assert response.context["advanced_search"] is False
+    content = response.content.decode()
+    assert fallback_notice("#bug AND") in content
+    # And the syntax is right there, under the results.
+    assert 'id="how-to-search"' in content
+
+
+def test_search_results_of_a_valid_query_only_show_the_syntax(client):
+    CollectableFactory(description="sticker", tags=["bug"])
+
+    response = client.get(reverse("collectable:search"), {"q": "#bug"})
+
+    assert response.context["advanced_search"] is True
+    content = response.content.decode()
+    assert fallback_notice("#bug") not in content
+    assert 'id="how-to-search"' in content
+
+
+def test_other_lists_do_not_show_the_search_syntax(client):
+    response = client.get(reverse("collectable:latest"))
+
+    assert response.context["is_search"] is False
+    assert 'id="how-to-search"' not in response.content.decode()
 
 
 def test_collectable_search_parses_concurrently():

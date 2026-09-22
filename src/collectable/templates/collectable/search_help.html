@@ -1,0 +1,103 @@
+{% load i18n %}
+{# The reference of the query language. Keep in step with `collectable/search.py`. #}
+<details class="search-help" id="how-to-search">
+    <summary>{% translate "Every way to search" %}</summary>
+    <dl>
+        <div>
+            <dt>
+                <code>mozweek</code>
+            </dt>
+            <dd>
+                {% translate "a word of the description, of a tag, of the identifier or of the file name" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>"mozweek 2024"</code>
+            </dt>
+            <dd>
+                {% translate "those words, in that order" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>#sticker</code>
+            </dt>
+            <dd>
+                {% translate "that tag, exactly" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>#stick*</code>
+            </dt>
+            <dd>
+                {% translate "every tag starting with those letters" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>#*</code>
+            </dt>
+            <dd>
+                {% translate "any tag at all" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>description:paris</code>
+            </dt>
+            <dd>
+                {% translate "that word in the description only" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>id:a1b2</code> {% translate "or" %} <code>filename:IMG_3270</code>
+            </dt>
+            <dd>
+                {% translate "the identifier or the name of the photo" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>tags:#paris,#2024</code>
+            </dt>
+            <dd>
+                {% translate "those tags and no others" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>#paris AND #2024</code>
+            </dt>
+            <dd>
+                {% translate "both, among any others" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>#paris OR #lyon</code>
+            </dt>
+            <dd>
+                {% translate "one or the other" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>NOT #2024</code> {% translate "or" %} <code>-#2024</code>
+            </dt>
+            <dd>
+                {% translate "everything but those" %}
+            </dd>
+        </div>
+        <div>
+            <dt>
+                <code>(#paris OR #lyon) AND -#duplicate</code>
+            </dt>
+            <dd>
+                {% translate "parentheses group the conditions" %}
+            </dd>
+        </div>
+    </dl>
+</details>

@@ -690,6 +690,7 @@ main.collectable.details #attributes form {
 
 header form#search {
   display: flex;
+  position: relative;
   flex: 1 1 20rem;
   max-width: 32rem;
   margin: 0 1rem;
@@ -713,6 +714,118 @@ header form#search input[type="search"] {
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+/* Shown while the search box has the focus and nothing typed in it yet: a few
+   queries of this collection, to say that the box takes more than words.
+   Inside the form, so that clicking an example does not close it first. */
+.search-hint {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px var(--card-shadow-hover);
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+header form#search:focus-within:has(input:placeholder-shown) .search-hint {
+  display: block;
+}
+
+.search-hint p {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.search-hint ul {
+  margin: 0.4rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-hint li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.15rem 0;
+}
+
+.search-hint code {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--tag-bg-hover);
+  color: var(--tag-color);
+  white-space: nowrap;
+}
+
+.search-hint-what {
+  opacity: 0.7;
+}
+
+.search-hint-more {
+  font-size: 0.8rem;
+}
+
+/* The query language, under the results it applies to. */
+.search-fallback {
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid var(--tag-color);
+  background: var(--tag-bg-hover);
+}
+
+.search-help {
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.search-help summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.search-help dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0.8rem 0 0;
+}
+
+.search-help dl > div {
+  display: contents;
+}
+
+.search-help dt {
+  white-space: nowrap;
+}
+
+.search-help dt code {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--tag-bg-hover);
+  color: var(--tag-color);
+}
+
+.search-help dd {
+  margin: 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 771px) {
+  .search-help dl {
+    grid-template-columns: 1fr;
+  }
+
+  .search-help dd {
+    margin-bottom: 0.5rem;
+  }
 }
 
 header form#search input[type="search"]::placeholder {

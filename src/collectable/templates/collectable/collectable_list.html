@@ -7,6 +7,16 @@
     <p>
         {% blocktranslate count counter=page_obj.paginator.count %}{{ counter }} collectable.{% plural %}{{counter}} collectables.{% endblocktranslate %}
     </p>
+    {% if is_search %}
+        {% if search_keywords and not advanced_search %}
+            <p class="search-fallback">
+                {% blocktranslate trimmed with keywords=search_keywords %}
+                    "{{ keywords }}" could not be read as a query, so its words were searched as they are.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
+        {% include "collectable/search_help.html" %}
+    {% endif %}
     <section id="collectable-list" class="collectable-grid">
         {% for collectable in page_obj %}
             {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}

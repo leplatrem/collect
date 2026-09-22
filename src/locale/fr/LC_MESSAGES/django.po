@@ -440,6 +440,62 @@ msgstr "Aucun objet possédé."
 msgid "Most spares"
 msgstr "Le plus de doubles"
 
+msgid "Searching goes further than words:"
+msgstr "La recherche va plus loin que les mots :"
+
+msgid "The whole syntax is listed under the results of a search."
+msgstr "Toute la syntaxe est listée sous les résultats d'une recherche."
+
+#, python-format
+msgid ""
+"\"%(keywords)s\" could not be read as a query, so its words were searched as "
+"they are."
+msgstr ""
+"\"%(keywords)s\" n'a pas pu être lue comme une requête, ses mots ont donc été "
+"recherchés tels quels."
+
+msgid "or"
+msgstr "ou"
+
+msgid "Every way to search"
+msgstr "Toutes les façons de chercher"
+
+msgid "a word of the description, of a tag, of the identifier or of the file name"
+msgstr "un mot de la description, d'une étiquette, de l'identifiant ou du nom de fichier"
+
+msgid "those words, in that order"
+msgstr "ces mots, dans cet ordre"
+
+msgid "that tag, exactly"
+msgstr "cette étiquette, exactement"
+
+msgid "every tag starting with those letters"
+msgstr "toutes les étiquettes commençant par ces lettres"
+
+msgid "any tag at all"
+msgstr "n'importe quelle étiquette"
+
+msgid "that word in the description only"
+msgstr "ce mot dans la description uniquement"
+
+msgid "the identifier or the name of the photo"
+msgstr "l'identifiant ou le nom de la photo"
+
+msgid "those tags and no others"
+msgstr "ces étiquettes et aucune autre"
+
+msgid "both, among any others"
+msgstr "les deux, parmi d'autres éventuelles"
+
+msgid "one or the other"
+msgstr "l'une ou l'autre"
+
+msgid "everything but those"
+msgstr "tout sauf celles-là"
+
+msgid "parentheses group the conditions"
+msgstr "les parenthèses regroupent les conditions"
+
 msgid "Collections"
 msgstr "Collections"
 
