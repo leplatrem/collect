@@ -333,6 +333,12 @@ RELATED_COLLECTABLES_LIST_COUNT = config(
 # Number of history entries shown on the details page. Unbounded otherwise,
 # and every save appends one.
 HISTORY_LIST_COUNT: int = config("COLLECT_HISTORY_LIST_COUNT", default=20, cast=int)
+# Number of collectable IDs kept in session to navigate from one collectable to
+# the previous/next one. Every list page stores them, and every request reads
+# them back, so this directly drives the size of each session.
+SESSION_LIST_MAX_SIZE: int = config(
+    "COLLECT_SESSION_LIST_MAX_SIZE", default=200, cast=int
+)
 SIGNUP_SECRETS_WORDS: list[str] = config(
     "COLLECT_SIGNUP_SECRETS_WORDS", cast=lambda v: [s.strip() for s in v.split(",")]
 )

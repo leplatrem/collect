@@ -192,10 +192,15 @@ def store_current_list_in_session(request, ids):
     """
     Store the current list of collectable IDs in session, for easy navigation
     between previous and next in details view.
-    We only store the first 1000 IDs to avoid bloating the session.
+
+    The list is written on every list page view, and read back on every
+    subsequent request of the session, so its size is capped: it is a
+    navigation convenience, not a full result set.
     """
     # Store as strings to be JSON serializable.
-    request.session["collectable_list"] = [str(id_) for id_ in ids[:1000]]
+    request.session["collectable_list"] = [
+        str(id_) for id_ in ids[: settings.SESSION_LIST_MAX_SIZE]
+    ]
     request.session.modified = True
 
 

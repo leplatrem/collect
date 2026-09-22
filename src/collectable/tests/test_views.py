@@ -703,6 +703,28 @@ def test_collection_view_related_tags(db, client):
     assert related == {"shared": 2}
 
 
+def test_list_view_stores_a_bounded_list_in_session(db, client, settings):
+    settings.SESSION_LIST_MAX_SIZE = 3
+    for _ in range(5):
+        CollectableFactory()
+
+    client.get(reverse("collectable:latest"))
+
+    # The list is written on every list view and read back on every request of
+    # the session afterwards.
+    assert len(client.session["collectable_list"]) == 3
+
+
+def test_collection_view_stores_a_bounded_list_in_session(db, client, settings):
+    settings.SESSION_LIST_MAX_SIZE = 2
+    for _ in range(5):
+        CollectableFactory(tags=["big"])
+
+    client.get(reverse("collectable:collection", kwargs={"slugs": "big"}))
+
+    assert len(client.session["collectable_list"]) == 2
+
+
 def test_list_view_session_list_follows_the_displayed_order(db, client):
     oldest = CollectableFactory()
     newest = CollectableFactory()
