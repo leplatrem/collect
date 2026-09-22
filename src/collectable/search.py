@@ -247,13 +247,35 @@ def _to_boolean_expr(tree, counter=0, mapping=None):
     return str(tree), mapping, counter
 
 
+def _tag_condition(value: str) -> Q:
+    """
+    The condition a tag term matches with: an exact name, a prefix for
+    `#tag*`, or any tag at all for `#*`.
+    """
+    val = value.strip()
+    if val == "*":
+        return Q(tags__isnull=False)
+    if val.endswith("*"):
+        return Q(tags__name__istartswith=val[:-1])
+    return Q(tags__name__iexact=val)
+
+
 class QBuilder:
     def __init__(self):
         self._tags_exact_specs = []
+        self._tag_match_specs = []
 
     @property
     def needs_annotations(self):
-        return bool(self._tags_exact_specs)
+        return bool(self._tags_exact_specs or self._tag_match_specs)
+
+    @property
+    def tag_conditions(self) -> list[Q]:
+        """
+        The tag conditions the compiled query counts the matches of. The
+        include `Q` only refers to them by the alias of their annotation.
+        """
+        return [condition for _alias, condition in self._tag_match_specs]
 
     def apply_annotations(self, qs):
         for names, total_alias, match_alias in self._tags_exact_specs:
@@ -265,7 +287,23 @@ class QBuilder:
                     ),
                 }
             )
+        for alias, condition in self._tag_match_specs:
+            qs = qs.annotate(**{alias: Count("tags", filter=condition, distinct=True)})
         return qs
+
+    def _tag_match_q(self, condition: Q) -> Q:
+        """
+        Turn a condition on the tags relation into one on a count of the tags
+        matching it.
+
+        Tags are a many-to-many, so two conditions on them in the same
+        `filter()` call have to be satisfied by one single tag: `#a AND #b`
+        would never match anything. Counting the matches of each condition
+        separately is what makes them independent.
+        """
+        alias = f"tag_match_{len(self._tag_match_specs)}"
+        self._tag_match_specs.append((alias, condition))
+        return Q(**{f"{alias}__gt": 0})
 
     def compile(self, query_string: str) -> tuple[Q, Q]:
         """
@@ -311,11 +349,7 @@ class QBuilder:
             val = value.strip()
 
             if fld == "tag":
-                if val == "*":
-                    return Q(tags__isnull=False)
-                if val.endswith("*"):
-                    return Q(tags__name__istartswith=val[:-1])
-                return Q(tags__name__iexact=val)
+                return self._tag_match_q(_tag_condition(val))
 
             if field == "id":
                 return Q(id__icontains=value)
@@ -331,7 +365,7 @@ class QBuilder:
                 Q(description__icontains=value)
                 | Q(id__icontains=value)
                 | Q(photo__icontains=value)
-                | Q(tags__name__icontains=value)
+                | self._tag_match_q(Q(tags__name__icontains=value))
             )
 
         def build(node) -> tuple[Q, Q]:
@@ -364,13 +398,10 @@ class QBuilder:
                 # Route NOT #... into exclude_q (correct for M2M)
                 if isinstance(child, Symbol):
                     t = as_term(child)
-                    val = t.value
                     if t.field == "tag":
-                        if val == "*":
-                            return Q(), Q(tags__isnull=False)
-                        if val.endswith("*"):
-                            return Q(), Q(tags__name__istartswith=val[:-1])
-                        return Q(), Q(tags__name__iexact=val)
+                        # Excluding is a row-by-row question, so the condition
+                        # goes as it is: see `_tag_match_q`.
+                        return Q(), _tag_condition(t.value)
                 # Generic NOT (non-tag): ~include
                 inc, _exc = build(child)
                 return ~inc, Q()
