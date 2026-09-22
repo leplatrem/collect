@@ -58,6 +58,33 @@ def test_index_view_lists_the_most_spares(client, user):
     assert list(response.context["most_spares"]) == [spared]
 
 
+def test_index_view_orders_every_section(client, user):
+    oldest = CollectableFactory()
+    middle = CollectableFactory()
+    newest = CollectableFactory()
+    # Two likes on the oldest, one on the newest, none on the one in between.
+    for liker in (user, UserFactory()):
+        PossessionFactory(user=liker, collectable=oldest, likes=True)
+    PossessionFactory(user=user, collectable=newest, likes=True)
+
+    response = client.get(reverse("collectable:index"))
+
+    assert list(response.context["latest"]) == [newest, middle, oldest]
+    assert list(response.context["most_liked"]) == [oldest, newest]
+
+
+def test_index_view_orders_ties_by_creation_date(client, user):
+    older = CollectableFactory()
+    newer = CollectableFactory()
+    for collectable in (older, newer):
+        PossessionFactory(user=user, collectable=collectable, wants=True)
+
+    response = client.get(reverse("collectable:index"))
+
+    # As wanted as each other, so the newest comes first.
+    assert list(response.context["most_wanted"]) == [newer, older]
+
+
 def test_create_view_authenticated_get(db, logged_in_client, collectable):
     url = reverse("collectable:create")
     response = logged_in_client.get(url)

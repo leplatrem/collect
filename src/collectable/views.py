@@ -48,41 +48,27 @@ def index(request):
     # to query the IDs of the collectables we want to show.
     # https://docs.djangoproject.com/en/stable/ref/models/querysets/#when-querysets-are-evaluated
     base_qs = Collectable.objects.only("id").with_possession_counts()
-    querysets = {
-        "latest": base_qs.order_by("-created_at")[: settings.HOME_LIST_COUNT],
-        "most_liked": base_qs.order_by("-nlikes").filter(nlikes__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
-        "most_wanted": base_qs.order_by("-nwants").filter(nwants__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
-        "most_owned": base_qs.order_by("-nowns").filter(nowns__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
-        "most_spares": base_qs.order_by("-nswaps").filter(nswaps__gt=0)[
-            : settings.HOME_LIST_COUNT
-        ],
+    sections = {
+        "latest": (base_qs, "-created_at"),
+        "most_liked": (base_qs.filter(nlikes__gt=0), "-nlikes"),
+        "most_wanted": (base_qs.filter(nwants__gt=0), "-nwants"),
+        "most_owned": (base_qs.filter(nowns__gt=0), "-nowns"),
+        "most_spares": (base_qs.filter(nswaps__gt=0), "-nswaps"),
     }
 
     context = {
         "total_collectables": Collectable.objects.count(),
-        "latest": Collectable.objects.filter(pk__in=querysets["latest"])
-        .with_possession_counts()
-        .prefetch_tags_and_possessions(request.user),
-        "most_liked": Collectable.objects.filter(pk__in=querysets["most_liked"])
-        .with_possession_counts()
-        .prefetch_tags_and_possessions(request.user),
-        "most_wanted": Collectable.objects.filter(pk__in=querysets["most_wanted"])
-        .with_possession_counts()
-        .prefetch_tags_and_possessions(request.user),
-        "most_owned": Collectable.objects.filter(pk__in=querysets["most_owned"])
-        .with_possession_counts()
-        .prefetch_tags_and_possessions(request.user),
-        "most_spares": Collectable.objects.filter(pk__in=querysets["most_spares"])
-        .with_possession_counts()
-        .prefetch_tags_and_possessions(request.user),
         "tag_list": tag_list,
     }
+    for name, (qs, sort_by) in sections.items():
+        ordering = (sort_by, "-created_at") if sort_by != "-created_at" else (sort_by,)
+        shown = qs.order_by(*ordering)[: settings.HOME_LIST_COUNT]
+        context[name] = (
+            Collectable.objects.filter(pk__in=shown)
+            .with_possession_counts()
+            .prefetch_tags_and_possessions(request.user)
+            .order_by(*ordering)
+        )
     return render(request, "collectable/index.html", context)
 
 
