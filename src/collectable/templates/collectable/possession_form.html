@@ -5,7 +5,8 @@
         <form hx-post="{% url 'collectable:possession' form.instance.collectable.id %}"
               hx-target="#possession-form-{{ form.instance.collectable.id }}"
               hx-swap="outerHTML"
-              hx-trigger="change">
+              hx-sync="this:replace"
+              hx-trigger="change delay:250ms">
             {{ form.as_p }}
         </form>
     {% endif %}
