@@ -1,0 +1,144 @@
+/* Tags field: pills, completion, and chips for the most used tags.
+   See `tags.js`: everything below the input is built by the script.
+
+   Both the pills and the chips carry a `button`, so the selectors here have to
+   be specific enough to beat the `form:not(.inline) button:not(.link)` rules
+   of `style.css`, which style the form's own submit button. */
+
+.tags-widget {
+  position: relative;
+}
+
+.tags-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  list-style: none;
+}
+
+/* The box behaves like the input it replaces, focus ring included. */
+.tags-pills:focus-within {
+  outline: 2px solid var(--link-color);
+  outline-offset: 1px;
+}
+
+.tags-pill {
+  display: inline-flex;
+  gap: 0.15rem;
+  align-items: center;
+  padding: 0.2rem 0.2rem 0.2rem 0.7rem;
+  border-radius: 20px;
+  background-color: color-mix(in srgb, var(--tag-color) 15%, transparent);
+  color: var(--tag-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-field .tags-widget button.tags-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.form-field .tags-widget button.tags-remove:hover,
+.form-field .tags-widget button.tags-remove:focus-visible {
+  background-color: color-mix(in srgb, var(--tag-color) 30%, transparent);
+  box-shadow: none;
+}
+
+.tags-entry-item {
+  flex: 1;
+  min-width: 8rem;
+}
+
+/* Blends into the pills box, which carries the border and the focus ring. */
+.form-field .tags-widget .tags-entry {
+  width: 100%;
+  padding: 0.25rem;
+  border: none;
+  background: none;
+}
+
+.form-field .tags-widget .tags-entry:focus {
+  outline: none;
+}
+
+.tags-suggestions {
+  position: absolute;
+  z-index: 10;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0.2rem 0 0;
+  padding: 0.2rem;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px var(--card-shadow-hover);
+  list-style: none;
+}
+
+.tags-suggestion {
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tags-suggestion:hover,
+.tags-suggestion.active {
+  background-color: color-mix(in srgb, var(--tag-color) 15%, transparent);
+  color: var(--tag-color);
+}
+
+.tags-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.tags-chips-label {
+  opacity: 0.7;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+.form-field .tags-widget button.tags-chip {
+  margin: 0;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--tag-color);
+  font-size: 0.85rem;
+}
+
+.form-field .tags-widget button.tags-chip:hover {
+  background-color: color-mix(in srgb, var(--tag-color) 15%, transparent);
+  box-shadow: none;
+}
+
+/* Already on the collectable: clicking again takes it off. */
+.form-field .tags-widget button.tags-chip[aria-pressed="true"] {
+  border-color: var(--tag-color);
+  background-color: color-mix(in srgb, var(--tag-color) 25%, transparent);
+}
