@@ -76,6 +76,56 @@ def test_collectable_search_tags_exact_only_those_tags():
     assert set(res) == {exact, order_diff}
 
 
+def test_collectable_search_two_tags_with_and():
+    both = CollectableFactory(description="x", tags=["foo", "bar"])
+    CollectableFactory(description="y", tags=["foo"])
+    CollectableFactory(description="z", tags=["bar"])
+    # Unlike `tags:#foo,#bar`, more tags than the two asked for is fine.
+    more = CollectableFactory(description="w", tags=["foo", "bar", "baz"])
+
+    res = Collectable.objects.all().advanced_search("#foo AND #bar")
+
+    assert set(res) == {both, more}
+
+
+def test_collectable_search_three_tags_with_and():
+    all_three = CollectableFactory(description="x", tags=["foo", "bar", "baz"])
+    CollectableFactory(description="y", tags=["foo", "bar"])
+
+    res = Collectable.objects.all().advanced_search("#foo AND #bar AND #baz")
+
+    assert set(res) == {all_three}
+
+
+def test_collectable_search_tags_with_and_and_prefix():
+    match = CollectableFactory(description="x", tags=["project-foo", "bar"])
+    CollectableFactory(description="y", tags=["project-foo"])
+
+    res = Collectable.objects.all().advanced_search("#project* AND #bar")
+
+    assert set(res) == {match}
+
+
+def test_collectable_search_tags_with_and_and_not():
+    match = CollectableFactory(description="x", tags=["foo", "bar"])
+    CollectableFactory(description="y", tags=["foo", "bar", "old"])
+
+    res = Collectable.objects.all().advanced_search("#foo AND #bar AND NOT #old")
+
+    assert set(res) == {match}
+
+
+def test_collectable_search_two_words_matching_tags_with_and():
+    # Bare words are looked for in the description and the tags alike, so two
+    # of them have to be matched by two different tags.
+    both = CollectableFactory(description="", tags=["holiday", "summer"])
+    CollectableFactory(description="", tags=["holiday"])
+
+    res = Collectable.objects.all().advanced_search("holiday AND summer")
+
+    assert set(res) == {both}
+
+
 def test_collectable_search_boolean_and_or_not():
     CollectableFactory(description="error report", tags=["wontfix"])
     a = CollectableFactory(description="error report", tags=["bug"])
@@ -263,7 +313,8 @@ def test_collectable_search_parses_concurrently():
     def compile_repeatedly(query):
         for _ in range(40):
             try:
-                results[query] = QBuilder().compile(query)
+                builder = QBuilder()
+                results[query] = (builder.compile(query), builder)
             except Exception as exc:
                 errors.append(exc)
                 return
@@ -287,6 +338,8 @@ def test_collectable_search_parses_concurrently():
     assert len(results) == len(queries)
     # Each thread must get the terms of its own query, not of another one.
     for i, query in enumerate(queries):
-        include_q, _exclude_q = results[query]
+        (include_q, _exclude_q), builder = results[query]
         assert f"value{i}" in str(include_q)
-        assert f"tag{i}" in str(include_q)
+        # Tags are matched through a count, so their name is in the condition
+        # that count filters on.
+        assert f"tag{i}" in str(builder.tag_conditions)
