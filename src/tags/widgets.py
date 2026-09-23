@@ -1,8 +1,6 @@
 from django.conf import settings
-from django.db.models import Count, Q
 from django.utils.translation import gettext as _
 from taggit.forms import TagWidget
-from taggit.models import Tag
 
 
 class TagPillsWidget(TagWidget):
@@ -16,21 +14,23 @@ class TagPillsWidget(TagWidget):
     when the script does not run.
     """
 
-    template_name = "collectable/tags_widget.html"
+    template_name = "tags/widget.html"
+
+    def __init__(self, vocabulary, attrs=None):
+        """
+        :param vocabulary: callable returning the tag names to complete from,
+            most used first. Which tags are worth offering is the caller's
+            business, this widget only shows them.
+        """
+        super().__init__(attrs)
+        self.vocabulary = vocabulary
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         widget = context["widget"]
         # Most used first: completion offers the whole vocabulary, in that
         # order, and the chips only its head.
-        vocabulary = list(
-            Tag.objects.annotate(
-                ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
-            )
-            .filter(ncollectable__gt=0)
-            .order_by("-ncollectable", "name")
-            .values_list("name", flat=True)[: settings.TAG_COMPLETION_LIST_COUNT]
-        )
+        vocabulary = list(self.vocabulary())
         # The script builds every control it needs from this payload, rather
         # than from markup that would be dead weight without it. Labels are
         # translated here, where gettext knows the active language.
@@ -50,5 +50,5 @@ class TagPillsWidget(TagWidget):
         return context
 
     class Media:
-        js = ("collectable/tags.js",)
-        css = {"all": ("collectable/tags.css",)}
+        js = ("tags/script.js",)
+        css = {"all": ("tags/style.css",)}

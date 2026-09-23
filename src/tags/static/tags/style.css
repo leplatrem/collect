@@ -1,5 +1,5 @@
 /* Tags field: pills, completion, and chips for the most used tags.
-   See `tags.js`: everything below the input is built by the script.
+   See `script.js`: everything below the input is built by the script.
 
    Both the pills and the chips carry a `button`, so the selectors here have to
    be specific enough to beat the `form:not(.inline) button:not(.link)` rules

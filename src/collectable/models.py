@@ -48,6 +48,23 @@ class UUIDTaggedItem(
         verbose_name_plural = _("Tags")
 
 
+def visible_tag_names():
+    """
+    The tag names worth offering in the edit form, most used first.
+
+    Tags only used by hidden collectables are a dead end, and so are the ones
+    no collectable uses anymore, so neither is suggested.
+    """
+    return (
+        Tag.objects.annotate(
+            ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
+        )
+        .filter(ncollectable__gt=0)
+        .order_by("-ncollectable", "name")
+        .values_list("name", flat=True)[: settings.TAG_COMPLETION_LIST_COUNT]
+    )
+
+
 class CollectableQuerySet(models.QuerySet):
     """
     Custom QuerySet for Collectable model to include methods for prefetching.

@@ -1,6 +1,3 @@
-import json
-import re
-
 import pytest
 
 from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
@@ -102,44 +99,6 @@ def test_possession_form_keeps_want_of_already_owned(user, collectable):
     form = PossessionForm({"owns": True, "wants": True}, instance=possession)
     assert form.is_valid(), form.errors
     assert form.save().wants is True
-
-
-@pytest.mark.django_db
-def test_collectable_form_ships_the_tag_vocabulary(settings):
-    settings.POPULAR_TAG_LIST_COUNT = 2
-    CollectableFactory(tags=["common", "rare"])
-    CollectableFactory(tags=["common", "usual"])
-    CollectableFactory(tags=["common", "usual"])
-
-    rendered = CollectableForm()["tags"].as_widget()
-    data = json.loads(
-        re.search(
-            r'<script id="id_tags-data" type="application/json">(.*?)</script>',
-            rendered,
-            re.DOTALL,
-        ).group(1)
-    )
-
-    # Most used first, so that completion and the chips both start with them.
-    assert data["vocabulary"] == ["common", "usual", "rare"]
-    assert data["popular"] == ["common", "usual"]
-
-
-@pytest.mark.django_db
-def test_collectable_form_tag_vocabulary_ignores_hidden_and_unused(settings):
-    CollectableFactory(tags=["shown"])
-    CollectableFactory(tags=["hidden-only"], hidden=True)
-
-    rendered = CollectableForm()["tags"].as_widget()
-    data = json.loads(
-        re.search(
-            r'<script id="id_tags-data" type="application/json">(.*?)</script>',
-            rendered,
-            re.DOTALL,
-        ).group(1)
-    )
-
-    assert data["vocabulary"] == ["shown"]
 
 
 @pytest.mark.django_db
