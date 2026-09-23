@@ -1,6 +1,6 @@
 import pytest
 
-from collectable.forms import DuplicateReportForm, PossessionForm
+from collectable.forms import CollectableForm, DuplicateReportForm, PossessionForm
 from collectable.models import Possession
 from collectable.tests.factories import CollectableFactory, UserFactory
 
@@ -99,3 +99,19 @@ def test_possession_form_keeps_want_of_already_owned(user, collectable):
     form = PossessionForm({"owns": True, "wants": True}, instance=possession)
     assert form.is_valid(), form.errors
     assert form.save().wants is True
+
+
+@pytest.mark.django_db
+def test_collectable_form_tags_input_is_still_a_plain_text_field(collectable):
+    """
+    The script enhances it in the browser, but the value submitted is the
+    comma-separated one, with or without it.
+    """
+    collectable.tags.add("first", "second")
+
+    rendered = CollectableForm(instance=collectable)["tags"].as_widget()
+
+    assert 'type="text"' in rendered
+    assert 'name="tags"' in rendered
+    # As rendered by `tags_joiner`, and read back by `tags_splitter`.
+    assert "#first, #second" in rendered
