@@ -1,6 +1,7 @@
 from django.urls import path, re_path
 
 from collect.throttle import throttle
+from collectable.feeds import CollectableListFeed, CollectableListRssFeed
 
 from . import views
 
@@ -53,3 +54,27 @@ urlpatterns = [
         name="collection",
     ),
 ]
+
+
+def feed_urlpatterns():
+    """
+    Every list is also published as a feed, in both formats, eg.
+    `latest/feed.atom` and `latest/feed.rss`. Search feeds carry their query
+    in `?q=`, and are throttled like the page they mirror.
+    """
+    for kind in views.LIST_ORDERING:
+        slug = kind.replace("_", "-")
+        for feed_class in (CollectableListFeed, CollectableListRssFeed):
+            feed_view = feed_class(kind=kind)
+            if kind == "search":
+                feed_view = throttle("search", "THROTTLE_SEARCH", methods=("GET",))(
+                    feed_view
+                )
+            yield path(
+                f"{slug}/feed.{feed_class.format}",
+                feed_view,
+                name=f"{slug}-{feed_class.format}",
+            )
+
+
+urlpatterns += list(feed_urlpatterns())

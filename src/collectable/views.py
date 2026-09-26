@@ -1,5 +1,6 @@
 import logging
 from typing import Any
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
@@ -72,6 +73,70 @@ def index(request):
     return render(request, "collectable/index.html", context)
 
 
+# The lists the site publishes, and how each of them is sorted. `collectable/
+# feeds.py` publishes the very same ones, so both live off these tables.
+LIST_ORDERING = {
+    "latest": "-created_at",
+    "search": "-created_at",
+    "most_liked": "-nlikes",
+    "most_wanted": "-nwants",
+    "most_owned": "-nowns",
+    "most_spares": "-nswaps",
+}
+
+# A "most liked" list of collectables that nobody liked is only noise.
+LIST_MINIMUM = {
+    "most_liked": "nlikes__gt",
+    "most_wanted": "nwants__gt",
+    "most_owned": "nowns__gt",
+    "most_spares": "nswaps__gt",
+}
+
+LIST_TITLES = {
+    "latest": _("Latest collectables"),
+    "most_liked": _("Most liked collectables"),
+    "most_wanted": _("Most wanted collectables"),
+    "most_owned": _("Most owned collectables"),
+    "most_spares": _("Collectables with the most spares"),
+}
+
+# What a list is, in a sentence: under its title on the page, and in the
+# reader of whoever subscribes to its feed before ever seeing the page.
+LIST_DESCRIPTIONS = {
+    "latest": _("The collectables most recently added to the collection."),
+    "most_liked": _("The collectables the most collectors like."),
+    "most_wanted": _("The collectables the most collectors are looking for."),
+    "most_owned": _("The collectables the most collectors own."),
+    "most_spares": _("The collectables the most collectors have a spare of."),
+    "search": _("The collectables matching this search."),
+}
+
+
+def list_of_kind(qs: QuerySet[Collectable], kind: str) -> QuerySet[Collectable]:
+    """
+    Sort and trim `qs` the way the `kind` list is published, both on its page
+    and in its feed. Search results are left out: they need the keywords.
+    """
+    qs = qs.order_by(LIST_ORDERING[kind], "-created_at")
+    if minimum := LIST_MINIMUM.get(kind):
+        qs = qs.filter(**{minimum: 0})
+    return qs
+
+
+def search_collectables(
+    qs: QuerySet[Collectable], keywords: str
+) -> tuple[QuerySet[Collectable], bool]:
+    """
+    Search `keywords` as a query, or as plain words when it cannot be read as
+    one. Returns the results and which of the two was used.
+    """
+    try:
+        return qs.advanced_search(keywords), True
+    except (ValueError, SyntaxError) as exc:
+        logger.warning("Invalid search query '%s': %s", keywords, exc)
+        return qs.basic_search(keywords), False
+
+
 class CollectableListView(ListView):
     model = Collectable
     kind = "latest"
@@ -83,40 +148,17 @@ class CollectableListView(ListView):
         self.extra_context = {}
 
     def get_queryset(self) -> QuerySet[Collectable]:
-        qs = (
+        qs = list_of_kind(
             super()
             .get_queryset()
             .with_possession_counts()
-            .prefetch_tags_and_possessions(self.request.user)
+            .prefetch_tags_and_possessions(self.request.user),
+            self.kind,
         )
-        sort_by = {
-            "latest": "-created_at",
-            "search": "-created_at",
-            "most_liked": "-nlikes",
-            "most_wanted": "-nwants",
-            "most_owned": "-nowns",
-            "most_spares": "-nswaps",
-        }[self.kind]
-        qs = qs.order_by(sort_by, "-created_at")
-
-        if self.kind == "most_liked":
-            qs = qs.filter(nlikes__gt=0)
-        elif self.kind == "most_wanted":
-            qs = qs.filter(nwants__gt=0)
-        elif self.kind == "most_owned":
-            qs = qs.filter(nowns__gt=0)
-        elif self.kind == "most_spares":
-            qs = qs.filter(nswaps__gt=0)
-        elif self.kind == "search":
-            try:
-                qs = qs.advanced_search(self.search_keywords)
-                self.extra_context["advanced_search"] = True
-            except (ValueError, SyntaxError) as exc:
-                logger.warning(
-                    "Invalid search query '%s': %s", self.search_keywords, exc
-                )
-                qs = qs.basic_search(self.search_keywords)
-                self.extra_context["advanced_search"] = False
+        if self.kind == "search":
+            qs, self.extra_context["advanced_search"] = search_collectables(
+                qs, self.search_keywords
+            )
 
         store_current_list_in_session(self.request, qs.values_list("id", flat=True))
 
@@ -126,26 +168,32 @@ class CollectableListView(ListView):
     def search_keywords(self) -> str:
         return self.request.GET.get("q", "").strip()
 
+    def feed_url(self, feed_format: str) -> str:
+        """
+        This very list, as a feed. A search feed carries its query along, so
+        that a reader can follow one.
+        """
+        url = reverse(f"collectable:{self.kind.replace('_', '-')}-{feed_format}")
+        if self.search_keywords:
+            url = f"{url}?{urlencode({'q': self.search_keywords})}"
+        return url
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.extra_context)
         context["is_search"] = self.kind == "search"
         context["search_keywords"] = self.search_keywords
-        context["title"] = {
-            "latest": _("Latest collectables"),
-            "search": (
+        if self.kind == "search":
+            context["title"] = (
                 _("Search results for '%(q)s'")
                 if self.extra_context.get("advanced_search")
                 else _("Basic search results for '%(q)s'")
-            )
-            % {
-                "q": self.search_keywords,
-            },
-            "most_liked": _("Most liked collectables"),
-            "most_wanted": _("Most wanted collectables"),
-            "most_owned": _("Most owned collectables"),
-            "most_spares": _("Collectables with the most spares"),
-        }[self.kind]
+            ) % {"q": self.search_keywords}
+        else:
+            context["title"] = LIST_TITLES[self.kind]
+        context["list_description"] = LIST_DESCRIPTIONS[self.kind]
+        context["feed_atom_url"] = self.feed_url("atom")
+        context["feed_rss_url"] = self.feed_url("rss")
         return context
 
 

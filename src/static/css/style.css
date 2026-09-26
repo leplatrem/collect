@@ -845,6 +845,79 @@ header form#search input[type="search"]::-webkit-search-decoration {
 }
 
 /* =========================================================
+   Feeds
+   ========================================================= */
+
+/* What the list is, under its title: the same sentence its feed carries. */
+.list-description {
+  margin-bottom: 0.3rem;
+  opacity: 0.7;
+}
+
+/* The feed is offered next to the count of the list, faint enough to stay out
+   of the way of the collectables, and legible to whoever goes looking. */
+.list-summary {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.feed-follow {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.feed-follow a {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  opacity: 0.45;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.feed-follow:hover a,
+.feed-follow:focus-within a {
+  opacity: 1;
+}
+
+.feed-follow a:hover {
+  text-decoration: underline;
+}
+
+.feed-icon {
+  width: 0.75em;
+  height: 0.75em;
+  fill: currentColor;
+}
+
+/* The other format only turns up for whoever is already looking at the first
+   one. Hidden rather than transparent, so it cannot be clicked by accident,
+   and still reachable with the keyboard once the link before it has focus. */
+.feed-alt {
+  visibility: hidden;
+}
+
+.feed-follow:hover .feed-alt,
+.feed-follow:focus-within .feed-alt {
+  visibility: visible;
+}
+
+/* Hovering is not a thing on touch screens: there, both formats show. */
+@media (hover: none) {
+  .feed-follow a {
+    opacity: 0.7;
+  }
+
+  .feed-alt {
+    visibility: visible;
+  }
+}
+
+/* =========================================================
    Details page
    ========================================================= */
 

@@ -330,6 +330,9 @@ PAGE_REVEAL_LOAD_NEXT = config(
 RELATED_COLLECTABLES_LIST_COUNT = config(
     "COLLECT_RELATED_COLLECTABLES_LIST_COUNT", default=20, cast=int
 )
+# Number of collectables published in each Atom/RSS feed. Readers poll them
+# often, and only show what is new, so a long tail is of no use to anybody.
+FEED_ITEM_COUNT: int = config("COLLECT_FEED_ITEM_COUNT", default=20, cast=int)
 # Number of history entries shown on the details page. Unbounded otherwise,
 # and every save appends one.
 HISTORY_LIST_COUNT: int = config("COLLECT_HISTORY_LIST_COUNT", default=20, cast=int)
