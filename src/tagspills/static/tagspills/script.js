@@ -271,6 +271,7 @@
           if (!entry.value && tags.length) {
             event.preventDefault();
             remove(tags[tags.length - 1]);
+            entry.focus();
           }
           break;
         case "ArrowDown":
