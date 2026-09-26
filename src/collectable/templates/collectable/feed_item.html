@@ -1,9 +1,5 @@
 {% load i18n %}
 {% load collectable_extras %}
-{% comment %}
-    The body of a feed entry. It is read far from the site, so every URL in
-    it has to be absolute.
-{% endcomment %}
 {% spaceless %}
     <p>
         <a href="{% fullurl obj.get_absolute_url %}">

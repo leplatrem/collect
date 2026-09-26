@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
-from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
+from django.utils.feedgenerator import Atom1Feed
 from django.utils.translation import gettext_lazy as _
 
 from collectable.models import Collectable
@@ -16,15 +16,10 @@ from collectable.views import (
 )
 
 
-class CollectableListFeed(Feed):
+class CollectableListAtomFeed(Feed):
     """
     A list page, published as a feed: the same collectables, in the same
-    order, for the collectors who follow the collection from a reader rather
-    than by coming back to the site.
-
-    Unlike a view, a single instance serves every request of its URL, so
-    nothing about the request may be kept on `self`: what the feed methods
-    need of it travels in the object built by `get_object()`.
+    order.
     """
 
     feed_type = Atom1Feed
@@ -102,8 +97,3 @@ class CollectableListFeed(Feed):
 
     def item_copyright(self, item):
         return item.get_license_display()
-
-
-class CollectableListRssFeed(CollectableListFeed):
-    feed_type = Rss201rev2Feed
-    format = "rss"

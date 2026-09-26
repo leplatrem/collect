@@ -60,6 +60,7 @@ def index(request):
     context = {
         "total_collectables": Collectable.objects.count(),
         "tag_list": tag_list,
+        "feed_atom_url": reverse("collectable:latest-atom"),
     }
     for name, (qs, sort_by) in sections.items():
         ordering = (sort_by, "-created_at") if sort_by != "-created_at" else (sort_by,)
@@ -168,12 +169,8 @@ class CollectableListView(ListView):
     def search_keywords(self) -> str:
         return self.request.GET.get("q", "").strip()
 
-    def feed_url(self, feed_format: str) -> str:
-        """
-        This very list, as a feed. A search feed carries its query along, so
-        that a reader can follow one.
-        """
-        url = reverse(f"collectable:{self.kind.replace('_', '-')}-{feed_format}")
+    def feed_url(self) -> str:
+        url = reverse(f"collectable:{self.kind.replace('_', '-')}-atom")
         if self.search_keywords:
             url = f"{url}?{urlencode({'q': self.search_keywords})}"
         return url
@@ -192,8 +189,7 @@ class CollectableListView(ListView):
         else:
             context["title"] = LIST_TITLES[self.kind]
         context["list_description"] = LIST_DESCRIPTIONS[self.kind]
-        context["feed_atom_url"] = self.feed_url("atom")
-        context["feed_rss_url"] = self.feed_url("rss")
+        context["feed_atom_url"] = self.feed_url()
         return context
 
 

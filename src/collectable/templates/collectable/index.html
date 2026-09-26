@@ -8,6 +8,7 @@
     {% plural %}
     {{ counter }} collectables.
     {% endblocktranslate %}
+    {% include "collectable/feed_follow.html" %}
     <h2>{% translate "Latest" %}</h2>
     <div class="collectable-grid">
         {% for collectable in latest %}

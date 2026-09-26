@@ -3,9 +3,10 @@
 {% load collectable_extras %}
 {% block title %}{{ title }}{% endblock %}
 {% block meta %}
-    {# Feed readers and browsers pick these up on their own. #}
-    <link rel="alternate" type="application/atom+xml" title="{{ title }} (Atom)" href="{{ feed_atom_url }}" />
-    <link rel="alternate" type="application/rss+xml" title="{{ title }} (RSS)" href="{{ feed_rss_url }}" />
+    <link rel="alternate"
+          type="application/atom+xml"
+          title="{{ title }} (Atom)"
+          href="{{ feed_atom_url }}" />
 {% endblock meta %}
 {% block content %}
     <h1>{{ title }}</h1>

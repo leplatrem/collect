@@ -18,17 +18,11 @@ def parse(response):
     "path_name,content_type",
     [
         ("collectable:latest-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:latest-rss", "application/rss+xml; charset=utf-8"),
         ("collectable:most-liked-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:most-liked-rss", "application/rss+xml; charset=utf-8"),
         ("collectable:most-wanted-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:most-wanted-rss", "application/rss+xml; charset=utf-8"),
         ("collectable:most-owned-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:most-owned-rss", "application/rss+xml; charset=utf-8"),
         ("collectable:most-spares-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:most-spares-rss", "application/rss+xml; charset=utf-8"),
         ("collectable:search-atom", "application/atom+xml; charset=utf-8"),
-        ("collectable:search-rss", "application/rss+xml; charset=utf-8"),
     ],
 )
 def test_feeds_are_served(db, client, path_name, content_type):
@@ -149,30 +143,6 @@ def test_search_feed_is_throttled(client, db, settings):
 
     assert client.get(reverse("collectable:search-atom")).status_code == 200
     assert client.get(reverse("collectable:search-atom")).status_code == 429
-
-
-@pytest.mark.parametrize(
-    "path_name,atom_name,rss_name",
-    [
-        ("collectable:latest", "collectable:latest-atom", "collectable:latest-rss"),
-        (
-            "collectable:most-spares",
-            "collectable:most-spares-atom",
-            "collectable:most-spares-rss",
-        ),
-    ],
-)
-def test_list_pages_advertise_their_feeds(db, client, path_name, atom_name, rss_name):
-    response = client.get(reverse(path_name))
-
-    content = response.content.decode()
-    assert (
-        f'<link rel="alternate" type="application/atom+xml" title="{response.context["title"]} (Atom)" href="{reverse(atom_name)}" />'
-        in content
-    )
-    assert f'href="{reverse(rss_name)}"' in content
-    # And the discreet hint, for the visitors who would not look at the source.
-    assert f'<a class="feed-main"\n       href="{reverse(atom_name)}"' in content
 
 
 def test_list_pages_carry_the_same_description_as_their_feed(db, client):
