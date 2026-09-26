@@ -334,9 +334,7 @@ RELATED_COLLECTABLES_LIST_COUNT = config(
 # Number of history entries shown on the details page. Unbounded otherwise,
 # and every save appends one.
 HISTORY_LIST_COUNT: int = config("COLLECT_HISTORY_LIST_COUNT", default=20, cast=int)
-# Tag names shipped with the edit form, most used first: the whole list is
-# embedded in the page, so completion needs no request of its own. The chips
-# offered in one click are the head of that same list.
+# Tag names that we ship in the page to provide completion.
 TAG_COMPLETION_LIST_COUNT: int = config(
     "COLLECT_TAG_COMPLETION_LIST_COUNT", default=500, cast=int
 )

@@ -8,7 +8,7 @@ from collectable.models import (
     Collectable,
     DuplicateReport,
     Possession,
-    visible_tag_names,
+    popular_tags_names,
 )
 from collectable.tests.factories import (
     CollectableFactory,
@@ -39,21 +39,21 @@ def test_tags_with_count_ignores_hidden(collectable):
     assert [t.ncollectable for t in collectable.tags_with_count()] == [1]
 
 
-def test_visible_tag_names_are_ordered_by_usage(db):
+def test_popular_tags_names_are_ordered_by_usage(db):
     CollectableFactory(tags=["common", "rare"])
     CollectableFactory(tags=["common", "usual"])
     CollectableFactory(tags=["common", "usual"])
 
     # Most used first, so that completion and the chips both start with them.
-    assert list(visible_tag_names()) == ["common", "usual", "rare"]
+    assert list(popular_tags_names()) == ["common", "usual", "rare"]
 
 
-def test_visible_tag_names_ignore_hidden_and_unused(collectable):
+def test_popular_tags_names_ignore_hidden_and_unused(collectable):
     collectable.tags.add("shown")
     CollectableFactory(tags=["hidden-only"], hidden=True)
     Tag.objects.create(name="orphan", slug="orphan")
 
-    assert list(visible_tag_names()) == ["shown"]
+    assert list(popular_tags_names()) == ["shown"]
 
 
 def test_possession_of_authenticated(user, collectable):

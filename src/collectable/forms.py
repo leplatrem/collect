@@ -16,7 +16,7 @@ from collectable.models import (
     Collectable,
     DuplicateReport,
     Possession,
-    visible_tag_names,
+    popular_tags_names,
 )
 from cropper.fields import CropImageField
 from tags.widgets import TagPillsWidget
@@ -59,10 +59,8 @@ class CollectableForm(ModelForm):
         ]
         widgets = {
             "description": Textarea(attrs={"rows": "5"}),
-            # Mobile keyboards would capitalize and correct every tag, which
-            # is how near-duplicates get created.
             "tags": TagPillsWidget(
-                visible_tag_names,
+                get_vocabulary=popular_tags_names,
                 attrs={
                     "autocapitalize": "none",
                     "autocorrect": "off",

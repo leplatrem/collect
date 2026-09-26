@@ -48,12 +48,9 @@ class UUIDTaggedItem(
         verbose_name_plural = _("Tags")
 
 
-def visible_tag_names():
+def popular_tags_names():
     """
-    The tag names worth offering in the edit form, most used first.
-
-    Tags only used by hidden collectables are a dead end, and so are the ones
-    no collectable uses anymore, so neither is suggested.
+    Tags with most collectables.
     """
     return (
         Tag.objects.annotate(

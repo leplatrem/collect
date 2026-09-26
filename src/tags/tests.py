@@ -7,7 +7,7 @@ from taggit.forms import TagField
 from tags.widgets import TagPillsWidget
 
 
-def payload(rendered):
+def extract_data(rendered):
     """The JSON the script reads everything it builds from."""
     return json.loads(
         re.search(
@@ -31,16 +31,14 @@ def render(vocabulary, initial=None):
 def test_widget_ships_the_vocabulary_and_offers_its_head(settings):
     settings.POPULAR_TAG_LIST_COUNT = 2
 
-    data = payload(render(["common", "usual", "rare"]))
+    data = extract_data(render(["common", "usual", "rare"]))
 
     assert data["vocabulary"] == ["common", "usual", "rare"]
-    # The chips are the head of the same list, which the caller ordered.
     assert data["popular"] == ["common", "usual"]
 
 
 def test_widget_ships_its_labels():
-    """The script has no catalog of its own: every label is rendered here."""
-    data = payload(render([]))
+    data = extract_data(render([]))
 
     assert "%(tag)s" in data["labels"]["remove"]
     assert set(data["labels"]) == {
@@ -54,10 +52,7 @@ def test_widget_ships_its_labels():
 
 
 def test_widget_renders_a_plain_text_input():
-    """
-    The script enhances it in the browser, but with or without it the field
-    submitted is the same comma-separated text input.
-    """
+    """Test that plain text gets enhanced but still runs without JS."""
     rendered = render(["known"], initial="first, second")
 
     assert 'type="text"' in rendered
