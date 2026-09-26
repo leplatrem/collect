@@ -260,8 +260,6 @@
         case "Enter":
         case ",":
           event.preventDefault();
-          // The details form saves on Enter from any of its inputs: here it
-          // means "this tag is done", nothing more.
           event.stopPropagation();
           accept(
             activeIndex >= 0 ? options[activeIndex].textContent : entry.value,
@@ -293,13 +291,6 @@
             closeSuggestions();
           }
           break;
-      }
-    });
-
-    // Enter is also what the details form listens to, on keyup.
-    entry.addEventListener("keyup", (event) => {
-      if (event.key === "Enter") {
-        event.stopPropagation();
       }
     });
 
