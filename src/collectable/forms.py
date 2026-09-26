@@ -19,7 +19,7 @@ from collectable.models import (
     popular_tags_names,
 )
 from cropper.fields import CropImageField
-from tags.widgets import TagPillsWidget
+from tagspills.widgets import TagPillsWidget
 
 
 class CollectableForm(ModelForm):

@@ -4,7 +4,7 @@ import re
 from django.forms import Form
 from taggit.forms import TagField
 
-from tags.widgets import TagPillsWidget
+from tagspills.widgets import TagPillsWidget
 
 
 def extract_data(rendered):

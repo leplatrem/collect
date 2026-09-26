@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "collectable.apps.CollectableConfig",
     "accounts",
     "cropper",
-    "tags",
+    "tagspills",
     # 3rd party
     "simple_history",
     "taggit",

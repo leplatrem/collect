@@ -9,7 +9,7 @@ class TagPillsWidget(TagWidget):
     completion and one-click chips for the most used tags.
     """
 
-    template_name = "tags/widget.html"
+    template_name = "tagspills/widget.html"
 
     def __init__(self, get_vocabulary, attrs=None):
         """
@@ -39,5 +39,5 @@ class TagPillsWidget(TagWidget):
         return context
 
     class Media:
-        js = ("tags/script.js",)
-        css = {"all": ("tags/style.css",)}
+        js = ("tagspills/script.js",)
+        css = {"all": ("tagspills/style.css",)}
