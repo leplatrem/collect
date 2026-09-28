@@ -855,16 +855,18 @@ header form#search input[type="search"]::-webkit-search-decoration {
 
 .list-summary {
   display: flex;
-  gap: 0.6rem;
   align-items: baseline;
   flex-wrap: wrap;
 }
 
+/* The margin rather than a flex `gap`: the same offer also sits at the end of
+   a heading, on the collection pages, where there is no flex row to space. */
 .feed-follow {
   display: inline-flex;
-  gap: 0.5rem;
   align-items: center;
+  margin-left: 0.6rem;
   font-size: 0.85rem;
+  font-weight: normal;
 }
 
 .feed-follow a {

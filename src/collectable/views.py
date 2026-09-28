@@ -60,7 +60,7 @@ def index(request):
     context = {
         "total_collectables": Collectable.objects.count(),
         "tag_list": tag_list,
-        "feed_atom_url": reverse("collectable:latest-atom"),
+        "feed_atom_url": reverse("collectable:latest-feed"),
     }
     for name, (qs, sort_by) in sections.items():
         ordering = (sort_by, "-created_at") if sort_by != "-created_at" else (sort_by,)
@@ -170,7 +170,7 @@ class CollectableListView(ListView):
         return self.request.GET.get("q", "").strip()
 
     def feed_url(self) -> str:
-        url = reverse(f"collectable:{self.kind.replace('_', '-')}-atom")
+        url = reverse(f"collectable:{self.kind.replace('_', '-')}-feed")
         if self.search_keywords:
             url = f"{url}?{urlencode({'q': self.search_keywords})}"
         return url
@@ -522,6 +522,7 @@ def collection(request, slugs):
 
     context = {
         "slugs": slugs,
+        "feed_atom_url": reverse("collectable:collection-feed", args=[",".join(slugs)]),
         "collectable_list": collectable_list,
         "page_obj": paginate(request, qs=collectable_list),
         "tag_list": tag_list,

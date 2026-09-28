@@ -1,9 +1,8 @@
 from django.urls import path, re_path
 
 from collect.throttle import throttle
-from collectable.feeds import CollectableListAtomFeed
 
-from . import views
+from . import feeds, views
 
 
 urlpatterns = [
@@ -19,6 +18,11 @@ urlpatterns = [
         views.collection,
         name="collection",
     ),
+    re_path(
+        r"^collection/(?P<slugs>[0-9a-zA-Z_\-]+(,[0-9a-zA-Z_\-]+)*)/feed.atom$",
+        feeds.CollectionAtomFeed(),
+        name="collection-feed",
+    ),
 ]
 
 
@@ -27,7 +31,7 @@ def lists_urlpatterns():
         slug = kind.replace("_", "-")
 
         list_view = views.CollectableListView.as_view(kind=kind)
-        feed_view = CollectableListAtomFeed(kind=kind)
+        feed_view = feeds.CollectableListAtomFeed(kind=kind)
 
         if kind == "search":
             throttle_dec = throttle("search", "THROTTLE_SEARCH", methods=("GET",))
@@ -35,7 +39,7 @@ def lists_urlpatterns():
             feed_view = throttle_dec(feed_view)
 
         yield path(f"{slug}/", list_view, name=slug)
-        yield path(f"{slug}/feed.atom", feed_view, name=f"{slug}-atom")
+        yield path(f"{slug}/feed.atom", feed_view, name=f"{slug}-feed")
 
 
 urlpatterns += list(lists_urlpatterns())

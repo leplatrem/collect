@@ -9,7 +9,7 @@ Publish and track your collectables.
 - Track the items you own, like, or want
 - Discover how much of the collections you own
 - Turn folders of images files into collections (see below)
-- Follow any list, or any search, with an Atom/RSS feed
+- Follow any list, collection, or search, with an Atom feed
 
 ![Screenshot](screenshot.png)
 
