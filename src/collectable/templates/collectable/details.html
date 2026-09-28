@@ -30,7 +30,7 @@
                   hx-select="#attributes"
                   hx-target="#attributes"
                   hx-select-oob="#messages,#photo,#history,#related"
-                  hx-trigger="submit, keyup[key=='Enter'] from:input, keyup[ctrlKey&&key=='Enter'] from:textarea"
+                  hx-trigger="submit, keydown[(ctrlKey||metaKey) && !repeat && key=='Enter']"
                   hx-swap="outerHTML">
                 {% csrf_token %}
                 {{ form_edit.non_field_errors }}
@@ -179,4 +179,18 @@
 {% endblock %}
 {% block foot %}
     {{ form_edit.media.js }}
+    <script>
+      // Enter in a single-line field submits the form on its own, which is a
+      // trap while editing: saving is the button, or Ctrl/Cmd+Enter. Bound on
+      // the document, since the form is replaced on every save.
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" || event.ctrlKey || event.metaKey) {
+          return;
+        }
+        // File inputs are left alone: there, Enter opens the picker.
+        if (event.target.matches?.("#attributes form input:not([type=file])")) {
+          event.preventDefault();
+        }
+      });
+    </script>
 {% endblock foot %}
