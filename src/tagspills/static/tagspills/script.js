@@ -252,6 +252,15 @@
       entry.focus();
     }
 
+    /** What was typed without being committed yet is a tag all the same. */
+    function commitPending() {
+      if (entry.value.trim()) {
+        add(entry.value);
+        entry.value = "";
+      }
+      closeSuggestions();
+    }
+
     entry.addEventListener("input", renderSuggestions);
 
     entry.addEventListener("keydown", (event) => {
@@ -259,6 +268,13 @@
       switch (event.key) {
         case "Enter":
         case ",":
+          // Ctrl/Cmd+Enter saves the form: commit what was typed, then let
+          // the event through, instead of keeping it here as one more
+          // "this tag is done".
+          if (event.ctrlKey || event.metaKey) {
+            commitPending();
+            return;
+          }
           event.preventDefault();
           event.stopPropagation();
           accept(
@@ -294,29 +310,21 @@
       }
     });
 
-    // Leaving the field keeps what was typed, rather than dropping it.
-    entry.addEventListener("blur", () => {
-      if (entry.value.trim()) {
-        add(entry.value);
-        entry.value = "";
+    // Pills and chips are buttons, which Enter activates: keep the form's
+    // Ctrl/Cmd+Enter from toggling the one that holds the focus on its way up.
+    root.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
       }
-      closeSuggestions();
     });
 
-    // Same for submitting straight from the tags field, with the button or a
-    // keyboard shortcut.
+    // Leaving the field keeps what was typed, rather than dropping it.
+    entry.addEventListener("blur", commitPending);
+
+    // Same when the form is submitted straight from the tags field.
     const form = input.closest("form");
     if (form) {
-      form.addEventListener(
-        "submit",
-        () => {
-          if (entry.value.trim()) {
-            add(entry.value);
-            entry.value = "";
-          }
-        },
-        { capture: true },
-      );
+      form.addEventListener("submit", commitPending, { capture: true });
     }
 
     commit();

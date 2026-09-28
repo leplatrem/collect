@@ -102,11 +102,46 @@ test("works as a plain text field without javascript", async ({ browser }) => {
   await context.close();
 });
 
+test("saves the collectable on ctrl/cmd + enter, keeping the typed tag", async ({
+  page,
+}) => {
+  await page.goto("/en/collectable/");
+  await page.locator(".collectable.thumbnail a").first().click();
+  await page.waitForURL(/collectable\/[0-9a-f-]+\//);
+
+  await page.locator(".tags-entry").fill("shortcut-tag");
+  await page.locator(".tags-entry").press("ControlOrMeta+Enter");
+
+  await expect(page.getByText(/updated successfully/i)).toBeVisible();
+  // Typed but never committed, and saved all the same.
+  await expect(page.locator('input[name="tags"]')).toHaveValue(/shortcut-tag/);
+});
+
+test("saves on ctrl/cmd + enter from a chip, without toggling it", async ({
+  page,
+}) => {
+  await page.goto("/en/collectable/");
+  await page.locator(".collectable.thumbnail a").first().click();
+  await page.waitForURL(/collectable\/[0-9a-f-]+\//);
+  const chip = page.locator(".tags-chip").first();
+  const pressed = await chip.getAttribute("aria-pressed");
+
+  await chip.focus();
+  await chip.press("ControlOrMeta+Enter");
+
+  await expect(page.getByText(/updated successfully/i)).toBeVisible();
+  // Enter on a button would activate it: the shortcut only saves.
+  await expect(page.locator(".tags-chip").first()).toHaveAttribute(
+    "aria-pressed",
+    pressed,
+  );
+});
+
 test("commits a tag on Enter instead of saving the collectable", async ({
   page,
 }) => {
-  // The details form saves on Enter from any of its inputs, which would be a
-  // trap for a field where Enter means "this tag is done".
+  // Enter means "this tag is done" here, and nothing else: the details form
+  // only saves on Ctrl/Cmd+Enter.
   await page.goto("/en/collectable/");
   await page.locator(".collectable.thumbnail a").first().click();
   await page.waitForURL(/collectable\/[0-9a-f-]+\//);
