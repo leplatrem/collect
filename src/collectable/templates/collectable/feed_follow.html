@@ -1,0 +1,17 @@
+{% load i18n %}
+<span class="feed-follow">
+    <a class="feed-main"
+       href="{{ feed_atom_url }}"
+       type="application/atom+xml"
+       title="{% translate "Follow this list in a feed reader (Atom)" %}">
+        <svg class="feed-icon"
+             viewBox="0 0 8 8"
+             aria-hidden="true"
+             focusable="false">
+            <circle cx="1.5" cy="6.5" r="1.5" />
+            <path d="M0 3v2c1.66 0 3 1.34 3 3h2c0-2.76-2.24-5-5-5z" />
+            <path d="M0 0v2c3.31 0 6 2.69 6 6h2c0-4.42-3.58-8-8-8z" />
+        </svg>
+        {% translate "Follow" %}
+    </a>
+</span>

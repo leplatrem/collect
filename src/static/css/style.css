@@ -845,6 +845,55 @@ header form#search input[type="search"]::-webkit-search-decoration {
 }
 
 /* =========================================================
+   Feeds
+   ========================================================= */
+
+.list-description {
+  margin-bottom: 0.3rem;
+  opacity: 0.7;
+}
+
+.list-summary {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+/* The margin rather than a flex `gap`: the same offer also sits at the end of
+   a heading, on the collection pages, where there is no flex row to space. */
+.feed-follow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+.feed-follow a {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  opacity: 0.45;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.feed-follow:hover a,
+.feed-follow:focus-within a {
+  opacity: 1;
+}
+
+.feed-follow a:hover {
+  text-decoration: underline;
+}
+
+.feed-icon {
+  width: 0.75em;
+  height: 0.75em;
+  fill: currentColor;
+}
+
+/* =========================================================
    Details page
    ========================================================= */
 

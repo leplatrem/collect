@@ -435,6 +435,10 @@ class Collectable(models.Model):
             return os.path.basename(self.source_file.name)
         return None
 
+    def title(self):
+        # Collectables have no title: build one as we can.
+        return self.description or os.path.basename(self.photo.name) or str(self.id)
+
     class Meta:
         verbose_name = _("Collectable")
         verbose_name_plural = _("Collectables")
