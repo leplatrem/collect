@@ -684,6 +684,14 @@ main.collectable.details #attributes form {
   }
 }
 
+/*
+Hide help text for tags widget *.as-columns
+*/
+main.collectable.create #attributes form .tags-widget + .helptext,
+main.collectable.details #attributes form .tags-widget + .helptext {
+  display: none;
+}
+
 /* =========================================================
    Header search
    ========================================================= */
