@@ -11,8 +11,15 @@ from django.forms import (
 from django.urls import Resolver404, resolve
 from django.utils.translation import gettext_lazy as _
 
-from collectable.models import UUID_REGEX, Collectable, DuplicateReport, Possession
+from collectable.models import (
+    UUID_REGEX,
+    Collectable,
+    DuplicateReport,
+    Possession,
+    popular_tags_names,
+)
 from cropper.fields import CropImageField
+from tagspills.widgets import TagPillsWidget
 
 
 class CollectableForm(ModelForm):
@@ -52,6 +59,14 @@ class CollectableForm(ModelForm):
         ]
         widgets = {
             "description": Textarea(attrs={"rows": "5"}),
+            "tags": TagPillsWidget(
+                get_vocabulary=popular_tags_names,
+                attrs={
+                    "autocapitalize": "none",
+                    "autocorrect": "off",
+                    "spellcheck": "false",
+                },
+            ),
         }
 
 

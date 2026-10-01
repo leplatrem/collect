@@ -1,0 +1,8 @@
+{% load i18n %}
+<div class="tags-widget">
+    <input type="text"
+           name="{{ widget.name }}"
+           {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+           {% include "django/forms/widgets/attrs.html" %}>
+    {{ widget.data|json_script:widget.data_id }}
+</div>

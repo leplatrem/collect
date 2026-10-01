@@ -216,6 +216,27 @@ msgstr "Je possède cet objet."
 msgid "Spare"
 msgstr "Double"
 
+#, python-format
+msgid "Remove tag %(tag)s"
+msgstr "Retirer l'étiquette %(tag)s"
+
+#, python-format
+msgid "Added tag %(tag)s"
+msgstr "Étiquette %(tag)s ajoutée"
+
+#, python-format
+msgid "Removed tag %(tag)s"
+msgstr "Étiquette %(tag)s retirée"
+
+msgid "Add a tag..."
+msgstr "Ajouter une étiquette..."
+
+msgid "Most used tags:"
+msgstr "Étiquettes les plus utilisées :"
+
+msgid "Tag suggestions"
+msgstr "Suggestions d'étiquettes"
+
 msgid "I have a spare copy of this one, available for swap."
 msgstr "J'ai un double de cet objet, disponible pour un échange."
 

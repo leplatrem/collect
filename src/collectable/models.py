@@ -48,6 +48,20 @@ class UUIDTaggedItem(
         verbose_name_plural = _("Tags")
 
 
+def popular_tags_names():
+    """
+    Tags with most collectables.
+    """
+    return (
+        Tag.objects.annotate(
+            ncollectable=Count("collectable", filter=Q(collectable__hidden=False))
+        )
+        .filter(ncollectable__gt=0)
+        .order_by("-ncollectable", "name")
+        .values_list("name", flat=True)[: settings.TAG_COMPLETION_LIST_COUNT]
+    )
+
+
 class CollectableQuerySet(models.QuerySet):
     """
     Custom QuerySet for Collectable model to include methods for prefetching.

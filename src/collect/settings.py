@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "collectable.apps.CollectableConfig",
     "accounts",
     "cropper",
+    "tagspills",
     # 3rd party
     "simple_history",
     "taggit",
@@ -333,6 +334,13 @@ RELATED_COLLECTABLES_LIST_COUNT = config(
 # Number of history entries shown on the details page. Unbounded otherwise,
 # and every save appends one.
 HISTORY_LIST_COUNT: int = config("COLLECT_HISTORY_LIST_COUNT", default=20, cast=int)
+# Tag names that we ship in the page to provide completion.
+TAG_COMPLETION_LIST_COUNT: int = config(
+    "COLLECT_TAG_COMPLETION_LIST_COUNT", default=500, cast=int
+)
+POPULAR_TAG_LIST_COUNT: int = config(
+    "COLLECT_POPULAR_TAG_LIST_COUNT", default=10, cast=int
+)
 # Number of collectable IDs kept in session to navigate from one collectable to
 # the previous/next one. Every list page stores them, and every request reads
 # them back, so this directly drives the size of each session.
