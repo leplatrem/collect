@@ -243,7 +243,7 @@ a.more:hover {
 .collectable.thumbnail a {
   overflow: hidden;
   display: block;
-  max-height: 260px;
+  max-height: 293px;
 }
 
 .collectable.thumbnail:hover {
