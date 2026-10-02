@@ -21,7 +21,7 @@ from taggit.managers import TaggableManager
 from taggit.models import Tag
 
 from collect.utils import tags_joiner
-from collectable.processors import FlattenOnWhite
+from collectable.processors import ExifTranspose, FlattenOnWhite
 from collectable.search import QBuilder
 from collectable.validators import (
     MaxFileSizeValidator,
@@ -236,6 +236,7 @@ class Collectable(models.Model):
     thumbnail = ImageSpecField(
         source="photo",
         processors=[
+            ExifTranspose(),
             Thumbnail(
                 settings.COLLECTABLE_THUMBNAIL_SIZE,
                 settings.COLLECTABLE_THUMBNAIL_SIZE,

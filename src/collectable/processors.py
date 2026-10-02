@@ -1,4 +1,11 @@
-from PIL import Image
+from PIL import Image, ImageOps
+
+
+class ExifTranspose:
+    """Rotate/flip the image according to its EXIF orientation tag."""
+
+    def process(self, image):
+        return ImageOps.exif_transpose(image)
 
 
 class FlattenOnWhite:
