@@ -43,14 +43,10 @@
             <div class="collectable-grid" id="collectable-list">
                 {% for collectable in page_obj %}
                     {% if page_obj.has_next and forloop.counter == page_obj|next_page_reveal_index %}
-                        <span class="invisible"
-                              hx-get="{% page_url page_obj.next_page_number %}"
-                              hx-swap="beforeend"
-                              hx-target="#collectable-list"
-                              hx-select="#collectable-list > *"
-                              hx-trigger="revealed"></span>
+                        {% include "collectable/collectable_thumbnail.html" with load_next_page=True %}
+                    {% else %}
+                        {% include "collectable/collectable_thumbnail.html" %}
                     {% endif %}
-                    {% include "collectable/collectable_thumbnail.html" %}
                 {% empty %}
                     {{ empty_message }}
                 {% endfor %}

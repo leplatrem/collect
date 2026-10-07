@@ -163,8 +163,13 @@ button.link {
   margin-top: 1rem;
 }
 
-.invisible {
-  display: none;
+/* Infinite scroll trigger: zero-sized, but laid out so htmx can tell when it is revealed. */
+.next-page-trigger {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
 }
 
 /* Hidden on screen, still announced by screen readers. */

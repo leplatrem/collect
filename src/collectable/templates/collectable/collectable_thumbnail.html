@@ -1,6 +1,15 @@
 {% load i18n %}
 {% load collectable_extras %}
 <div class="collectable thumbnail">
+    {% if load_next_page %}
+        {# Positioned in the card: a `display: none` trigger is always considered revealed by htmx. #}
+        <span class="next-page-trigger"
+              hx-get="{% page_url page_obj.next_page_number %}"
+              hx-swap="beforeend"
+              hx-target="#collectable-list"
+              hx-select="#collectable-list > *"
+              hx-trigger="revealed"></span>
+    {% endif %}
     <a href="{% url "collectable:details" collectable.id %}"
        title="{% if collectable.description %}{{ collectable.description }}{% endif %}">
         <img alt="{% if collectable.description %}{{ collectable.description }}{% else %}{% blocktranslate with obj=collectable %}Thumbnail of {{ obj }}{% endblocktranslate %}{% endif %}" height="{{ COLLECTABLE_THUMBNAIL_SIZE }}" width="{{ COLLECTABLE_THUMBNAIL_SIZE }}" src="{{ collectable.thumbnail.url }}" />
