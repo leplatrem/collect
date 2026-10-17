@@ -2,10 +2,18 @@
 {% load i18n %}
 {% load collectable_extras %}
 {% block title %}{{ title }}{% endblock %}
+{% block meta %}
+    <link rel="alternate"
+          type="application/atom+xml"
+          title="{{ title }} (Atom)"
+          href="{{ feed_atom_url }}" />
+{% endblock meta %}
 {% block content %}
     <h1>{{ title }}</h1>
-    <p>
+    <p class="list-description">{{ list_description }}</p>
+    <p class="list-summary">
         {% blocktranslate count counter=page_obj.paginator.count %}{{ counter }} collectable.{% plural %}{{counter}} collectables.{% endblocktranslate %}
+        {% include "collectable/feed_follow.html" %}
     </p>
     {% if is_search %}
         {% if search_keywords and not advanced_search %}

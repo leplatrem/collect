@@ -2,47 +2,13 @@ from django.urls import path, re_path
 
 from collect.throttle import throttle
 
-from . import views
+from . import feeds, views
 
 
 urlpatterns = [
     path("", views.index, name="index"),
     path("profile/", views.profile, name="profile"),
     path("trades/", views.trades, name="trades"),
-    path(
-        "latest/",
-        views.CollectableListView.as_view(kind="latest"),
-        name="latest",
-    ),
-    path(
-        "most-liked/",
-        views.CollectableListView.as_view(kind="most_liked"),
-        name="most-liked",
-    ),
-    path(
-        "most-wanted/",
-        views.CollectableListView.as_view(kind="most_wanted"),
-        name="most-wanted",
-    ),
-    path(
-        "most-owned/",
-        views.CollectableListView.as_view(kind="most_owned"),
-        name="most-owned",
-    ),
-    path(
-        "most-spares/",
-        views.CollectableListView.as_view(kind="most_spares"),
-        name="most-spares",
-    ),
-    # Searching is the most expensive read of the site (it scans descriptions
-    # and tags), and the search box queries it as the visitor types.
-    path(
-        "search/",
-        throttle("search", "THROTTLE_SEARCH", methods=("GET",))(
-            views.CollectableListView.as_view(kind="search")
-        ),
-        name="search",
-    ),
     path("create/", views.create, name="create"),
     path("<uuid:id>/", views.details, name="details"),
     path("<uuid:id>/duplicate/", views.DuplicateView.as_view(), name="duplicate"),
@@ -52,4 +18,28 @@ urlpatterns = [
         views.collection,
         name="collection",
     ),
+    re_path(
+        r"^collection/(?P<slugs>[0-9a-zA-Z_\-]+(,[0-9a-zA-Z_\-]+)*)/feed.atom$",
+        feeds.CollectionAtomFeed(),
+        name="collection-feed",
+    ),
 ]
+
+
+def lists_urlpatterns():
+    for kind in views.LIST_ORDERING:
+        slug = kind.replace("_", "-")
+
+        list_view = views.CollectableListView.as_view(kind=kind)
+        feed_view = feeds.CollectableListAtomFeed(kind=kind)
+
+        if kind == "search":
+            throttle_dec = throttle("search", "THROTTLE_SEARCH", methods=("GET",))
+            list_view = throttle_dec(list_view)
+            feed_view = throttle_dec(feed_view)
+
+        yield path(f"{slug}/", list_view, name=slug)
+        yield path(f"{slug}/feed.atom", feed_view, name=f"{slug}-feed")
+
+
+urlpatterns += list(lists_urlpatterns())

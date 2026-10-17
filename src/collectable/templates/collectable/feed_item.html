@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load collectable_extras %}
+{% spaceless %}
+    <p>
+        <a href="{% fullurl obj.get_absolute_url %}">
+            <img alt="{% if obj.description %}{{ obj.description }}{% else %}{% blocktranslate with id=obj.id %}Thumbnail of {{ id }}{% endblocktranslate %}{% endif %}" height="{{ COLLECTABLE_THUMBNAIL_SIZE }}" width="{{ COLLECTABLE_THUMBNAIL_SIZE }}" src="{% fullurl obj.thumbnail.url %}" />
+        </a>
+    </p>
+    {% if obj.description %}<p>{{ obj.description }}</p>{% endif %}
+    {% if obj.tags_list %}
+        {# Kept on one line: a feed reader shows what is between the links. #}
+        <p>{% for tag in obj.tags_list %}{% url "collectable:collection" tag.slug as tag_page %}<a href="{% fullurl tag_page %}">#{{ tag.name }}</a>{% if not forloop.last %}&nbsp;{% endif %}{% endfor %}</p>
+    {% endif %}
+{% endspaceless %}

@@ -5,6 +5,12 @@
 {% block title %}
     {% translate "Collection" %}
 {% endblock %}
+{% block meta %}
+    <link rel="alternate"
+          type="application/atom+xml"
+          title="{% translate "Collection" %} {{ slugs|join:", " }} (Atom)"
+          href="{{ feed_atom_url }}" />
+{% endblock meta %}
 {% block content %}
     <h1>
         {% translate "Collection" %}
@@ -19,6 +25,7 @@
         {% plural %}
         {{ counter }} Results
         {% endblocktranslate %}
+        {% include "collectable/feed_follow.html" %}
     </h2>
     {% if user.is_authenticated %}
         <input type="checkbox"
