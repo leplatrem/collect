@@ -9,6 +9,9 @@ x-app-env: &app-env
   # to start with a published key when DJANGO_DEBUG is off).
   DJANGO_SECRET_KEY: local-composition-only
   DJANGO_REDIS_URL: redis://cache:6379/0
+  # The browser tests log in about twenty times in a row, from one address:
+  # the default rate limit is meant for a public deployment, not for them.
+  COLLECT_THROTTLE_LOGIN: 200/60
 
 services:
   web:
@@ -80,7 +83,10 @@ services:
       sh -c "
         uv run manage.py smart_create_user --admin admin s3cr3t &&
         uv run manage.py smart_create_user testuser testpass &&
-        uv run manage.py smart_create_user --collector collector collectorpass
+        uv run manage.py smart_create_user --collector collector collectorpass &&
+        uv run manage.py smart_create_user --collector partner partnerpass &&
+        uv run manage.py smart_create_user alice alicepass &&
+        uv run manage.py smart_create_user bob bobpass &&
         uv run manage.py loadfolder testuser /mnt/demo
       "
     volumes:
