@@ -27,9 +27,12 @@ services:
       - ./.env:/app/.env
       - media-folder:/mnt/media:rw
     depends_on:
-      - db
-      - cache
-      - init
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
 
   db:
     image: postgres:15
@@ -40,11 +43,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "collectdb"]
-      interval: 30s
-      timeout: 60s
-      retries: 5
-      start_period: 80s
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   # Shared cache: sessions and thumbnail existence, so that they are not
   # recomputed by every worker process.
@@ -67,7 +70,8 @@ services:
     volumes:
       - ./.env:/app/.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   demo:
     image: collect:latest
@@ -88,7 +92,8 @@ services:
       - ./demo:/mnt/demo
       - media-folder:/mnt/media:rw
     depends_on:
-      - init
+      init:
+        condition: service_completed_successfully
 
 volumes:
   media-folder:
