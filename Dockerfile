@@ -1,4 +1,4 @@
-FROM python:3.12.5 AS python-base
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
@@ -27,9 +27,10 @@ ENV PYTHONUNBUFFERED=1 \
 # processing a big image is returned to the system.
 ENV GUNICORN_CMD_ARGS="--bind ${HOST}:${PORT} --threads 4 --timeout 60 --max-requests 1000 --max-requests-jitter 100 --access-logfile '-' --error-logfile '-' --capture-output"
 
-# Install system dependencies
+# Runtime dependencies. Python packages use prebuilt wheels, so compiler and
+# PostgreSQL development headers are not needed in the application image.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential libpq-dev gettext libmagic1 && \
+    apt-get install -y --no-install-recommends gettext libmagic1 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip install uv

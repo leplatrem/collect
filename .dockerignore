@@ -4,3 +4,13 @@ db.sqlite3
 .env
 .*_cache
 .venv/
+node_modules/
+.git/
+demo/
+media-folder/
+db-folder/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+test-results/
+.coverage
